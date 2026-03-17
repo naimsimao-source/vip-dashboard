@@ -686,16 +686,24 @@ const DAILY_CONTRIBUTORS_16 = [
 // ═══════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════
-let USERS = JSON.parse(localStorage.getItem('vip_users') || 'null') || [
-  {login:'admin', name:'Admin', password:'admin@2026', role:'admin'},
-  {login:'cmo', name:'CMO', password:'cmo@2026', role:'CMO'},
-  {login:'coo', name:'COO', password:'coo@2026', role:'COO'},
+const BASE_USERS = [
+  {login:'admin',        name:'Admin',          password:'admin@2026',  role:'admin'},
+  {login:'joao.avila',   name:'João Ávila',      password:'galera@2026', role:'CMO'},
+  {login:'teresa.caeiro',name:'Teresa Caeiro',   password:'galera@2026', role:'COO'},
+  {login:'andre.zanotti', name:'Andre Zanotti',  password:'galera@2026', role:'VIP'},
+  {login:'andre.santos', name:'André Santos',    password:'galera@2026', role:'CRM'},
 ];
+// Merge base users with any extra users created via Admin panel
+const savedExtra = JSON.parse(localStorage.getItem('vip_extra_users') || '[]');
+let USERS = [...BASE_USERS, ...savedExtra.filter(u => !BASE_USERS.find(b => b.login === u.login))];
 let currentUser = null;
 let selectedDate = '16-03';
 let chartsInstances = {};
 
-function saveUsers() { localStorage.setItem('vip_users', JSON.stringify(USERS)); }
+function saveUsers() {
+  const extra = USERS.filter(u => !BASE_USERS.find(b => b.login === u.login));
+  localStorage.setItem('vip_extra_users', JSON.stringify(extra));
+}
 
 function doLogin() {
   const u = document.getElementById('username').value.trim();
