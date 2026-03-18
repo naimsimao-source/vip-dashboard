@@ -13,6 +13,27 @@
   --text: #f0f0f5; --muted: #5a5a72; --pos: #c8ff00; --neg: #ff4d6d;
   --sidebar-w: 220px;
 }
+
+/* LIGHT MODE */
+body.light {
+  --bg: #f4f4f0; --surface: #ffffff; --surface2: #f0f0ea;
+  --border: rgba(0,0,0,0.09); --text: #111118; --muted: #8888a0;
+  --pos: #4a8c00; --neg: #d63050;
+}
+body.light .kpi-value { color: var(--kpi-color, var(--text)); }
+body.light .form-group input { background: #f4f4f0; }
+body.light .date-btn, body.light .filter-tab { background: #f0f0ea; }
+body.light .date-btn.active, body.light .filter-tab.active { background: var(--accent); color: #000; }
+body.light .chart-card, body.light .table-card, body.light .kpi-card,
+body.light .hall-card, body.light .insight-box, body.light .vip-card,
+body.light .upload-zone, body.light .monthly-highlight { background: #ffffff; }
+body.light .mh-cell { background: #ffffff; }
+body.light .login-box { background: #ffffff; }
+body.light td, body.light th { color: var(--text); }
+body.light .td-pos { color: var(--pos); }
+body.light .td-neg { color: var(--neg); }
+body.light .sidebar-overlay.open { background: rgba(0,0,0,.4); }
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
@@ -205,6 +226,14 @@ tr:hover td{background:var(--surface2)}
   .kpi-grid{grid-template-columns:1fr}
   .monthly-highlight{grid-template-columns:1fr}
 }
+
+.theme-toggle{display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;padding:8px 0;width:100%}
+.theme-toggle-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;flex:1}
+.toggle-switch{width:38px;height:20px;background:var(--border);border-radius:20px;position:relative;transition:background .2s;flex-shrink:0;border:1px solid var(--border)}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted);transition:all .2s}
+body.light .toggle-switch{background:var(--accent);border-color:var(--accent)}
+body.light .toggle-switch::after{left:20px;background:#000}
+.theme-toggle-icon{font-size:14px}
 </style>
 </head>
 <body>
@@ -226,6 +255,7 @@ tr:hover td{background:var(--surface2)}
   <!-- Mobile header -->
   <div class="mobile-header">
     <div class="mobile-logo">Daily<span>Result</span></div>
+    <button class="mobile-menu-btn" onclick="toggleTheme()" style="font-size:18px;margin-right:4px;" title="Tema">☀️</button>
     <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
   </div>
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -250,6 +280,11 @@ tr:hover td{background:var(--surface2)}
       <div class="sidebar-user-name" id="user-display">—</div>
       <div class="sidebar-user-role" id="role-display">—</div>
       <button class="btn-logout" onclick="doLogout()">Sair</button>
+      <div class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
+        <span class="theme-toggle-icon" id="theme-icon">☀️</span>
+        <span class="theme-toggle-label" id="theme-label">Light</span>
+        <div class="toggle-switch" id="theme-switch"></div>
+      </div>
     </div>
   </aside>
 
@@ -499,7 +534,33 @@ function doLogin(){
   initApp();
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();});
+document.addEventListener('DOMContentLoaded', applyStoredTheme);
 function doLogout(){currentUser=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('username').value='';document.getElementById('password').value='';document.getElementById('login-error').style.display='none';}
+
+
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('vip_theme', isLight ? 'light' : 'dark');
+  const icon = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  if(icon) icon.textContent = isLight ? '🌙' : '☀️';
+  if(label) label.textContent = isLight ? 'Dark' : 'Light';
+  // Update mobile toggle icon too
+  const mobileBtn = document.querySelector('.mobile-header .mobile-menu-btn');
+  if(mobileBtn) mobileBtn.textContent = isLight ? '🌙' : '☀️';
+}
+function applyStoredTheme(){
+  const stored = localStorage.getItem('vip_theme');
+  if(stored === 'light'){
+    document.body.classList.add('light');
+    const icon = document.getElementById('theme-icon');
+    const label = document.getElementById('theme-label');
+    if(icon) icon.textContent = '🌙';
+    if(label) label.textContent = 'Dark';
+    const mobileBtn = document.querySelector('.mobile-header .mobile-menu-btn');
+    if(mobileBtn) mobileBtn.textContent = '🌙';
+  }
+}
 
 function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('open');
