@@ -763,6 +763,13 @@ function renderInsights(){
   // Churn risk: days where players dropped vs previous
   const churnRiskDays=DAILY_DATA.filter((d,i)=>i>0&&d.players<DAILY_DATA[i-1].players*0.95);
 
+  const _wkd=DAILY_DATA.filter(d=>{const p=d.date.split('-');const dt=new Date(2026,2,parseInt(p[0]));const dw=dt.getDay();return dw>=1&&dw<=5;});
+  const _wke=DAILY_DATA.filter(d=>{const p=d.date.split('-');const dt=new Date(2026,2,parseInt(p[0]));const dw=dt.getDay();return dw===0||dw===6;});
+  const _aWd=_wkd.length?_wkd.reduce((s,d)=>s+d.ggr,0)/_wkd.length:0;
+  const _aWe=_wke.length?_wke.reduce((s,d)=>s+d.ggr,0)/_wke.length:0;
+  const _dff=_aWe-_aWd;
+  const weeklyInsightText='Em dias úteis (seg–sex), o GGR médio foi <strong>'+fmtM(_aWd)+'<\/strong>. Nos fins de semana, <strong>'+fmtM(_aWe)+'<\/strong> — uma diferença de <strong>'+fmtM(_dff)+'<\/strong> ('+(_dff>=0?'+':'')+(_aWd!==0?((_dff/Math.abs(_aWd))*100).toFixed(1):0)+'%). '+(_dff>0?'Os fins de semana são mais lucrativos — vale intensificar promoções nestes dias.':'Os dias úteis têm desempenho superior — o público VIP pode ser mais ativo durante a semana.');
+
   const insights=[
     {color:'#c8ff00',eyebrow:'📈 Previsão de Tendência (Regressão Linear)',
      title:`Próximos 3 dias estimados: ${fmtM(forecastD1)}, ${fmtM(forecastD2)}, ${fmtM(forecastD3)}`,
@@ -781,14 +788,7 @@ function renderInsights(){
      text:`O NGR acumulado representa <strong>${ngrMargin}%</strong> do GGR bruto. ${parseFloat(ngrMargin)>60?'Esta margem é sólida e indica boa gestão de custos operacionais.':'Esta margem está abaixo do ideal (>60%), sugerindo revisão dos custos de bônus e promoções.'} O total depositado de <strong>${fmtM(totalDep)}</strong> em ${n} dias representa uma média de <strong>${fmtM(totalDep/n)}/dia</strong>. Existe correlação entre os dias de maior depósito e maior GGR — focar em ativações de depósito pode ampliar receita.`},
     {color:'#c8ff00',eyebrow:'🔮 Análise de Padrão Semanal',
      title:'Fins de semana geram maior volume de GGR',
-     text:()=>{
-       const weekdays=DAILY_DATA.filter(d=>{const parts=d.date.split('-');const dt=new Date(2026,2,parseInt(parts[0]));const dow=dt.getDay();return dow>=1&&dow<=5;});
-       const weekend=DAILY_DATA.filter(d=>{const parts=d.date.split('-');const dt=new Date(2026,2,parseInt(parts[0]));const dow=dt.getDay();return dow===0||dow===6;});
-       const avgWd=weekdays.length?weekdays.reduce((s,d)=>s+d.ggr,0)/weekdays.length:0;
-       const avgWe=weekend.length?weekend.reduce((s,d)=>s+d.ggr,0)/weekend.length:0;
-       const diff=avgWe-avgWd;
-       return`Em dias úteis (seg–sex), o GGR médio foi <strong>${fmtM(avgWd)}</strong>. Nos fins de semana, <strong>${fmtM(avgWe)}</strong> — uma diferença de <strong>${fmtM(diff)}</strong> (${diff>=0?'+':''}${avgWd!==0?((diff/Math.abs(avgWd))*100).toFixed(1):0}%). ${diff>0?'Os fins de semana são mais lucrativos — vale intensificar promoções nestes dias.':'Os dias úteis têm desempenho superior — o público VIP pode ser mais ativo durante a semana.'}`;
-     }()},
+     text:weeklyInsightText},
   ];
 
   document.getElementById('insights-container').innerHTML=`<div class="insights-grid">${insights.map(ins=>`<div class="insight-box" style="--box-color:${ins.color}"><div class="insight-eyebrow">${ins.eyebrow}</div><div class="insight-title">${ins.title}</div><div class="insight-text">${ins.text}</div></div>`).join('')}</div>`;
