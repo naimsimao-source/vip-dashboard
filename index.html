@@ -16,23 +16,129 @@
 
 /* LIGHT MODE */
 body.light {
-  --bg: #f4f4f0; --surface: #ffffff; --surface2: #f0f0ea;
-  --border: rgba(0,0,0,0.09); --text: #111118; --muted: #8888a0;
-  --pos: #4a8c00; --neg: #d63050;
+  --bg: #f0f2f5;
+  --surface: #ffffff;
+  --surface2: #e8eaed;
+  --border: rgba(0,0,0,0.11);
+  --accent: #5a8a00;
+  --accent2: #0077aa;
+  --text: #0d0d14;
+  --muted: #6b6b88;
+  --pos: #3d7a00;
+  --neg: #c0002a;
+  --sidebar-w: 220px;
 }
-body.light .kpi-value { color: var(--kpi-color, var(--text)); }
-body.light .form-group input { background: #f4f4f0; }
-body.light .date-btn, body.light .filter-tab { background: #f0f0ea; }
-body.light .date-btn.active, body.light .filter-tab.active { background: var(--accent); color: #000; }
-body.light .chart-card, body.light .table-card, body.light .kpi-card,
-body.light .hall-card, body.light .insight-box, body.light .vip-card,
-body.light .upload-zone, body.light .monthly-highlight { background: #ffffff; }
-body.light .mh-cell { background: #ffffff; }
-body.light .login-box { background: #ffffff; }
-body.light td, body.light th { color: var(--text); }
+/* Base backgrounds */
+body.light { background: var(--bg); color: var(--text); }
+body.light .sidebar { background: #ffffff; border-color: rgba(0,0,0,0.1); }
+body.light .mobile-header { background: #ffffff; border-color: rgba(0,0,0,0.1); }
+body.light .sidebar-overlay.open { background: rgba(0,0,0,0.45); }
+
+/* Login */
+body.light #login-screen { background: var(--bg); }
+body.light .login-box { background: #ffffff; border-color: rgba(0,0,0,0.1); }
+body.light .form-group input { background: var(--bg); border-color: rgba(0,0,0,0.15); color: var(--text); }
+body.light .form-group input::placeholder { color: var(--muted); }
+body.light .btn-login { background: var(--accent); color: #ffffff; }
+
+/* Nav */
+body.light .nav-item { color: var(--muted); }
+body.light .nav-item:hover { color: var(--text); background: var(--surface2); }
+body.light .nav-item.active { color: var(--accent); border-left-color: var(--accent); }
+body.light .nav-section { color: var(--muted); }
+body.light .sidebar-user-name { color: var(--text); }
+body.light .btn-logout { border-color: rgba(0,0,0,0.15); color: var(--muted); }
+body.light .btn-logout:hover { border-color: var(--neg); color: var(--neg); }
+
+/* Cards & surfaces */
+body.light .kpi-card { background: #ffffff; border-color: rgba(0,0,0,0.09); }
+body.light .kpi-card::after { opacity: 0.6; }
+body.light .kpi-label { color: var(--muted); }
+body.light .kpi-sub { color: var(--muted); }
+body.light .kpi-delta.up { background: rgba(61,122,0,0.1); color: var(--pos); }
+body.light .kpi-delta.down { background: rgba(192,0,42,0.1); color: var(--neg); }
+body.light .kpi-delta.neutral { background: rgba(107,107,136,0.12); color: var(--muted); }
+
+/* Chart cards */
+body.light .chart-card { background: #ffffff; border-color: rgba(0,0,0,0.09); }
+body.light .chart-title { color: var(--muted); }
+
+/* Tables */
+body.light .table-card { background: #ffffff; border-color: rgba(0,0,0,0.09); }
+body.light .table-header { border-color: rgba(0,0,0,0.09); }
+body.light .table-title { color: var(--muted); }
+body.light th { color: var(--muted); border-color: rgba(0,0,0,0.09); }
+body.light td { color: var(--text); border-color: rgba(255,255,255,0); }
+body.light tr:hover td { background: var(--surface2); }
 body.light .td-pos { color: var(--pos); }
 body.light .td-neg { color: var(--neg); }
-body.light .sidebar-overlay.open { background: rgba(0,0,0,.4); }
+body.light .td-neutral { color: var(--accent2); }
+
+/* Date / filter buttons */
+body.light .date-btn { background: #ffffff; border-color: rgba(0,0,0,0.12); color: var(--muted); }
+body.light .date-btn:hover { border-color: var(--accent); color: var(--text); }
+body.light .date-btn.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+body.light .filter-tab { background: #ffffff; border-color: rgba(0,0,0,0.12); color: var(--muted); }
+body.light .filter-tab:hover { border-color: var(--accent); color: var(--text); }
+body.light .filter-tab.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+
+/* VIP cards */
+body.light .vip-card { background: #ffffff; border-color: rgba(0,0,0,0.09); }
+body.light .vip-level-title { color: var(--text); }
+body.light .vip-stat-label { color: var(--muted); }
+body.light .vip-stat-value { color: var(--text); }
+body.light .vip-badge-p { background: rgba(61,122,0,0.1); color: var(--pos); border-color: rgba(61,122,0,0.25); }
+body.light .vip-badge-n { background: rgba(192,0,42,0.1); color: var(--neg); border-color: rgba(192,0,42,0.2); }
+
+/* Hall da fama */
+body.light .hall-card { background: #ffffff; border-color: rgba(0,0,0,0.09); }
+body.light .hall-header { border-color: rgba(0,0,0,0.09); }
+body.light .hall-title.win { color: var(--pos); }
+body.light .hall-title.con { color: var(--accent2); }
+body.light .hall-row { border-color: rgba(0,0,0,0.05); }
+body.light .hall-username { color: var(--text); }
+body.light .hall-rank { color: var(--muted); }
+body.light .hall-rank.top { color: var(--accent); }
+body.light .hall-count.win { background: rgba(61,122,0,0.1); color: var(--pos); }
+body.light .hall-count.con { background: rgba(0,119,170,0.1); color: var(--accent2); }
+body.light .badge-new { background: rgba(61,122,0,0.15); color: var(--pos); }
+body.light .badge-up { background: rgba(0,119,170,0.12); color: var(--accent2); }
+body.light .badge-down { background: rgba(192,0,42,0.1); color: var(--neg); }
+
+/* Insights */
+body.light .insight-box { background: #ffffff; border-color: rgba(0,0,0,0.09); }
+body.light .insight-eyebrow { color: var(--muted); }
+body.light .insight-title { color: var(--text); }
+body.light .insight-text { color: #3a3a50; }
+body.light .insight-text strong { color: var(--text); }
+
+/* Monthly highlight */
+body.light .monthly-highlight { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.09); }
+body.light .mh-cell { background: #ffffff; }
+body.light .mh-label { color: var(--muted); }
+
+/* Admin */
+body.light .upload-zone { background: #ffffff; border-color: rgba(0,0,0,0.15); }
+body.light .upload-zone:hover { background: rgba(90,138,0,0.04); border-color: var(--accent); }
+body.light .upload-text { color: var(--muted); }
+body.light .upload-text strong { color: var(--text); }
+body.light .upload-sub { color: var(--muted); }
+body.light .log-time { color: var(--muted); }
+body.light .log-ok { color: var(--pos); }
+body.light .log-err { color: var(--neg); }
+body.light .btn-add { background: var(--surface2); border-color: rgba(0,0,0,0.12); color: var(--text); }
+body.light .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+body.light .btn-danger { border-color: rgba(192,0,42,0.3); color: var(--neg); }
+
+/* Page titles & badges */
+body.light .page-eyebrow { color: var(--muted); }
+body.light .badge-live { background: rgba(90,138,0,0.1); color: var(--accent); border-color: rgba(90,138,0,0.3); }
+body.light .sep { background: rgba(0,0,0,0.08); }
+
+/* Toggle switch */
+body.light .toggle-switch { background: var(--accent); border-color: var(--accent); }
+body.light .toggle-switch::after { left: 20px; background: #ffffff; }
+body.light .theme-toggle-label { color: var(--muted); }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -541,25 +647,23 @@ function doLogout(){currentUser=null;document.getElementById('login-screen').sty
 function toggleTheme(){
   const isLight = document.body.classList.toggle('light');
   localStorage.setItem('vip_theme', isLight ? 'light' : 'dark');
+  updateThemeUI(isLight);
+}
+function updateThemeUI(isLight){
   const icon = document.getElementById('theme-icon');
   const label = document.getElementById('theme-label');
-  if(icon) icon.textContent = isLight ? '🌙' : '☀️';
+  // isLight=true  → currently in light mode → show "Dark" (switch back to dark)
+  // isLight=false → currently in dark mode  → show "Light" (switch to light)
+  if(icon)  icon.textContent  = isLight ? '🌙' : '☀️';
   if(label) label.textContent = isLight ? 'Dark' : 'Light';
-  // Update mobile toggle icon too
-  const mobileBtn = document.querySelector('.mobile-header .mobile-menu-btn');
-  if(mobileBtn) mobileBtn.textContent = isLight ? '🌙' : '☀️';
+  const mobileBtns = document.querySelectorAll('.mobile-header .mobile-menu-btn');
+  if(mobileBtns[0]) mobileBtns[0].textContent = isLight ? '🌙' : '☀️';
 }
 function applyStoredTheme(){
   const stored = localStorage.getItem('vip_theme');
-  if(stored === 'light'){
-    document.body.classList.add('light');
-    const icon = document.getElementById('theme-icon');
-    const label = document.getElementById('theme-label');
-    if(icon) icon.textContent = '🌙';
-    if(label) label.textContent = 'Dark';
-    const mobileBtn = document.querySelector('.mobile-header .mobile-menu-btn');
-    if(mobileBtn) mobileBtn.textContent = '🌙';
-  }
+  const isLight = stored === 'light';
+  if(isLight) document.body.classList.add('light');
+  updateThemeUI(isLight);
 }
 
 function toggleSidebar(){
