@@ -340,6 +340,30 @@ tr:hover td{background:var(--surface2)}
 body.light .toggle-switch{background:var(--accent);border-color:var(--accent)}
 body.light .toggle-switch::after{left:20px;background:#000}
 .theme-toggle-icon{font-size:14px}
+
+/* MAP PAGE */
+.map-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;}
+.ctrl-group{display:flex;flex-direction:column;gap:6px;}
+.map-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start;}
+.map-sidebar{}
+.state-path{stroke:var(--bg);stroke-width:0.6;transition:all .2s;cursor:pointer;}
+.state-path:hover{stroke:var(--accent);stroke-width:1.4;filter:brightness(1.25);}
+.state-path.map-selected{stroke:var(--accent);stroke-width:2;filter:brightness(1.4);}
+.state-label-svg{font-size:7.5px;font-family:'DM Mono',monospace;fill:rgba(0,0,0,.75);pointer-events:none;font-weight:700;}
+.map-rank-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.03);gap:9px;cursor:pointer;transition:background .15s;}
+.map-rank-row:hover{background:var(--surface2);}
+.map-rank-row.map-rank-active{background:rgba(200,255,0,.06);border-left:2px solid var(--accent);}
+.map-rank-num{font-size:11px;font-weight:800;color:var(--muted);width:22px;font-family:'DM Mono',monospace;}
+.map-rank-num.map-top{color:var(--accent);}
+.map-rank-name{flex:1;font-size:12px;font-weight:600;}
+.map-rank-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);}
+.map-rank-bar{width:50px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.map-rank-fill{height:100%;border-radius:2px;background:var(--accent);}
+.map-kpi-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.map-kpi-row:last-child{border-bottom:none;}
+.map-kpi-label{font-size:11px;color:var(--muted);}
+.map-kpi-value{font-size:13px;font-family:'DM Mono',monospace;font-weight:700;}
+@media(max-width:900px){.map-layout{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -380,6 +404,7 @@ body.light .toggle-switch::after{left:20px;background:#000}
       <div class="nav-item" onclick="showPage('vip')"><span class="icon">◆</span> VIP Levels</div>
       <div class="nav-item" onclick="showPage('hall')"><span class="icon">★</span> Hall da Fama</div>
       <div class="nav-item" onclick="showPage('historico')"><span class="icon">◎</span> Histórico</div>
+      <div class="nav-item" onclick="showPage('mapa')"><span class="icon">⊕</span> Mapa VIP</div>
       <div class="nav-item" onclick="showPage('insights')"><span class="icon">⟳</span> Insights IA</div>
       <div id="admin-nav" class="nav-item" onclick="showPage('admin')" style="display:none;"><span class="icon">⚙</span> Admin</div>
     </nav>
@@ -622,6 +647,68 @@ body.light .toggle-switch::after{left:20px;background:#000}
       </div>
     </div>
 
+
+    <!-- MAPA VIP -->
+    <div class="page" id="page-mapa">
+      <div class="page-header">
+        <div class="page-eyebrow">Geolocalização</div>
+        <div class="page-title">Mapa <span>VIP</span></div>
+      </div>
+      <div class="map-controls" style="margin-bottom:20px;">
+        <div class="ctrl-group">
+          <div class="ctrl-label" style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Métrica</div>
+          <div class="filter-tabs" id="map-metric-tabs">
+            <div class="filter-tab active" onclick="setMapMetric('players',this)">Players</div>
+            <div class="filter-tab" onclick="setMapMetric('ngr',this)">NGR</div>
+            <div class="filter-tab" onclick="setMapMetric('deposit',this)">Depósitos</div>
+          </div>
+        </div>
+        <div class="ctrl-group" style="margin-left:8px;">
+          <div class="ctrl-label" style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">VIP Level</div>
+          <div class="filter-tabs" id="map-vip-tabs">
+            <div class="filter-tab active" onclick="setMapVip('all',this)">Todos</div>
+            <div class="filter-tab" onclick="setMapVip('16',this)">16</div>
+            <div class="filter-tab" onclick="setMapVip('17',this)">17</div>
+            <div class="filter-tab" onclick="setMapVip('18',this)">18</div>
+            <div class="filter-tab" onclick="setMapVip('19',this)">19</div>
+            <div class="filter-tab" onclick="setMapVip('20',this)">20</div>
+          </div>
+        </div>
+      </div>
+      <div class="map-layout">
+        <div>
+          <div class="chart-card">
+            <div class="chart-title" id="map-chart-title">Distribuição de Players VIP por Estado</div>
+            <svg id="brazil-map" viewBox="0 0 800 860" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;cursor:default;"></svg>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;">
+              <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">Menor</span>
+              <div id="map-legend-bar" style="display:flex;gap:2px;align-items:center;"></div>
+              <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">Maior</span>
+            </div>
+          </div>
+        </div>
+        <div class="map-sidebar" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="chart-card" id="map-state-card">
+            <div style="text-align:center;padding:30px 10px;color:var(--muted);font-size:13px;">👆 Clique em um estado para ver os detalhes</div>
+          </div>
+          <div class="table-card" id="map-vip-table" style="display:none;">
+            <div class="table-header"><span class="table-title">Breakdown por VIP Level</span></div>
+            <div class="table-scroll">
+              <table id="map-vip-breakdown">
+                <thead><tr><th>Level</th><th>Players</th><th>NGR</th><th>Depósito</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-header"><span class="table-title" id="map-ranking-title">Top 15 Estados — Players</span></div>
+            <div id="map-ranking-list"></div>
+          </div>
+        </div>
+      </div>
+      <div id="map-tooltip" style="position:fixed;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:12px 16px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:9999;max-width:220px;"></div>
+    </div>
+
     <!-- ADMIN -->
     <div class="page" id="page-admin">
       <div class="page-header">
@@ -697,6 +784,7 @@ const MONTHLY_FEB = {"avg_players": 2406, "total_ggr": 4251686.86, "total_ngr": 
 const MONTHLY_JAN = {"days": 31, "avg_players": 2866, "total_ggr": 6645694.72, "total_ngr": 5884134.47, "total_bonus": 761560.25, "total_deposit": 22238019.61, "generosity": 11.46, "ngr_margin": 88.54};
 const MONTHLY_BY_MONTH = {"01-2026": {"label": "Janeiro", "days": 31, "avg_players": 2866, "total_ggr": 6645694.72, "total_ngr": 5884134.47, "total_bonus": 761560.25, "total_deposit": 22238019.61, "generosity": 11.46, "ngr_margin": 88.54}, "02-2026": {"label": "Fevereiro", "days": 28, "avg_players": 2406, "total_ggr": 4251686.86, "total_ngr": 3372316.67, "total_bonus": 879370.19, "total_deposit": 14574756.51, "generosity": 20.68, "ngr_margin": 79.32}, "03-2026": {"label": "Março", "days": 18, "avg_players": 2407, "total_ggr": 2912438.79, "total_ngr": 2042219.6, "total_bonus": 870219.19, "total_deposit": 9471055.67, "generosity": 29.88, "ngr_margin": 70.12}};
 const VIP_MONTHLY_AGG = {"02-2026": [{"level": "16 - N", "players": 7127, "ggr": -2329055.37, "ngr": -2356237.81, "bonus": 27182.44, "deposit": 1416038.04}, {"level": "16 - P", "players": 28745, "ggr": 3688187.08, "ngr": 3630361.37, "bonus": 57825.71, "deposit": 3926170.72}, {"level": "17 - N", "players": 3225, "ggr": -1761293.83, "ngr": -1824801.15, "bonus": 63507.32, "deposit": 1325549.53}, {"level": "17 - P", "players": 18024, "ggr": 3409954.67, "ngr": 3197940.04, "bonus": 212014.63, "deposit": 3697566.6}, {"level": "18 - N", "players": 984, "ggr": -644462.65, "ngr": -691503.53, "bonus": 47040.88, "deposit": 459407.98}, {"level": "18 - P", "players": 6291, "ggr": 1137337.57, "ngr": 978316.66, "bonus": 159020.91, "deposit": 1221015.23}, {"level": "19 - N", "players": 232, "ggr": -371885.99, "ngr": -389765.56, "bonus": 17879.56, "deposit": 306158.96}, {"level": "19 - P", "players": 1515, "ggr": 628190.34, "ngr": 512073.45, "bonus": 116116.89, "deposit": 793259.56}, {"level": "20 - N", "players": 190, "ggr": -509093.92, "ngr": -535057.12, "bonus": 25963.2, "deposit": 367390.37}, {"level": "20 - P", "players": 1036, "ggr": 1003809.0, "ngr": 850990.35, "bonus": 152818.65, "deposit": 1062199.52}], "03-2026": [{"level": "16 - N", "players": 3709.0, "ggr": -1605686.05, "ngr": -1633124.85, "bonus": 27438.8, "deposit": 900849.24}, {"level": "16 - P", "players": 18781.0, "ggr": 2542411.34, "ngr": 2451239.65, "bonus": 91171.69, "deposit": 2536157.36}, {"level": "17 - N", "players": 1936.0, "ggr": -1068224.97, "ngr": -1120403.77, "bonus": 52178.8, "deposit": 709887.34}, {"level": "17 - P", "players": 12093.0, "ggr": 1921722.65, "ngr": 1708061.95, "bonus": 213660.7, "deposit": 2045928.81}, {"level": "18 - N", "players": 627.0, "ggr": -779491.42, "ngr": -817072.28, "bonus": 37580.86, "deposit": 452363.43}, {"level": "18 - P", "players": 4259.0, "ggr": 1209195.87, "ngr": 1066589.14, "bonus": 142606.73, "deposit": 987532.12}, {"level": "19 - N", "players": 143.0, "ggr": -208597.76, "ngr": -235420.28, "bonus": 26822.52, "deposit": 238766.3}, {"level": "19 - P", "players": 930.0, "ggr": 384748.6, "ngr": 311563.18, "bonus": 73185.42, "deposit": 483943.33}, {"level": "20 - N", "players": 137.0, "ggr": -303710.6, "ngr": -344708.09, "bonus": 40997.48, "deposit": 292598.87}, {"level": "20 - P", "players": 718.0, "ggr": 820071.1, "ngr": 655494.91, "bonus": 164576.19, "deposit": 823028.77}], "01-2026": [{"level": "16 - N", "players": 7883, "ggr": -2921218.14, "ngr": -2945433.43, "bonus": 24215.29, "deposit": 2519985.66}, {"level": "16 - P", "players": 45526, "ggr": 5332442.0, "ngr": 5251577.34, "bonus": 80864.66, "deposit": 6682145.66}, {"level": "17 - N", "players": 3524, "ggr": -2443135.09, "ngr": -2506584.02, "bonus": 63448.93, "deposit": 2048953.49}, {"level": "17 - P", "players": 20865, "ggr": 4811043.22, "ngr": 4606695.69, "bonus": 204347.53, "deposit": 5411935.04}, {"level": "18 - N", "players": 950, "ggr": -758347.29, "ngr": -796535.79, "bonus": 38188.5, "deposit": 810509.83}, {"level": "18 - P", "players": 6958, "ggr": 1741806.6, "ngr": 1607629.48, "bonus": 134177.12, "deposit": 2056847.05}, {"level": "19 - N", "players": 218, "ggr": -353816.92, "ngr": -373345.44, "bonus": 19528.52, "deposit": 246110.49}, {"level": "19 - P", "players": 1621, "ggr": 790282.34, "ngr": 729507.72, "bonus": 60774.62, "deposit": 866303.93}, {"level": "20 - N", "players": 233, "ggr": -569745.26, "ngr": -595331.29, "bonus": 25586.03, "deposit": 470092.98}, {"level": "20 - P", "players": 1081, "ggr": 1016383.24, "ngr": 905954.19, "bonus": 110429.05, "deposit": 1125135.48}]};
+const GEO_DATA = {"SP": {"total": {"players": 2773, "ngr": 32287127.55, "deposit": 99777635.71}, "levels": {"16": {"players": 2002, "ngr": 6482122.44, "deposit": 34147759.71}, "17": {"players": 500, "ngr": 5705219.41, "deposit": 21164769.67}, "18": {"players": 197, "ngr": 4846170.69, "deposit": 17364025.87}, "19": {"players": 48, "ngr": 3274453.51, "deposit": 8384392.69}, "20": {"players": 26, "ngr": 11979161.5, "deposit": 18716687.77}}, "name": "São Paulo"}, "RS": {"total": {"players": 762, "ngr": 4652899.77, "deposit": 20631106.34}, "levels": {"16": {"players": 594, "ngr": 1778159.54, "deposit": 11829447.38}, "17": {"players": 126, "ngr": 1457098.62, "deposit": 3950243.94}, "18": {"players": 33, "ngr": 690450.79, "deposit": 2828567.68}, "19": {"players": 5, "ngr": 323263.7, "deposit": 1073562.0}, "20": {"players": 4, "ngr": 403927.12, "deposit": 949285.34}}, "name": "Rio Grande do Sul"}, "GO": {"total": {"players": 271, "ngr": 1403269.06, "deposit": 14556533.66}, "levels": {"16": {"players": 206, "ngr": 664807.2, "deposit": 10319568.06}, "17": {"players": 47, "ngr": 589873.75, "deposit": 3114461.26}, "18": {"players": 15, "ngr": 116358.5, "deposit": 585755.67}, "19": {"players": 3, "ngr": 32229.61, "deposit": 536748.67}}, "name": "Goiás"}, "PI": {"total": {"players": 59, "ngr": 462297.01, "deposit": 1468139.02}, "levels": {"16": {"players": 44, "ngr": 135889.33, "deposit": 604179.97}, "17": {"players": 11, "ngr": 95075.13, "deposit": 345068.3}, "18": {"players": 2, "ngr": 63201.17, "deposit": 163986.35}, "19": {"players": 1, "ngr": 10299.98, "deposit": 31274.0}, "20": {"players": 1, "ngr": 157831.4, "deposit": 323630.4}}, "name": "Piauí"}, "MG": {"total": {"players": 895, "ngr": 5410164.86, "deposit": 24639482.97}, "levels": {"16": {"players": 680, "ngr": 2084150.3, "deposit": 9951451.12}, "17": {"players": 158, "ngr": 1631922.58, "deposit": 8467807.83}, "18": {"players": 40, "ngr": 655608.56, "deposit": 1824443.21}, "19": {"players": 11, "ngr": 634575.14, "deposit": 1408746.5}, "20": {"players": 6, "ngr": 403908.28, "deposit": 2987034.31}}, "name": "Minas Gerais"}, "AC": {"total": {"players": 29, "ngr": 121729.47, "deposit": 635938.47}, "levels": {"16": {"players": 23, "ngr": 56955.62, "deposit": 148112.3}, "17": {"players": 4, "ngr": -35410.53, "deposit": 265021.0}, "19": {"players": 2, "ngr": 100184.38, "deposit": 222805.17}}, "name": "Acre"}, "BA": {"total": {"players": 474, "ngr": 2779284.14, "deposit": 11000059.36}, "levels": {"16": {"players": 353, "ngr": 1038375.45, "deposit": 4625260.6}, "17": {"players": 87, "ngr": 806816.31, "deposit": 3485314.15}, "18": {"players": 22, "ngr": 341364.52, "deposit": 1232590.22}, "19": {"players": 8, "ngr": 193400.1, "deposit": 581171.79}, "20": {"players": 4, "ngr": 399327.76, "deposit": 1075722.6}}, "name": "Bahia"}, "RJ": {"total": {"players": 734, "ngr": 4746667.04, "deposit": 21913720.37}, "levels": {"16": {"players": 565, "ngr": 2194629.96, "deposit": 12710809.15}, "17": {"players": 134, "ngr": 1229809.05, "deposit": 5057278.03}, "18": {"players": 24, "ngr": 404460.05, "deposit": 1125011.34}, "19": {"players": 4, "ngr": 254214.14, "deposit": 1179988.8}, "20": {"players": 7, "ngr": 663553.84, "deposit": 1840633.05}}, "name": "Rio de Janeiro"}, "SE": {"total": {"players": 67, "ngr": 377681.2, "deposit": 1320231.85}, "levels": {"16": {"players": 52, "ngr": 193890.5, "deposit": 625665.72}, "17": {"players": 11, "ngr": 82554.51, "deposit": 281967.11}, "18": {"players": 4, "ngr": 101236.19, "deposit": 412599.02}}, "name": "Sergipe"}, "SC": {"total": {"players": 473, "ngr": 3010635.9, "deposit": 14340340.69}, "levels": {"16": {"players": 359, "ngr": 1068054.38, "deposit": 5141141.08}, "17": {"players": 97, "ngr": 1208959.68, "deposit": 3584946.12}, "18": {"players": 11, "ngr": 192184.21, "deposit": 1267904.65}, "19": {"players": 3, "ngr": 380256.01, "deposit": 4058242.0}, "20": {"players": 3, "ngr": 161181.62, "deposit": 288106.84}}, "name": "Santa Catarina"}, "PR": {"total": {"players": 676, "ngr": 5750394.57, "deposit": 15769446.75}, "levels": {"16": {"players": 525, "ngr": 1671191.33, "deposit": 6769339.77}, "17": {"players": 113, "ngr": 1205263.88, "deposit": 4124725.45}, "18": {"players": 28, "ngr": 668468.59, "deposit": 2116034.13}, "19": {"players": 6, "ngr": 161937.32, "deposit": 436957.72}, "20": {"players": 4, "ngr": 2043533.45, "deposit": 2322389.68}}, "name": "Paraná"}, "MS": {"total": {"players": 141, "ngr": 836594.61, "deposit": 3004608.77}, "levels": {"16": {"players": 115, "ngr": 279204.6, "deposit": 1675555.23}, "17": {"players": 17, "ngr": 122271.91, "deposit": 367597.57}, "18": {"players": 7, "ngr": 275920.62, "deposit": 695673.49}, "19": {"players": 1, "ngr": 12273.33, "deposit": 61731.15}, "20": {"players": 1, "ngr": 146924.15, "deposit": 204051.33}}, "name": "Mato Grosso do Sul"}, "CE": {"total": {"players": 195, "ngr": 1155670.66, "deposit": 3746031.13}, "levels": {"16": {"players": 149, "ngr": 467435.84, "deposit": 1842053.35}, "17": {"players": 38, "ngr": 483784.09, "deposit": 1252357.23}, "18": {"players": 7, "ngr": 145105.15, "deposit": 507713.55}, "19": {"players": 1, "ngr": 59345.58, "deposit": 143907.0}}, "name": "Ceará"}, "MT": {"total": {"players": 193, "ngr": 1059714.17, "deposit": 4969220.08}, "levels": {"16": {"players": 152, "ngr": 396015.99, "deposit": 1960312.51}, "17": {"players": 29, "ngr": 250777.79, "deposit": 1254184.83}, "18": {"players": 8, "ngr": 121997.3, "deposit": 317031.83}, "19": {"players": 2, "ngr": 65533.43, "deposit": 385839.91}, "20": {"players": 2, "ngr": 225389.66, "deposit": 1051851.0}}, "name": "Mato Grosso"}, "ES": {"total": {"players": 233, "ngr": 1698782.43, "deposit": 7024251.44}, "levels": {"16": {"players": 172, "ngr": 590914.28, "deposit": 2311296.69}, "17": {"players": 45, "ngr": 602425.47, "deposit": 2055610.12}, "18": {"players": 13, "ngr": 278006.35, "deposit": 1099132.23}, "19": {"players": 1, "ngr": 3306.2, "deposit": 17859.4}, "20": {"players": 2, "ngr": 224130.13, "deposit": 1540353.0}}, "name": "Espírito Santo"}, "RO": {"total": {"players": 64, "ngr": 307535.06, "deposit": 1312649.89}, "levels": {"16": {"players": 53, "ngr": 191078.71, "deposit": 797807.97}, "17": {"players": 9, "ngr": 108059.54, "deposit": 354655.28}, "18": {"players": 1, "ngr": 8791.77, "deposit": 40882.64}, "20": {"players": 1, "ngr": -394.96, "deposit": 119304.0}}, "name": "Rondônia"}, "PE": {"total": {"players": 194, "ngr": 1482311.99, "deposit": 6593084.91}, "levels": {"16": {"players": 136, "ngr": 459053.8, "deposit": 1795600.21}, "17": {"players": 45, "ngr": 125964.28, "deposit": 1982390.8}, "18": {"players": 9, "ngr": 220323.66, "deposit": 1046917.74}, "19": {"players": 1, "ngr": 2560.49, "deposit": 5019.0}, "20": {"players": 3, "ngr": 674409.75, "deposit": 1763157.16}}, "name": "Pernambuco"}, "MA": {"total": {"players": 132, "ngr": 921116.83, "deposit": 3470939.42}, "levels": {"16": {"players": 100, "ngr": 300447.62, "deposit": 1262060.0}, "17": {"players": 22, "ngr": 251984.44, "deposit": 835275.95}, "18": {"players": 7, "ngr": 108089.05, "deposit": 287297.0}, "19": {"players": 2, "ngr": 63302.04, "deposit": 164597.47}, "20": {"players": 1, "ngr": 197293.67, "deposit": 921709.0}}, "name": "Maranhão"}, "AL": {"total": {"players": 79, "ngr": 503231.84, "deposit": 1634068.51}, "levels": {"16": {"players": 58, "ngr": 229516.64, "deposit": 811883.46}, "17": {"players": 14, "ngr": 116251.06, "deposit": 456544.95}, "18": {"players": 5, "ngr": 86917.48, "deposit": 153009.47}, "19": {"players": 2, "ngr": 70546.66, "deposit": 212630.63}}, "name": "Alagoas"}, "PB": {"total": {"players": 110, "ngr": 507848.23, "deposit": 2905272.58}, "levels": {"16": {"players": 85, "ngr": 197632.86, "deposit": 1512488.14}, "17": {"players": 21, "ngr": 280111.76, "deposit": 1044763.08}, "18": {"players": 4, "ngr": 30103.62, "deposit": 348021.36}}, "name": "Paraíba"}, "AP": {"total": {"players": 38, "ngr": 135096.23, "deposit": 449520.09}, "levels": {"16": {"players": 31, "ngr": 86956.62, "deposit": 335279.87}, "17": {"players": 5, "ngr": 48528.07, "deposit": 110593.22}, "18": {"players": 2, "ngr": -388.46, "deposit": 3647.0}}, "name": "Amapá"}, "DF": {"total": {"players": 234, "ngr": 1336898.07, "deposit": 4699789.58}, "levels": {"16": {"players": 181, "ngr": 582301.29, "deposit": 2130719.53}, "17": {"players": 37, "ngr": 329996.7, "deposit": 1344074.23}, "18": {"players": 12, "ngr": 181793.5, "deposit": 437105.82}, "19": {"players": 2, "ngr": 102570.55, "deposit": 473735.0}, "20": {"players": 2, "ngr": 140236.03, "deposit": 314155.0}}, "name": "Distrito Federal"}, "AM": {"total": {"players": 137, "ngr": 715481.68, "deposit": 2952104.29}, "levels": {"16": {"players": 109, "ngr": 374042.89, "deposit": 1635714.89}, "17": {"players": 25, "ngr": 253660.32, "deposit": 629352.31}, "18": {"players": 2, "ngr": 15686.8, "deposit": 34581.46}, "19": {"players": 1, "ngr": 72091.67, "deposit": 652455.63}}, "name": "Amazonas"}, "RN": {"total": {"players": 96, "ngr": 759947.14, "deposit": 3102680.19}, "levels": {"16": {"players": 72, "ngr": 218971.74, "deposit": 1027330.44}, "17": {"players": 20, "ngr": 162152.58, "deposit": 1047277.25}, "18": {"players": 2, "ngr": 928.63, "deposit": 929.0}, "19": {"players": 1, "ngr": 79451.37, "deposit": 102966.76}, "20": {"players": 1, "ngr": 298442.82, "deposit": 924176.74}}, "name": "Rio Grande do Norte"}, "PA": {"total": {"players": 168, "ngr": 826993.31, "deposit": 3128427.74}, "levels": {"16": {"players": 129, "ngr": 391979.09, "deposit": 1793025.73}, "17": {"players": 28, "ngr": 284367.86, "deposit": 905939.55}, "18": {"players": 9, "ngr": 62298.73, "deposit": 182576.68}, "19": {"players": 2, "ngr": 88347.62, "deposit": 246885.78}}, "name": "Pará"}, "RR": {"total": {"players": 23, "ngr": 109499.69, "deposit": 282415.19}, "levels": {"16": {"players": 19, "ngr": 65454.22, "deposit": 202580.66}, "17": {"players": 4, "ngr": 44045.47, "deposit": 79834.53}}, "name": "Roraima"}, "TO": {"total": {"players": 44, "ngr": 783700.57, "deposit": 2543490.85}, "levels": {"16": {"players": 31, "ngr": 80550.22, "deposit": 394913.82}, "17": {"players": 8, "ngr": 102112.25, "deposit": 518252.13}, "18": {"players": 2, "ngr": 9008.23, "deposit": 39988.0}, "20": {"players": 3, "ngr": 592029.87, "deposit": 1590336.9}}, "name": "Tocantins"}};
 
 // ═══════════════════ STATE ═══════════════════
 let currentUser = null;
@@ -798,6 +886,7 @@ function showPage(name){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')===`showPage('${name}')`)n.classList.add('active');});
+  if(name==='mapa') setTimeout(renderBrazilMap, 50);
   if(window.innerWidth<=768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
 }
 
@@ -1455,6 +1544,182 @@ function addLog(msg,type){
   const now=new Date().toLocaleString('pt-BR');uploadLogs.unshift({time:now,msg,type});
   const el=document.getElementById('upload-log');
   el.innerHTML=`<div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Log de Atividade</div>`+uploadLogs.map(l=>`<div class="log-entry"><span class="log-time">${l.time}</span><span class="log-msg log-${l.type}">${l.msg}</span></div>`).join('');
+}
+
+
+// ═══════════════════ MAP VIP ═══════════════════
+const MAP_STATE_NAMES = {"AC": "Acre", "AL": "Alagoas", "AP": "Amapá", "AM": "Amazonas", "BA": "Bahia", "CE": "Ceará", "DF": "Distrito Federal", "ES": "Espírito Santo", "GO": "Goiás", "MA": "Maranhão", "MT": "Mato Grosso", "MS": "Mato Grosso do Sul", "MG": "Minas Gerais", "PA": "Pará", "PB": "Paraíba", "PR": "Paraná", "PE": "Pernambuco", "PI": "Piauí", "RJ": "Rio de Janeiro", "RN": "Rio Grande do Norte", "RS": "Rio Grande do Sul", "RO": "Rondônia", "RR": "Roraima", "SC": "Santa Catarina", "SP": "São Paulo", "SE": "Sergipe", "TO": "Tocantins"};
+const MAP_STATE_PATHS = {"AC": "M95,488 L140,468 L178,474 L194,496 L182,520 L140,528 L98,514 Z", "AM": "M168,298 L265,272 L325,278 L358,315 L362,358 L332,398 L288,414 L248,418 L198,408 L162,378 L148,342 L156,312 Z", "RR": "M226,186 L277,176 L307,196 L317,230 L296,261 L256,269 L220,254 L210,224 Z", "AP": "M358,218 L394,208 L418,228 L412,262 L388,278 L356,268 L342,242 Z", "PA": "M322,278 L418,262 L472,278 L494,314 L482,362 L452,392 L402,402 L356,396 L332,396 L362,358 L358,315 Z", "TO": "M482,362 L514,346 L538,362 L548,402 L538,448 L508,468 L476,456 L462,422 L452,392 Z", "MA": "M472,278 L524,266 L558,282 L562,318 L542,346 L514,346 L482,362 L452,392 L402,402 L392,372 L412,342 L432,308 Z", "PI": "M558,282 L598,276 L618,297 L612,338 L586,362 L558,356 L542,346 L562,318 Z", "CE": "M598,276 L644,269 L668,287 L662,322 L636,342 L612,338 L618,297 Z", "RN": "M644,269 L684,266 L698,282 L688,308 L662,318 L636,342 L662,322 L668,287 Z", "PB": "M662,318 L698,308 L708,322 L698,342 L672,346 L652,336 Z", "PE": "M586,362 L652,336 L698,342 L702,368 L672,382 L632,386 L596,376 L576,362 Z", "AL": "M672,382 L702,372 L712,387 L702,402 L680,408 L660,396 Z", "SE": "M666,396 L698,402 L702,418 L686,428 L662,422 Z", "BA": "M538,362 L596,376 L632,386 L660,396 L662,422 L642,452 L612,472 L572,482 L532,477 L506,456 L492,422 L496,392 L508,368 Z", "GO": "M458,422 L502,416 L538,432 L548,468 L532,496 L496,508 L460,497 L446,466 Z", "DF": "M497,457 L512,452 L517,464 L504,472 L491,464 Z", "MG": "M532,477 L572,482 L612,472 L642,487 L652,522 L636,557 L596,572 L556,566 L521,546 L506,512 L512,482 Z", "ES": "M642,487 L667,492 L672,522 L657,547 L636,557 L652,522 Z", "RJ": "M596,572 L636,557 L657,547 L662,567 L641,588 L610,592 L591,581 Z", "SP": "M456,537 L506,512 L556,566 L596,572 L591,581 L561,602 L516,607 L476,592 L451,566 Z", "MS": "M396,492 L458,482 L462,497 L496,508 L506,512 L456,537 L416,532 L386,512 Z", "MT": "M312,397 L396,386 L446,396 L458,422 L446,466 L416,482 L396,492 L362,482 L322,462 L302,432 Z", "RO": "M202,407 L292,412 L312,432 L302,432 L282,462 L251,466 L216,452 L196,426 Z", "PR": "M416,577 L456,566 L476,592 L452,617 L416,622 L386,607 L376,581 Z", "SC": "M386,622 L416,622 L452,617 L462,642 L432,657 L396,652 L376,636 Z", "RS": "M376,636 L432,657 L462,642 L472,673 L452,703 L412,717 L372,707 L352,677 L357,646 Z"};
+let mapMetric = 'players';
+let mapVip = 'all';
+let mapSelectedState = null;
+
+function mapGetVal(code, metric, vip) {
+  const d = GEO_DATA[code];
+  if(!d) return 0;
+  if(vip==='all') return d.total[metric]||0;
+  return (d.levels[vip]||{})[metric]||0;
+}
+function mapGetMax(metric, vip) {
+  return Math.max(1,...Object.keys(GEO_DATA).map(c=>mapGetVal(c,metric,vip)));
+}
+function mapColor(val, maxVal) {
+  if(!maxVal||val<=0) return '#1a1a24';
+  const t = Math.pow(val/maxVal, 0.5);
+  const stops=[[26,26,36],[40,80,0],[90,180,0],[200,255,0]];
+  const seg=t*(stops.length-1);
+  const i=Math.min(Math.floor(seg),stops.length-2);
+  const f=seg-i;
+  const a=stops[i],b=stops[i+1];
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)})`;
+}
+function mapFmtVal(val, metric) {
+  return metric==='players' ? fmtN(val) : fmtM(val);
+}
+
+function renderBrazilMap() {
+  const svg = document.getElementById('brazil-map');
+  if(!svg) return;
+  svg.querySelectorAll('.state-path,.state-label-svg').forEach(e=>e.remove());
+  const maxVal = mapGetMax(mapMetric, mapVip);
+
+  Object.entries(MAP_STATE_PATHS).forEach(([code, pathD]) => {
+    const val = mapGetVal(code, mapMetric, mapVip);
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', pathD);
+    path.setAttribute('fill', mapColor(val, maxVal));
+    path.setAttribute('class','state-path'+(mapSelectedState===code?' map-selected':''));
+    path.setAttribute('data-code', code);
+    path.addEventListener('mouseenter', e=>mapShowTooltip(e,code));
+    path.addEventListener('mousemove',  e=>mapMoveTooltip(e));
+    path.addEventListener('mouseleave', mapHideTooltip);
+    path.addEventListener('click', ()=>mapSelectState(code));
+    svg.appendChild(path);
+
+    // Label
+    const coords=[...pathD.matchAll(/[\d.]+,[\d.]+/g)].map(m=>{
+      const [x,y]=m[0].split(',').map(Number);return{x,y};
+    });
+    if(coords.length>0){
+      const cx=coords.reduce((s,c)=>s+c.x,0)/coords.length;
+      const cy=coords.reduce((s,c)=>s+c.y,0)/coords.length;
+      const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+      lbl.setAttribute('x',cx); lbl.setAttribute('y',cy+3);
+      lbl.setAttribute('text-anchor','middle');
+      lbl.setAttribute('class','state-label-svg');
+      lbl.textContent=code;
+      svg.appendChild(lbl);
+    }
+  });
+
+  // Legend
+  const bar = document.getElementById('map-legend-bar');
+  if(bar){
+    bar.innerHTML='';
+    for(let i=0;i<8;i++){
+      const d=document.createElement('div');
+      d.style.cssText=`width:18px;height:10px;border-radius:2px;background:${mapColor(i/7*maxVal,maxVal)}`;
+      bar.appendChild(d);
+    }
+  }
+  // Title
+  const title = document.getElementById('map-chart-title');
+  const mLabel={players:'Players',ngr:'NGR',deposit:'Depósitos'}[mapMetric];
+  if(title) title.textContent=`Distribuição de ${mLabel} VIP por Estado`+(mapVip!=='all'?` — Level ${mapVip}`:'');
+  // Ranking
+  renderMapRanking();
+}
+
+function mapShowTooltip(e, code) {
+  const d=GEO_DATA[code]; if(!d) return;
+  const tt=document.getElementById('map-tooltip');
+  const p=mapGetVal(code,'players',mapVip);
+  const n=mapGetVal(code,'ngr',mapVip);
+  const dep=mapGetVal(code,'deposit',mapVip);
+  tt.innerHTML=`<div style="font-size:13px;font-weight:700;margin-bottom:6px;">${d.name||MAP_STATE_NAMES[code]||code}</div>
+    <div style="display:flex;justify-content:space-between;gap:16px;font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);margin-bottom:3px;"><span>Players</span><span style="color:var(--text)">${fmtN(p)}</span></div>
+    <div style="display:flex;justify-content:space-between;gap:16px;font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);margin-bottom:3px;"><span>NGR</span><span style="color:var(--accent)">${fmtM(n)}</span></div>
+    <div style="display:flex;justify-content:space-between;gap:16px;font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);"><span>Depósitos</span><span style="color:var(--accent2)">${fmtM(dep)}</span></div>`;
+  tt.style.opacity='1';
+  mapMoveTooltip(e);
+}
+function mapMoveTooltip(e){
+  const tt=document.getElementById('map-tooltip');
+  tt.style.left=Math.min(e.clientX+14,window.innerWidth-240)+'px';
+  tt.style.top=Math.max(e.clientY-10,10)+'px';
+}
+function mapHideTooltip(){ const tt=document.getElementById('map-tooltip'); if(tt) tt.style.opacity='0'; }
+
+function mapSelectState(code) {
+  mapSelectedState=code;
+  document.querySelectorAll('.state-path').forEach(p=>p.classList.toggle('map-selected',p.getAttribute('data-code')===code));
+  const d=GEO_DATA[code]; if(!d) return;
+  const sorted=Object.entries(GEO_DATA).sort((a,b)=>mapGetVal(b[0],mapMetric,mapVip)-mapGetVal(a[0],mapMetric,mapVip));
+  const rank=sorted.findIndex(([c])=>c===code)+1;
+  const card=document.getElementById('map-state-card');
+  card.innerHTML=`
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));"></div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:2px;">${d.name||MAP_STATE_NAMES[code]||code} <span style="font-size:12px;color:var(--accent);">${code}</span></div>
+    <div style="font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;">#${rank} no ranking nacional</div>
+    <div class="map-kpi-row"><span class="map-kpi-label">Players VIP</span><span class="map-kpi-value td-neutral">${fmtN(d.total.players)}</span></div>
+    <div class="map-kpi-row"><span class="map-kpi-label">NGR Total</span><span class="map-kpi-value td-pos">${fmtM(d.total.ngr)}</span></div>
+    <div class="map-kpi-row"><span class="map-kpi-label">Depósitos</span><span class="map-kpi-value" style="color:var(--accent2)">${fmtM(d.total.deposit)}</span></div>
+    <div class="map-kpi-row"><span class="map-kpi-label">NGR / Player</span><span class="map-kpi-value">${fmtM(d.total.ngr/d.total.players)}</span></div>
+    <div class="map-kpi-row"><span class="map-kpi-label">Dep. / Player</span><span class="map-kpi-value">${fmtM(d.total.deposit/d.total.players)}</span></div>
+  `;
+  const tbl=document.querySelector('#map-vip-breakdown tbody');
+  tbl.innerHTML='';
+  [16,17,18,19,20].forEach(lvl=>{
+    const lv=d.levels[String(lvl)]||{players:0,ngr:0,deposit:0};
+    if(!lv.players) return;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="td-neutral">VIP ${lvl}</td><td>${fmtN(lv.players)}</td><td class="td-pos">${fmtM(lv.ngr)}</td><td style="color:var(--accent2)">${fmtM(lv.deposit)}</td>`;
+    tbl.appendChild(tr);
+  });
+  const trT=document.createElement('tr');
+  trT.style.fontWeight='700';trT.style.borderTop='1px solid var(--border)';
+  trT.innerHTML=`<td>Total</td><td>${fmtN(d.total.players)}</td><td class="td-pos">${fmtM(d.total.ngr)}</td><td style="color:var(--accent2)">${fmtM(d.total.deposit)}</td>`;
+  tbl.appendChild(trT);
+  document.getElementById('map-vip-table').style.display='block';
+  renderMapRanking();
+}
+
+function renderMapRanking() {
+  const sorted=Object.entries(GEO_DATA)
+    .filter(([c])=>MAP_STATE_PATHS[c])
+    .sort((a,b)=>mapGetVal(b[0],mapMetric,mapVip)-mapGetVal(a[0],mapMetric,mapVip))
+    .slice(0,15);
+  const maxV=mapGetVal(sorted[0]?.[0]||'SP',mapMetric,mapVip)||1;
+  const mLabel={players:'Players',ngr:'NGR',deposit:'Depósitos'}[mapMetric];
+  const title=document.getElementById('map-ranking-title');
+  if(title) title.textContent=`Top 15 Estados — ${mLabel}`;
+  const list=document.getElementById('map-ranking-list');
+  if(!list) return;
+  list.innerHTML=sorted.map(([code,d],i)=>{
+    const val=mapGetVal(code,mapMetric,mapVip);
+    const pct=maxV>0?(val/maxV*100):0;
+    return `<div class="map-rank-row ${mapSelectedState===code?'map-rank-active':''}" onclick="mapSelectState('${code}')">
+      <span class="map-rank-num ${i<3?'map-top':''}">#${i+1}</span>
+      <span class="map-rank-name">${MAP_STATE_NAMES[code]||code}</span>
+      <span class="map-rank-val">${mapFmtVal(val,mapMetric)}</span>
+      <div class="map-rank-bar"><div class="map-rank-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function setMapMetric(m,el){
+  mapMetric=m;
+  document.querySelectorAll('#map-metric-tabs .filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderBrazilMap();
+  if(mapSelectedState) mapSelectState(mapSelectedState);
+}
+function setMapVip(v,el){
+  mapVip=v;
+  document.querySelectorAll('#map-vip-tabs .filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderBrazilMap();
+  if(mapSelectedState) mapSelectState(mapSelectedState);
 }
 
 </script>
