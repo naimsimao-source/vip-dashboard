@@ -185,21 +185,34 @@ async function processGGR() {
     log('ggr-log', '  Enviando para Edge Function...', 'inf');
     bar('ggr-bar', 20);
 
-    const res = await fetch(SB_URL + '/functions/v1/process-daily', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY },
-      body: JSON.stringify({ rows: normalized, dayStr, monthKey })
-    });
+    // Send in batches of 500 to avoid payload limit
+    const BATCH = 500;
+    let lastResult = null;
+    const totalBatches = Math.ceil(normalized.length / BATCH);
 
-    bar('ggr-bar', 85);
-    const result = await res.json();
+    for (let b = 0; b < totalBatches; b++) {
+      const batch    = normalized.slice(b * BATCH, (b + 1) * BATCH);
+      const isLast   = b === totalBatches - 1;
+      const progress = Math.round(20 + (b + 1) / totalBatches * 65);
 
-    if (!res.ok || !result.ok) throw new Error(result.error || 'Edge Function erro ' + res.status);
+      log('ggr-log', '  Batch ' + (b+1) + '/' + totalBatches + ' (' + batch.length + ' players)...', 'inf');
+
+      const res = await fetch(SB_URL + '/functions/v1/process-daily', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY },
+        body: JSON.stringify({ rows: batch, dayStr, monthKey, isLast, batchIndex: b, totalBatches })
+      });
+
+      bar('ggr-bar', progress);
+      const result = await res.json();
+      if (!res.ok || !result.ok) throw new Error(result.error || 'Edge Function erro ' + res.status + ' batch ' + (b+1));
+      lastResult = result;
+    }
 
     bar('ggr-bar', 100);
-    log('ggr-log', '✅ ' + result.message, 'ok');
-    log('ggr-log', '   Players: ' + result.players + ' | Churn: ' + result.churn.alto + ' alto / ' + result.churn.medio + ' médio / ' + result.churn.baixo + ' baixo', 'ok');
-    log('ggr-log', '   RRP NGR total: R$' + (result.rrp_total_ngr || 0).toLocaleString('pt-BR'), 'ok');
+    log('ggr-log', '✅ ' + (lastResult?.message || 'Processado com sucesso!'), 'ok');
+    if (lastResult?.churn) log('ggr-log', '   Churn: ' + lastResult.churn.alto + ' alto / ' + lastResult.churn.medio + ' médio / ' + lastResult.churn.baixo + ' baixo', 'ok');
+    if (lastResult?.rrp_total_ngr) log('ggr-log', '   RRP NGR total: R$' + lastResult.rrp_total_ngr.toLocaleString('pt-BR'), 'ok');
     log('ggr-log', '   ↻ Atualize o dashboard (F5) para ver os novos dados.', 'inf');
     testConnection();
   } catch(e) {
