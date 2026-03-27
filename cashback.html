@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proposta Cashback — Abril 2026</title>
+<style>
+:root{--bg:#09090f;--s:#111118;--s2:#18181f;--b:#2a2a35;--t:#f0f0f5;--m:#888;--a:#c8ff00;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--t);font-family:'Segoe UI',sans-serif;padding:40px 32px;max-width:1100px;margin:0 auto;}
+h1{font-size:28px;font-weight:800;margin-bottom:6px;}
+h1 span{color:var(--a);}
+.meta{color:var(--m);font-size:13px;margin-bottom:40px;font-family:monospace;}
+.section{margin-bottom:36px;}
+.section-title{font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--b);}
+.card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:20px;margin-bottom:14px;}
+.card h3{font-size:14px;font-weight:700;margin-bottom:8px;}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.kpi{background:var(--s2);border-radius:8px;padding:14px;}
+.kl{font-size:11px;color:var(--m);margin-bottom:4px;}
+.kv{font-size:20px;font-weight:800;}
+.ok{color:#c8ff00;}.warn{color:#ff9900;}.err{color:#ff4d6d;}.info{color:#00e5ff;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;padding:10px 12px;color:var(--m);font-weight:600;border-bottom:2px solid var(--b);font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.b-ok{background:rgba(200,255,0,.15);color:#c8ff00;}
+.b-warn{background:rgba(255,153,0,.15);color:#ff9900;}
+.b-err{background:rgba(255,77,109,.15);color:#ff4d6d;}
+.b-info{background:rgba(0,229,255,.15);color:#00e5ff;}
+.b-neu{background:rgba(255,255,255,.08);color:#888;}
+.scenario-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.scenario{background:var(--s2);border-radius:8px;padding:16px;border:1px solid var(--b);}
+.scenario.highlight{border-color:var(--a);background:rgba(200,255,0,0.04);}
+.scenario h4{font-size:12px;font-weight:700;margin-bottom:12px;}
+.sc-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.sc-row:last-child{border-bottom:none;}
+.insight{background:var(--s2);border-radius:8px;padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--b);}
+.insight.ok{border-left-color:#c8ff00;}
+.insight.warn{border-left-color:#ff9900;}
+.insight.err{border-left-color:#ff4d6d;}
+.insight.info{border-left-color:#00e5ff;}
+.insight-title{font-size:13px;font-weight:700;margin-bottom:5px;}
+.insight-body{font-size:12px;color:var(--m);line-height:1.6;}
+.arrow-up{color:#c8ff00;}.arrow-down{color:#ff4d6d;}
+.seg-color-sn{color:#ff4d6d;}
+.seg-color-n{color:#ff9900;}
+.seg-color-b{color:#cd7f32;}
+.seg-color-s{color:#c0c0c0;}
+.seg-color-g{color:#ffd700;}
+.seg-color-p{color:#e5e4e2;}
+.seg-color-d{color:#00e5ff;}
+.seg-color-e{color:#c8ff00;}
+</style>
+</head>
+<body>
+
+<h1>Proposta de <span>Cashback por Segmentação</span></h1>
+<p class="meta">Análise baseada em dados reais · Março 2026 (26 dias) · Proposta para Abril 2026</p>
+
+<!-- DIAGNÓSTICO -->
+<div class="section">
+  <div class="section-title">📊 Diagnóstico — O Problema Atual</div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kl">Generosity Março</div><div class="kv warn">29,7%</div></div>
+    <div class="kpi"><div class="kl">Generosity Target</div><div class="kv ok">17,0%</div></div>
+    <div class="kpi"><div class="kl">Custo Bônus Março</div><div class="kv warn">R$1,18M</div></div>
+    <div class="kpi"><div class="kl">CashBack / Total Bônus</div><div class="kv warn">69,1%</div></div>
+    <div class="kpi"><div class="kl">Redução necessária</div><div class="kv err">R$605K</div></div>
+    <div class="kpi"><div class="kl">NGR Março</div><div class="kv">R$2,81M</div></div>
+  </div>
+
+  <div class="card">
+    <h3>O cashback está sendo distribuído de forma ineficiente</h3>
+    <table>
+      <thead><tr><th>Problema</th><th>Evidência</th><th>Impacto</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>511 players Super Negative</strong> recebem cashback alto</td>
+          <td>NGR médio -R$3.086 em 90 dias. Todos são VIP17-20, recebendo 10-25% de cashback</td>
+          <td class="err">~R$80K/mês pagos para quem já é negativo</td>
+        </tr>
+        <tr>
+          <td><strong>3.517 players Bronze</strong> com cashback de 5%</td>
+          <td>NGR médio apenas R$66 em 90 dias. Cashback de 5% consome >75% do NGR gerado</td>
+          <td class="warn">Custo R$90K/mês com ROI mínimo</td>
+        </tr>
+        <tr>
+          <td><strong>Limite VIP20 (R$2.000/dia)</strong> muito baixo para Elite</td>
+          <td>73 players Elite com NGR médio R$63.234 — cap de R$2K/dia restringe quem mais gera</td>
+          <td class="err">Risco de churn dos maiores geradores</td>
+        </tr>
+        <tr>
+          <td><strong>Cashback flat por VIP</strong> ignora performance real</td>
+          <td>VIP17 com NGR negativo recebe mesmo cashback que VIP17 com NGR de R$5K</td>
+          <td class="warn">Incentivo errado — premia quem perde, não quem gera</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- NOVA ESTRUTURA -->
+<div class="section">
+  <div class="section-title">🎯 Nova Estrutura — Cashback por Segmento de Performance</div>
+
+  <div class="insight info">
+    <div class="insight-title">💡 Princípio fundamental da mudança</div>
+    <div class="insight-body">O cashback deixa de ser um benefício de <strong>nível VIP</strong> e passa a ser um benefício de <strong>performance de 90 dias</strong>. Um VIP17 com NGR positivo consistente (Gold) recebe mais do que um VIP20 com NGR negativo (Super Negative). Isso cria o incentivo correto: jogar com consistência e gerar valor real.</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Segmento</th><th>Slots</th><th>Sports</th><th>Crash</th><th>Limite/dia</th>
+        <th>vs Atual</th><th>Justificativa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="seg-color-sn">⬤</span> <strong>Super Negative</strong><br><small style="color:var(--m)">NGR 90d &lt; 0 | VIP17+</small></td>
+        <td class="err"><strong>0%</strong></td><td class="err"><strong>0%</strong></td><td class="err"><strong>0%</strong></td>
+        <td class="err"><strong>R$0</strong></td>
+        <td><span class="badge b-err">↓ 10-25%</span></td>
+        <td style="font-size:11px;color:var(--m)">NGR médio -R$3.086. Cashback não retém, só aumenta prejuízo. Oferecer engajamento (torneios, missões) no lugar.</td>
+      </tr>
+      <tr>
+        <td><span class="seg-color-n">⬤</span> <strong>Negative</strong><br><small style="color:var(--m)">NGR 90d &lt; 0 | VIP16</small></td>
+        <td class="warn"><strong>2%</strong></td><td class="warn"><strong>2%</strong></td><td class="warn"><strong>0,5%</strong></td>
+        <td class="warn"><strong>R$50</strong></td>
+        <td><span class="badge b-warn">↓ 5%</span></td>
+        <td style="font-size:11px;color:var(--m)">Cashback mínimo simbólico para não perder o player, mas sem estimular o comportamento negativo.</td>
+      </tr>
+      <tr>
+        <td><span class="seg-color-b">⬤</span> <strong>Bronze</strong><br><small style="color:var(--m)">NGR R$0~R$250</small></td>
+        <td><strong>3%</strong></td><td><strong>3%</strong></td><td><strong>0,5%</strong></td>
+        <td><strong>R$100</strong></td>
+        <td><span class="badge b-warn">↓ 5%→3%</span></td>
+        <td style="font-size:11px;color:var(--m)">NGR médio R$66. Cashback de 5% consome >75% do NGR. Redução aumenta ROI sem perder o player.</td>
+      </tr>
+      <tr>
+        <td><span class="seg-color-s">⬤</span> <strong>Silver</strong><br><small style="color:var(--m)">NGR R$250~R$1.000</small></td>
+        <td class="ok"><strong>6%</strong></td><td class="ok"><strong>6%</strong></td><td class="ok"><strong>1%</strong></td>
+        <td class="ok"><strong>R$300</strong></td>
+        <td><span class="badge b-ok">↑ Novo tier</span></td>
+        <td style="font-size:11px;color:var(--m)">Maior potencial de crescimento (2.324 players, 16d ativos). Cashback diferenciado os incentiva a crescer para Gold.</td>
+      </tr>
+      <tr>
+        <td><span class="seg-color-g">⬤</span> <strong>Gold</strong><br><small style="color:var(--m)">NGR R$1.000~R$2.500</small></td>
+        <td class="ok"><strong>10%</strong></td><td class="ok"><strong>10%</strong></td><td class="ok"><strong>1,5%</strong></td>
+        <td class="ok"><strong>R$600</strong></td>
+        <td><span class="badge b-info">↑ Limite +20%</span></td>
+        <td style="font-size:11px;color:var(--m)">Mantém % (excelente ROI). Limite R$500→R$600 incentiva volume. 23 dias ativos/mês — grupo mais engajado.</td>
+      </tr>
+      <tr>
+        <td><span class="seg-color-p">⬤</span> <strong>Platina</strong><br><small style="color:var(--m)">NGR R$2.500~R$10.000</small></td>
+        <td class="ok"><strong>15%</strong></td><td class="ok"><strong>15%</strong></td><td class="ok"><strong>2%</strong></td>
+        <td class="ok"><strong>R$1.200</strong></td>
+        <td><span class="badge b-info">↑ Limite +20%</span></td>
+        <td style="font-size:11px;color:var(--m)">Mantém %. Limite R$1.000→R$1.200. NGR médio R$4.638 justifica amplamente. Alta atividade (26d/mês).</td>
+      </tr>
+      <tr>
+        <td><span class="seg-color-d">⬤</span> <strong>Diamond</strong><br><small style="color:var(--m)">NGR R$10.000~R$20.000</small></td>
+        <td class="ok"><strong>20%</strong></td><td class="ok"><strong>20%</strong></td><td class="ok"><strong>2,5%</strong></td>
+        <td class="ok"><strong>R$2.000</strong></td>
+        <td><span class="badge b-info">↑ Limite +33%</span></td>
+        <td style="font-size:11px;color:var(--m)">NGR médio R$13.630 — ROI extraordinário. Limite R$1.500→R$2.000 para evitar churn desse grupo crítico.</td>
+      </tr>
+      <tr style="background:rgba(200,255,0,0.04);">
+        <td><span class="seg-color-e">⬤</span> <strong>Elite</strong><br><small style="color:var(--m)">NGR &gt; R$20.000</small></td>
+        <td class="ok"><strong>25%</strong></td><td class="ok"><strong>25%</strong></td><td class="ok"><strong>3%</strong></td>
+        <td class="ok"><strong>R$5.000</strong></td>
+        <td><span class="badge b-ok">↑ Limite +150%</span></td>
+        <td style="font-size:11px;color:var(--m)">NGR médio R$63.234. 73 players geram ~R$4,6M em 90d. Cashback de R$5K/dia é &lt;3% do NGR diário médio. Reter é prioridade máxima.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- IMPACTO FINANCEIRO -->
+<div class="section">
+  <div class="section-title">💰 Impacto Financeiro Estimado — Onde Vêm as Economias</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Ação</th><th>Economia Estimada/mês</th><th>Risco</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Suspender cashback Super Negative (511 players VIP17-20)</td>
+          <td class="ok"><strong>~R$80.000</strong></td>
+          <td><span class="badge b-warn">Médio — monitorar churn</span></td>
+        </tr>
+        <tr>
+          <td>Reduzir Bronze de 5% para 3% (3.517 players VIP16)</td>
+          <td class="ok"><strong>~R$36.000</strong></td>
+          <td><span class="badge b-ok">Baixo — NGR já mínimo</span></td>
+        </tr>
+        <tr>
+          <td>Reduzir Negative de 5% para 2% (1.306 players VIP16)</td>
+          <td class="ok"><strong>~R$20.000</strong></td>
+          <td><span class="badge b-ok">Baixo</span></td>
+        </tr>
+        <tr>
+          <td>Aumento limite Elite (73 players) — custo adicional</td>
+          <td class="err"><strong>-R$12.000</strong></td>
+          <td><span class="badge b-ok">Baixo — ROI altíssimo</span></td>
+        </tr>
+        <tr style="background:rgba(200,255,0,0.04);">
+          <td><strong>Economia líquida estimada</strong></td>
+          <td class="ok"><strong>~R$124.000/mês</strong></td>
+          <td><span class="badge b-ok">Generosity -3,1pp</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:14px;padding:12px;background:rgba(255,153,0,0.08);border-radius:6px;font-size:12px;color:#ff9900;">
+      ⚠️ <strong>Nota:</strong> A mudança de 29,7% → 17% de generosity exige também crescimento de GGR. A economia de ~R$124K/mês reduz ~3pp. Os outros ~10pp virão do aumento de GGR por maior engajamento e upgrades de segmento.
+    </div>
+  </div>
+</div>
+
+<!-- PROJEÇÕES ABRIL -->
+<div class="section">
+  <div class="section-title">📈 Projeções Abril 2026 (31 dias)</div>
+  <div class="scenario-grid">
+    <div class="scenario">
+      <h4 style="color:#ff9900;">😐 Conservador<br><small>GGR +5% | Gen 20%</small></h4>
+      <div class="sc-row"><span style="color:var(--m)">GGR</span><span class="ok">R$5,00M</span></div>
+      <div class="sc-row"><span style="color:var(--m)">Bônus</span><span class="warn">R$1,00M</span></div>
+      <div class="sc-row"><span style="color:var(--m)">NGR</span><span class="ok">R$4,00M</span></div>
+      <div class="sc-row"><span style="color:var(--m)">vs Março NGR</span><span class="ok">+42%</span></div>
+      <div class="sc-row"><span style="color:var(--m)">Generosity</span><span class="warn">20%</span></div>
+    </div>
+    <div class="scenario highlight">
+      <h4 style="color:#c8ff00;">🎯 Realista — META<br><small>GGR +8% | Gen 17%</small></h4>
+      <div class="sc-row"><span style="color:var(--m)">GGR</span><span class="ok">R$5,14M</span></div>
+      <div class="sc-row"><span style="color:var(--m)">Bônus</span><span class="ok">R$874K</span></div>
+      <div class="sc-row"><span style="color:var(--m)">NGR</span><span class="ok">R$4,27M</span></div>
+      <div class="sc-row"><span style="color:var(--m)">vs Março NGR</span><span class="ok"><strong>+52%</strong></span></div>
+      <div class="sc-row"><span style="color:var(--m)">Generosity</span><span class="ok"><strong>17% ✓</strong></span></div>
+    </div>
+    <div class="scenario">
+      <h4 style="color:#00e5ff;">🚀 Otimista<br><small>GGR +15% | Gen 17%</small></h4>
+      <div class="sc-row"><span style="color:var(--m)">GGR</span><span class="ok">R$5,48M</span></div>
+      <div class="sc-row"><span style="color:var(--m)">Bônus</span><span class="ok">R$931K</span></div>
+      <div class="sc-row"><span style="color:var(--m)">NGR</span><span class="ok">R$4,55M</span></div>
+      <div class="sc-row"><span style="color:var(--m)">vs Março NGR</span><span class="ok">+62%</span></div>
+      <div class="sc-row"><span style="color:var(--m)">Generosity</span><span class="ok">17% ✓</span></div>
+    </div>
+  </div>
+  <div style="margin-top:12px;font-size:11px;color:var(--m);">
+    * Março teve 26 dias. Abril tem 31 dias (+19% mais dias) — parte significativa do crescimento é estrutural (mais dias de operação).
+  </div>
+</div>
+
+<!-- METAS POR SEGMENTO -->
+<div class="section">
+  <div class="section-title">🎯 Metas por Segmento — Abril</div>
+  <table>
+    <thead>
+      <tr><th>Segmento</th><th>Players Atual</th><th>Meta Players Ativos</th><th>NGR Alvo Abril</th><th>Dias Ativos/player</th><th>Alavanca Principal</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="seg-color-e">Elite</span></td><td>73</td><td>73 (reter 100%)</td><td class="ok"><strong>R$5,5M</strong></td><td>28</td><td>Limite maior (R$5K) retém e incentiva volume</td></tr>
+      <tr><td><span class="seg-color-d">Diamond</span></td><td>111</td><td>120 (+8 upgrades)</td><td class="ok"><strong>R$1,8M</strong></td><td>25</td><td>Limite R$2K + uptier de Platina</td></tr>
+      <tr><td><span class="seg-color-p">Platina</span></td><td>873</td><td>900 (+27 upgrades)</td><td class="ok"><strong>R$4,5M</strong></td><td>25</td><td>Cashback sobe para Silver→Gold→Platina</td></tr>
+      <tr><td><span class="seg-color-g">Gold</span></td><td>1.391</td><td>1.500 (+100 upgrades)</td><td class="ok"><strong>R$2,5M</strong></td><td>22</td><td>Limite R$600 incentiva quem está na fronteira</td></tr>
+      <tr><td><span class="seg-color-s">Silver</span></td><td>2.324</td><td>2.200 (-124 sobem)</td><td class="ok"><strong>R$1,4M</strong></td><td>18</td><td>Cashback 6% diferenciado vs Bronze</td></tr>
+      <tr><td><span class="seg-color-b">Bronze</span></td><td>3.517</td><td>3.300 (-217 sobem)</td><td><strong>R$280K</strong></td><td>8</td><td>Menor cashback → mais NGR por jogada</td></tr>
+      <tr><td><span class="seg-color-n">Negative</span></td><td>1.306</td><td>1.050 (meta -20%)</td><td class="err"><strong>-R$1,4M</strong></td><td>12</td><td>Cashback mínimo + RRP continua ativo</td></tr>
+      <tr><td><span class="seg-color-sn">Super Neg.</span></td><td>511</td><td>400 (meta -22%)</td><td class="err"><strong>-R$1,0M</strong></td><td>20</td><td>Sem cashback → downgrade natural ou churn controlado</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PLANO DE IMPLEMENTAÇÃO -->
+<div class="section">
+  <div class="section-title">📋 Plano de Implementação</div>
+  <div class="card">
+    <h3>Semana 1 (01-07 Abril) — Preparação e comunicação</h3>
+    <ul style="color:var(--m);font-size:13px;line-height:2;padding-left:16px;">
+      <li>Comunicar mudança para players Elite e Diamond com <strong>carta personalizada</strong> — destaque o limite maior como benefício</li>
+      <li>Para Super Negative: enviar comunicação de <strong>missões alternativas</strong> (torneios, bônus de recarga) antes de cortar cashback</li>
+      <li>Configurar nova segmentação no sistema de bônus baseada em NGR 90 dias</li>
+      <li>Criar relatório semanal de monitoramento de churn por segmento</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Semana 2-3 (08-21 Abril) — Execução e monitoramento</h3>
+    <ul style="color:var(--m);font-size:13px;line-height:2;padding-left:16px;">
+      <li>Ativar nova estrutura de cashback — monitorar <strong>diariamente</strong> os KPIs de churn nos primeiros 7 dias</li>
+      <li>Se Super Negative tiver churn &gt;15% na semana 1: <strong>rollback parcial</strong> — oferecer 3% como "cashback de retenção"</li>
+      <li>Acompanhar upgrades de segmento: meta de 100+ players subindo de Bronze→Silver na primeira quinzena</li>
+      <li>Verificar se generosity está convergindo para 17% — ajustar Bronze se necessário</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Semana 4 (22-30 Abril) — Avaliação e ajuste fino</h3>
+    <ul style="color:var(--m);font-size:13px;line-height:2;padding-left:16px;">
+      <li>Revisão completa de performance vs metas por segmento</li>
+      <li>Ajustar limites de Gold e Silver se conversão estiver abaixo do esperado</li>
+      <li>Preparar proposta de Maio com dados reais de Abril</li>
+      <li>Avaliar se bônus de equipe RRP foi atingido (meta R$4M)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ALERTAS E RISCOS -->
+<div class="section">
+  <div class="section-title">⚠️ Riscos e Mitigações</div>
+  <div class="insight warn">
+    <div class="insight-title">Churn do segmento Super Negative após corte de cashback</div>
+    <div class="insight-body">511 players VIP17-20 sem cashback podem churnar. <strong>Mitigação:</strong> substituir cashback por engajamento — torneios exclusivos VIP, missões com prêmios não-financeiros, acesso antecipado a novos jogos. Se churn &gt;20% na primeira semana, retornar a 3% como cashback de transição.</div>
+  </div>
+  <div class="insight warn">
+    <div class="insight-title">Players Elite podem não notar o aumento de limite imediatamente</div>
+    <div class="insight-body">O limite de R$5K/dia só gera retorno se os players jogarem mais. <strong>Mitigação:</strong> comunicação ativa (WhatsApp/email personalizado) informando o novo benefício. Account managers do RRP devem contatar os 73 Elite diretamente.</div>
+  </div>
+  <div class="insight info">
+    <div class="insight-title">A meta de 17% de generosity exige crescimento de GGR, não só corte de bônus</div>
+    <div class="insight-body">Mesmo com a economia de R$124K/mês, chegar em 17% requer GGR crescendo ~8% em Abril. O crescimento virá de: (1) Abril tem 31 dias vs 26 de Março (+19%), (2) engajamento maior dos segmentos Gold/Platina/Diamond com limites maiores, (3) upgrades de segmento trazendo mais NGR.</div>
+  </div>
+</div>
+
+<div style="margin-top:40px;padding:16px;background:var(--s2);border-radius:8px;font-size:11px;color:var(--m);text-align:center;">
+  Relatório gerado com base em dados reais de Dez/25 · Jan/26 · Fev/26 · Mar/26 (até dia 26) · 10.106 players analisados
+</div>
+
+</body>
+</html>
