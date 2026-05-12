@@ -1407,19 +1407,23 @@ function renderDailyReport() {
     const d_dp  = (curr.dp ||0) - (prev.dp ||0);
     const d_bn  = (curr.bn ||0) - (prev.bn ||0);
     const d_ad  = (curr.ad ||0) - (prev.ad ||0);
-    const genPct  = _DR_GEN[r.segment] || 0;
-    const genDisp = Math.max(0, (curr.ggr||0)*genPct - (curr.bn||0));
+    // Usar gen_margem/gen_limite/gen_usado da CARTEIRA (consistente com aba Carteiras)
+    const genPct   = (r.gen_teto_pct || 0) / 100;
+    const genLimit = r.gen_limite || 0;
+    const genUsed  = r.gen_usado  || 0;
+    const genDisp  = Math.max(0, genLimit - genUsed);
     return {
       u, name:(r['First name']||'')+' '+(r['Last name']||''),
       am:r['Account Manager'], segment:r.segment, vip:r['VIP level'],
-      ngr_curr:curr.ngr||0, ggr_curr:curr.ggr||0,
+      ngr_curr:curr.ngr||0, ggr_curr:curr.ggr||0, bn_curr:genUsed,
+      genLimit, genUsed,
       d_ngr, d_ggr, d_dp, d_bn,
       deposited: d_dp > 0,
       // Jogou: teve variação positiva em GGR ou NGR
       jogou:     d_ggr > 0 || d_ngr > 0,
       // Big Win: GGR ou NGR caiu (casa perdeu — jogador ganhou)
       bigWin:    d_ggr < -3000 || d_ngr < -3000,
-      genDisp, genPct,
+      genDisp, genPct, genLimit, genUsed,
       ims_link: curr.ims_link || r.ims_link || '',
     };
   });
@@ -1428,12 +1432,16 @@ function renderDailyReport() {
   _drAmKpi = {};
   _DR_AMS.forEach(am => _drAmKpi[am] = {
     total:0, jogou:0, nao_jogou:0, deposited:0, bigWin:0,
-    d_ngr:0, d_ggr:0, d_dp:0, d_bn:0, genDisp:0,
+    d_ngr:0, d_ggr:0, d_dp:0, d_bn:0, genDisp:0, margemReal:0, limiteTotal:0, usadoTotal:0,
   });
   _dailyRows.forEach(r => {
     const k = _drAmKpi[r.am]; if (!k) return;
     k.total++; k.d_ngr+=r.d_ngr; k.d_ggr+=r.d_ggr;
     k.d_dp+=r.d_dp; k.d_bn+=r.d_bn; k.genDisp+=r.genDisp;
+    // margem real = limite - usado (pode ser negativa), igual à aba Carteiras
+    k.margemReal  += (r.genLimit - r.genUsed);
+    k.limiteTotal += r.genLimit;
+    k.usadoTotal  += r.genUsed;
     if (r.jogou)     k.jogou++;     else k.nao_jogou++;
     if (r.deposited) k.deposited++;
     if (r.bigWin)    k.bigWin++;
@@ -1497,6 +1505,7 @@ function renderDailyReport() {
   </div>
 
   <div class="dr-am-grid" id="drAmGrid"></div>
+  <div id="drWalletChanges" style="margin-bottom:20px"></div>
   <div class="dr-filters"  id="drFilters"></div>
   <div class="dr-table-wrap">
     <table class="dr-table">
@@ -1509,7 +1518,91 @@ function renderDailyReport() {
 
   _drRenderAmCards();
   _drRenderFilters();
+  _drRenderWalletChanges();
   _drRenderTable();
+}
+
+// ── Entradas e saídas elegíveis da carteira ───────────────────────
+function _drRenderWalletChanges() {
+  // Novos VIPs elegíveis (≥ Platina High) que NÃO estão na carteira
+  const cartUserSet = new Set(CARTEIRA.map(r => String(r.Username)));
+  const saiuSet = new Set(SAIU_CARTEIRA.map(r => String(r.Username)));
+
+  const novosElegiveis = (DIFF.novos_vip || []).filter(r =>
+    (r.t === 'Platina High' || r.t === 'Diamond' || r.t === 'Elite') &&
+    !cartUserSet.has(String(r.u))
+  );
+
+  // Jogadores que desceram abaixo de Platina High e ainda estão na carteira
+  const sairamElegiveis = (DIFF.desceram || []).filter(r =>
+    (r.para === 'Platina Low' || r.para === 'Não VIP') &&
+    cartUserSet.has(String(r.u))
+  );
+
+  const tc2 = t => t==='Elite'?'var(--tier-eli)':t==='Diamond'?'var(--tier-dia)':t==='Platina High'?'var(--tier-ph)':'var(--tier-pl)';
+
+  if (novosElegiveis.length === 0 && sairamElegiveis.length === 0) return;
+
+  const container = document.getElementById('drWalletChanges');
+  if (!container) return;
+
+  let html = '';
+
+  if (novosElegiveis.length > 0) {
+    html += `
+      <div style="background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.25);border-radius:14px;padding:20px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:18px">🆕</span>
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--neon-cyan);letter-spacing:.1em;text-transform:uppercase">Entrada na carteira</div>
+            <div style="font-size:13px;color:var(--text-2);margin-top:2px">${novosElegiveis.length} jogador${novosElegiveis.length>1?'es elegíveis':'  elegível'} — atingiram ≥ Platina High</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${novosElegiveis.map(r => `
+            <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-2);border-radius:10px;padding:10px 14px">
+              <div>
+                <span style="font-weight:700;color:var(--text-1)">${r.fn} ${r.ln}</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);margin-left:8px">${r.u}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="background:${tc2(r.t)}22;color:${tc2(r.t)};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">${r.t}</span>
+                <span style="font-family:var(--mono);font-size:12px;color:var(--up)">NGR ${_drFmtN(r.ngr)}</span>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  if (sairamElegiveis.length > 0) {
+    html += `
+      <div style="background:rgba(255,84,112,.06);border:1px solid rgba(255,84,112,.25);border-radius:14px;padding:20px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:18px">⚠️</span>
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--down);letter-spacing:.1em;text-transform:uppercase">Saída da carteira</div>
+            <div style="font-size:13px;color:var(--text-2);margin-top:2px">${sairamElegiveis.length} jogador${sairamElegiveis.length>1?'es':''} caíram abaixo de Platina High</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${sairamElegiveis.map(r => `
+            <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-2);border-radius:10px;padding:10px 14px">
+              <div>
+                <span style="font-weight:700;color:var(--text-1)">${r.fn} ${r.ln}</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);margin-left:8px">${r.u}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:11px;color:var(--text-3)">${r.de}</span>
+                <span style="font-size:12px;color:var(--text-3)">→</span>
+                <span style="background:${tc2(r.para)}22;color:${tc2(r.para)};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">${r.para}</span>
+                <span style="font-family:var(--mono);font-size:12px;color:var(--down)">NGR ${_drFmtN(r.ngr_novo)}</span>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  container.innerHTML = html;
 }
 
 // ── Cards de AM ───────────────────────────────────────────────────
@@ -1542,14 +1635,34 @@ function _drRenderAmCards() {
           <span class="dr-kpi-val neu">${k.deposited}<span style="font-size:11px;font-weight:400;color:var(--text-3)"> / ${k.total}</span></span>
         </div>
         <div class="dr-kpi">
-          <span class="dr-kpi-lbl">Bônus Disp.</span>
-          <span class="dr-kpi-val warn">${_drFmtK(k.genDisp)}</span>
+          <span class="dr-kpi-lbl">Margem Gen</span>
+          <span class="dr-kpi-val ${k.margemReal>=0?'pos':'neg'}">${_drFmtK(k.margemReal)}</span>
         </div>
         <div class="dr-kpi">
           <span class="dr-kpi-lbl">⚠ Sem jogar</span>
           <span class="dr-kpi-val ${k.nao_jogou>0?'neg':'pos'}">${k.nao_jogou}</span>
         </div>
       </div>
+      ${(function(){
+        const _pct2 = k.limiteTotal > 0 ? (k.usadoTotal / k.limiteTotal * 100) : 0;
+        const _over2 = k.usadoTotal > k.limiteTotal;
+        const _fill2 = _over2 ? 100 : Math.min(100, _pct2);
+        const _bar2  = _over2 ? 'var(--down)' : _pct2 > 80 ? 'var(--neon-amber)' : col;
+        const _lbl2  = _over2 ? 'var(--down)' : _pct2 > 80 ? 'var(--neon-amber)' : 'var(--text-2)';
+        const _exc2  = k.usadoTotal - k.limiteTotal;
+        const _tag   = _over2
+          ? '<span style="color:var(--down)">+' + (_exc2/1000).toFixed(1) + 'k acima</span>'
+          : _pct2.toFixed(1) + '% do limite';
+        return '<div style="margin:12px 0 8px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'
+          + '<span style="font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Generosity</span>'
+          + '<span style="font-size:11px;font-weight:700;font-family:var(--mono);color:' + _lbl2 + '">' + _tag + '</span>'
+          + '</div>'
+          + '<div style="height:6px;background:var(--bg-0);border-radius:100px;overflow:hidden">'
+          + '<div style="height:100%;width:' + _fill2 + '%;background:' + _bar2 + ';border-radius:100px;box-shadow:0 0 8px ' + _bar2 + '44"></div>'
+          + '</div>'
+          + '</div>';
+      })()}
       <div class="dr-am-badges">
         ${k.bigWin?`<span class="dr-badge" style="background:rgba(255,180,61,.18);color:var(--neon-amber)">⚡ ${k.bigWin} Big Win</span>`:''}
         <span class="dr-badge" style="background:rgba(74,222,128,.1);color:var(--up)">
@@ -1646,7 +1759,9 @@ function _drRenderTable() {
     if (r.bigWin)    chips += `<span class="dr-chip chip-win">⚡ Big Win</span>`;
     if (r.deposited) chips += `<span class="dr-chip chip-dep">↑ Depositou</span>`;
     if (!chips)      chips  = `<span class="dr-chip chip-ok">● Jogou</span>`;
-    if (r.genDisp>0) chips += `<span class="dr-chip chip-bonus">+${_drFmtK(r.genDisp).replace('+','')}</span>`;
+    if (r.ggr_curr === 0) chips += `<span class="dr-chip" style="background:rgba(255,84,112,.18);color:var(--down)">✕ Sem GGR</span>`;
+    else if (r.genDisp === 0) chips += `<span class="dr-chip" style="background:rgba(255,180,61,.18);color:var(--neon-amber)">⚑ Teto atingido</span>`;
+    else if (r.genDisp>0) chips += `<span class="dr-chip chip-bonus">+${_drFmtK(r.genDisp).replace('+','')}</span>`;
 
     return `<tr class="${rowCls}">
       <td>
@@ -1659,7 +1774,18 @@ function _drRenderTable() {
       <td class="right ${r.d_ggr>0?'dr-pos':r.d_ggr<0?'dr-neg':'dr-neu'}">${_drFmtD(r.d_ggr)}</td>
       <td class="right ${r.d_dp>0?'dr-cyan':'dr-neu'}">${_drFmtD(r.d_dp)}</td>
       <td class="right ${r.d_bn>0?'dr-neg':'dr-neu'}">${_drFmtD(r.d_bn)}</td>
-      <td class="right ${r.genDisp>100?'dr-amber':'dr-neu'}">${r.genDisp>0?_drFmtN(r.genDisp):'<span style="color:var(--text-3)">—</span>'}</td>
+      <td class="right ${r.genDisp>100?'dr-amber':'dr-neu'}" style="position:relative">
+        ${(() => {
+          const capPct = (r.genPct*100).toFixed(0);
+          const usedPct = r.ggr_curr > 0 ? (r.genUsed/r.ggr_curr*100).toFixed(1) : '—';
+          const tooltip = `title="GGR 90d: ${_drFmtN(r.ggr_curr)} | Teto ${capPct}%: ${_drFmtN(r.genLimit)} | Bônus usado: ${_drFmtN(r.genUsed)} (${usedPct}%) | Margem: ${_drFmtN(r.genDisp)}"`;
+          if (r.ggr_curr === 0)
+            return `<span ${tooltip} style="color:var(--down);font-weight:700;font-size:11px;cursor:help;border-bottom:1px dashed var(--down)">Sem GGR</span>`;
+          if (r.genDisp === 0)
+            return `<span ${tooltip} style="color:var(--neon-amber);font-weight:700;font-size:11px;cursor:help;border-bottom:1px dashed var(--neon-amber)">Teto atingido</span>`;
+          return `<span ${tooltip} style="cursor:help;border-bottom:1px dashed rgba(255,180,61,.4)">${_drFmtN(r.genDisp)}</span>`;
+        })()}
+      </td>
       <td class="center"><div class="dr-chips">${chips}</div></td>
       <td class="center">${r.ims_link?`<a href="${r.ims_link}" target="_blank"
         style="display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:6px;
@@ -1682,6 +1808,7 @@ function _drRenderTable() {
 let cartMainTab = 'carteiras';
 let cartAM = 'all';
 let cartSeg = 'all';
+let cartTier = 'all';
 let cartSearch = '';
 let cartSort = { key: 'ngr', dir: 'desc' };
 let cartPage = 1;
@@ -1703,7 +1830,7 @@ function renderCarteiras() {
 
   // AM summary cards
   const amStats = {};
-  ams.forEach(am => { amStats[am] = {count:0,ngr:0,ggr:0,elite:0,diamond:0,ph:0,margem:0}; });
+  ams.forEach(am => { amStats[am] = {count:0,ngr:0,ggr:0,elite:0,diamond:0,ph:0,margem:0,limite:0,usado:0}; });
   CARTEIRA.forEach(r => {
     const s = amStats[r['Account Manager']];
     if (!s) return;
@@ -1712,6 +1839,8 @@ function renderCarteiras() {
     else if (r.segment==='Diamond') s.diamond++;
     else if (r.segment==='Platina High') s.ph++;
     s.margem += r.gen_margem||0;
+    s.limite += r.gen_limite||0;
+    s.usado  += r.gen_usado ||0;
   });
 
   // totais saídas por AM
@@ -1821,6 +1950,33 @@ function renderCarteiras() {
             ${s.ph?`<span class="cw-tier-badge" style="background:var(--tier-ph)20;color:var(--tier-ph)">${s.ph} Platina High</span>`:''}
           </div>
 
+${
+            (function(){
+              const _pct = s.limite > 0 ? (s.usado / s.limite * 100) : 0;
+              const _over = s.usado > s.limite;
+              const _fill = _over ? 100 : Math.min(100, _pct);
+              const _bar  = _over ? 'var(--down)' : _pct > 80 ? 'var(--neon-amber)' : col;
+              const _lbl  = _over ? 'var(--down)' : _pct > 80 ? 'var(--neon-amber)' : 'var(--text-2)';
+              const _exc  = (s.usado - s.limite);
+              const _label = _over
+                ? '<span style="color:var(--down)">+' + (_exc/1000).toFixed(1) + 'k acima do teto</span>'
+                : _pct.toFixed(1) + '% do limite';
+              return '<div style="margin-bottom:16px">'
+                + '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">'
+                + '<span style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Generosity utilizada</span>'
+                + '<span style="font-size:13px;font-weight:700;font-family:var(--mono);color:' + _lbl + '">' + _label + '</span>'
+                + '</div>'
+                + '<div style="position:relative;height:10px;background:var(--bg-3);border-radius:100px;overflow:hidden">'
+                + '<div style="height:100%;width:' + _fill + '%;background:' + _bar + ';border-radius:100px;transition:width 1s ease;box-shadow:0 0 10px ' + _bar + '44"></div>'
+                + '</div>'
+                + '<div style="display:flex;justify-content:space-between;margin-top:6px">'
+                + '<span style="font-size:10px;color:var(--text-3);font-family:var(--mono)">Usado: R$ ' + (s.usado/1000).toFixed(1) + 'k</span>'
+                + '<span style="font-size:10px;color:var(--text-3);font-family:var(--mono)">Limite: R$ ' + (s.limite/1000).toFixed(1) + 'k</span>'
+                + '</div>'
+                + '</div>';
+            })()
+          }
+
           <div class="cw-divider"></div>
 
           <div class="cw-footer-row">
@@ -1891,11 +2047,22 @@ function _renderCartFilters() {
       onclick="cartAM='${value}';cartPage=1;renderCarteirasTable()">${label}</button>`;
   };
 
+  const tierColors = { 'Platina High': 'var(--tier-ph)', 'Diamond': 'var(--tier-dia)', 'Elite': 'var(--tier-eli)' };
+  const makeTierBtn = (label, value, color) => {
+    const active = cartTier === value;
+    const sty = active && color ? `background:${color}33;color:${color};border-color:${color};` : '';
+    return `<button class="filter-btn ${active?'active':''}" style="${sty}"
+      onclick="cartTier='${value}';cartPage=1;renderCarteirasTable()">${label}</button>`;
+  };
+
   container.innerHTML = `
     <input type="text" class="search-input" id="cartSearchInput" placeholder="Buscar nome ou username..." value="${cartSearch}"
       oninput="cartSearch=this.value.toLowerCase();cartPage=1;renderCarteirasTable()">
     ${makeBtn('Todos AMs', 'all', '')}
     ${ams.map(am => makeBtn(am.split(' ')[0], am, amColors[am])).join('')}
+    <span style="width:1px;height:24px;background:var(--line-2);display:inline-block;vertical-align:middle;margin:0 4px"></span>
+    ${makeTierBtn('Todos Tiers', 'all', '')}
+    ${['Platina High','Diamond','Elite'].map(t => makeTierBtn(t, t, tierColors[t])).join('')}
   `;
 }
 
@@ -1915,6 +2082,7 @@ function renderCarteirasTable() {
 
   // Filtros
   if (cartAM !== 'all') data = data.filter(r => r['Account Manager'] === cartAM);
+  if (cartTier !== 'all') data = data.filter(r => r.segment === cartTier);
   if (cartSearch) data = data.filter(r => {
     const n = ((r['First name']||'') + ' ' + (r['Last name']||'') + ' ' + (r.Username||'')).toLowerCase();
     return n.includes(cartSearch);
