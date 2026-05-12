@@ -1738,54 +1738,129 @@ function renderCarteiras() {
   }
 
   c.innerHTML = `
-    <section class="hero">
-      <div class="hero-eyebrow">Carteiras · 11/05/2026</div>
-      <h1 class="hero-title">A <em>carteira</em><br>dos AMs.</h1>
-    </section>
+    <style>
+      .cw-header { margin-bottom:32px }
+      .cw-eyebrow { font-family:var(--mono);font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:6px }
+      .cw-title { font-family:var(--serif);font-size:clamp(28px,4vw,48px);font-weight:400;line-height:1.1;color:var(--text-1) }
+      .cw-title em { font-style:italic;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text }
 
-    <!-- AM CARDS -->
-    <div class="hero-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:32px">
+      .cw-am-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px }
+      .cw-am-card { background:var(--bg-1);border:1px solid var(--line);border-radius:16px;padding:22px;position:relative;overflow:hidden;transition:transform .15s,border-color .2s }
+      .cw-am-card::before { content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-color) }
+      .cw-am-card:hover { transform:translateY(-2px) }
+      .cw-am-name { font-size:17px;font-weight:700;color:var(--card-color);margin-bottom:18px;letter-spacing:-.01em }
+      .cw-kpi-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:18px }
+      .cw-kpi { display:flex;flex-direction:column;gap:3px }
+      .cw-kpi-lbl { font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em }
+      .cw-kpi-val { font-size:18px;font-weight:700;line-height:1.1 }
+      .cw-kpi-sub { font-size:10px;color:var(--text-3);margin-top:1px }
+      .cw-tiers { display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px }
+      .cw-tier-badge { font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px }
+      .cw-divider { height:1px;background:var(--line);margin-bottom:14px }
+      .cw-footer-row { display:flex;justify-content:space-between;align-items:center }
+      .cw-footer-stat { display:flex;flex-direction:column;gap:2px }
+      .cw-footer-lbl { font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em }
+      .cw-footer-val { font-size:13px;font-weight:600 }
+
+      .cw-nav { display:flex;align-items:center;gap:0;margin-bottom:28px;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:4px;width:fit-content }
+      .cw-nav-btn { padding:8px 20px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text-3);transition:all .2s;display:flex;align-items:center;gap:7px }
+      .cw-nav-btn:hover { color:var(--text-1) }
+      .cw-nav-btn.cw-active { background:var(--bg-3);color:var(--text-1);box-shadow:0 1px 4px rgba(0,0,0,.4) }
+      .cw-nav-btn.cw-active-cyan { background:var(--neon-cyan)18;color:var(--neon-cyan) }
+      .cw-nav-btn.cw-active-lime { background:var(--neon-lime)18;color:var(--neon-lime) }
+
+      .cw-sub-nav { display:flex;align-items:center;gap:8px;margin-bottom:20px }
+      .cw-tab-pill { padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--text-3);transition:all .18s }
+      .cw-tab-pill:hover { color:var(--text-1);border-color:var(--line-2) }
+      .cw-tab-pill.cw-tab-on { background:var(--neon-cyan)22;color:var(--neon-cyan);border-color:var(--neon-cyan) }
+      .cw-tab-pill.cw-tab-exit { background:var(--down)18;color:var(--down);border-color:var(--down) }
+      .cw-export-btn { margin-left:auto;padding:7px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--neon-lime)66;background:var(--neon-lime)12;color:var(--neon-lime);transition:all .18s;display:flex;align-items:center;gap:6px }
+      .cw-export-btn:hover { background:var(--neon-lime)22;border-color:var(--neon-lime) }
+
+      @media(max-width:900px){.cw-am-grid{grid-template-columns:1fr}}
+    </style>
+
+    <!-- HEADER -->
+    <div class="cw-header">
+      <div class="cw-eyebrow">Carteiras · ${SNAPSHOT.date}</div>
+      <h1 class="cw-title">A <em>carteira</em><br>dos AMs.</h1>
+    </div>
+
+    <!-- AM KANBAN CARDS -->
+    <div class="cw-am-grid">
       ${ams.map(am => {
         const s = amStats[am]; const col = amColors[am];
-        return `<div class="stat-card" style="border-color:${col}44">
-          <div class="stat-label" style="color:${col}">${am}</div>
-          <div class="stat-value">${s.count}</div>
-          <div class="stat-sub">${fmtNk(s.ngr)} NGR</div>
-          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;font-size:11px">
-            ${s.elite?`<span style="background:var(--tier-eli)22;color:var(--tier-eli);padding:1px 6px;border-radius:10px">${s.elite} Elite</span>`:''}
-            ${s.diamond?`<span style="background:var(--tier-dia)22;color:var(--tier-dia);padding:1px 6px;border-radius:10px">${s.diamond} Diamond</span>`:''}
-            ${s.ph?`<span style="background:var(--tier-ph)22;color:var(--tier-ph);padding:1px 6px;border-radius:10px">${s.ph} PH</span>`:''}
+        const margClass = s.margem >= 0 ? 'var(--up)' : 'var(--down)';
+        const totalGGR = s.ggr;
+        return `<div class="cw-am-card" style="--card-color:${col}">
+          <div class="cw-am-name">${am}</div>
+
+          <div class="cw-kpi-grid">
+            <div class="cw-kpi">
+              <span class="cw-kpi-lbl">Jogadores</span>
+              <span class="cw-kpi-val" style="color:${col}">${s.count}</span>
+            </div>
+            <div class="cw-kpi">
+              <span class="cw-kpi-lbl">NGR 90d</span>
+              <span class="cw-kpi-val" style="color:var(--up)">${fmtNk(s.ngr)}</span>
+            </div>
+            <div class="cw-kpi">
+              <span class="cw-kpi-lbl">GGR 90d</span>
+              <span class="cw-kpi-val" style="color:var(--text-1)">${fmtNk(s.ggr)}</span>
+            </div>
+            <div class="cw-kpi">
+              <span class="cw-kpi-lbl">Margem Gen</span>
+              <span class="cw-kpi-val" style="color:${margClass}">${fmtNk(s.margem)}</span>
+              <span class="cw-kpi-sub">base GGR</span>
+            </div>
           </div>
-          <div style="margin-top:8px;font-size:11px;color:${s.margem>=0?'var(--up)':'var(--down)'}">Margem gen: ${fmtNk(s.margem)}</div>
-          <div style="font-size:10px;color:var(--text-3);margin-top:4px">${saiuPorAM[am]||0} saíram da carteira</div>
+
+          <div class="cw-tiers">
+            ${s.elite?`<span class="cw-tier-badge" style="background:var(--tier-eli)20;color:var(--tier-eli)">${s.elite} Elite</span>`:''}
+            ${s.diamond?`<span class="cw-tier-badge" style="background:var(--tier-dia)20;color:var(--tier-dia)">${s.diamond} Diamond</span>`:''}
+            ${s.ph?`<span class="cw-tier-badge" style="background:var(--tier-ph)20;color:var(--tier-ph)">${s.ph} Platina High</span>`:''}
+          </div>
+
+          <div class="cw-divider"></div>
+
+          <div class="cw-footer-row">
+            <div class="cw-footer-stat">
+              <span class="cw-footer-lbl">Saíram da carteira</span>
+              <span class="cw-footer-val" style="color:var(--text-3)">${saiuPorAM[am]||0} players</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-3);font-family:var(--mono)">VIP ${Math.min(...CARTEIRA.filter(r=>r['Account Manager']===am).map(r=>r['VIP level']||0))}–${Math.max(...CARTEIRA.filter(r=>r['Account Manager']===am).map(r=>r['VIP level']||0))}</div>
+          </div>
         </div>`;
       }).join('')}
     </div>
 
-    <!-- MAIN TAB SWITCH -->
-    <div style="display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid var(--line);padding-bottom:12px">
-      <button onclick="cartMainTab='carteiras';renderCarteiras()" style="padding:6px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:none;background:var(--neon-cyan);color:#000;font-weight:600">Carteiras</button>
-      <button onclick="cartMainTab='daily';renderCarteiras()" style="padding:6px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--text-2)">📊 Relatório Diário</button>
+    <!-- NAV PRINCIPAL (segmento pill estilo) -->
+    <div class="cw-nav" style="margin-bottom:28px">
+      <button class="cw-nav-btn ${cartMainTab==='carteiras'?'cw-active-cyan':''}"
+        onclick="cartMainTab='carteiras';renderCarteiras()">
+        <span style="font-size:14px">◫</span> Carteiras
+      </button>
+      <button class="cw-nav-btn ${cartMainTab==='daily'?'cw-active-lime':''}"
+        onclick="cartMainTab='daily';renderCarteiras()">
+        <span style="font-size:14px">◈</span> Relatório Diário
+      </button>
     </div>
 
-    <!-- TABS INTERNAS -->
-    <div style="display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid var(--line);padding-bottom:12px">
-      <button onclick="cartTab='carteira';renderCarteirasTable()" id="ctab-carteira"
-        style="padding:6px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:none;
-               background:${cartTab==='carteira'?'var(--neon-cyan)':'transparent'};
-               color:${cartTab==='carteira'?'#000':'var(--text-2)'}">
-        Carteira Ativa (${CARTEIRA.length})
+    <!-- SUB-NAV (tabs internas) -->
+    <div class="cw-sub-nav">
+      <button class="cw-tab-pill ${cartTab==='carteira'?'cw-tab-on':''}"
+        onclick="cartTab='carteira';renderCarteirasTable()">
+        Carteira Ativa <span style="opacity:.6">(${CARTEIRA.length})</span>
       </button>
-      <button onclick="cartTab='saidas';renderCarteirasTable()" id="ctab-saidas"
-        style="padding:6px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:none;
-               background:${cartTab==='saidas'?'var(--down)':'transparent'};
-               color:${cartTab==='saidas'?'#fff':'var(--text-2)'}">
-        Saíram da Carteira (${SAIU_CARTEIRA.filter(r=>r.motivo_saida).length})
+      <button class="cw-tab-pill ${cartTab==='saidas'?'cw-tab-exit':''}"
+        onclick="cartTab='saidas';renderCarteirasTable()">
+        Saíram da Carteira <span style="opacity:.6">(${SAIU_CARTEIRA.filter(r=>r.motivo_saida).length})</span>
       </button>
-      <button onclick="exportCarteira('all')"
-        style="margin-left:auto;padding:6px 18px;border-radius:8px;font-size:13px;cursor:pointer;
-               border:1px solid var(--neon-lime);background:var(--neon-lime)22;color:var(--neon-lime);font-weight:600">
-        ↓ Exportar XLSX
+      <button class="cw-export-btn" onclick="exportCarteira('all')">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 1v7M3 5l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Exportar XLSX
       </button>
     </div>
 
