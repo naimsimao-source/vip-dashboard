@@ -1631,7 +1631,7 @@ function renderDailyReport() {
       d_ngr, d_ggr, d_dp, d_bn,
       deposited: d_dp > 0,
       // Jogou: teve variação positiva em GGR ou NGR
-      jogou:     d_ggr > 0 || d_ngr > 0,
+      jogou:     d_ggr !== 0 || d_ngr !== 0,
       // Big Win: GGR ou NGR caiu (casa perdeu — jogador ganhou)
       bigWin:    d_ggr < -3000 || d_ngr < -3000,
       genDisp, genPct, genLimit, genUsed,
