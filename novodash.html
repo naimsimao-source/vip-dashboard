@@ -2306,7 +2306,7 @@ function _renderCartFilters() {
 
   container.innerHTML = `
     <input type="text" class="search-input" id="cartSearchInput" placeholder="Buscar nome ou username..." value="${cartSearch}"
-      oninput="cartSearch=this.value.toLowerCase();cartPage=1;renderCarteirasTable()">
+      oninput="cartSearch=this.value.toLowerCase();cartPage=1;_renderCartTableOnly()">
     ${makeBtn('Todos AMs', 'all', '')}
     ${ams.map(am => makeBtn(am.split(' ')[0], am, amColors[am])).join('')}
     <span style="width:1px;height:24px;background:var(--line-2);display:inline-block;vertical-align:middle;margin:0 4px"></span>
@@ -2319,6 +2319,21 @@ function _renderCartFilters() {
     <span style="width:1px;height:24px;background:var(--line-2);display:inline-block;vertical-align:middle;margin:0 4px"></span>
     ${makeDepBtn('Qualquer','all','')} ${makeDepBtn('≥ 7d s/dep','7','var(--neon-amber)')} ${makeDepBtn('≥ 14d s/dep','14','var(--down)')}
   `;
+}
+
+function _renderCartTableOnly() {
+  // Salvar cursor antes do render
+  const _inp = document.getElementById('cartSearchInput');
+  const _pos = _inp ? _inp.selectionStart : null;
+  renderCarteirasTable();
+  // Restaurar foco após render (requestAnimationFrame garante que o DOM atualizou)
+  requestAnimationFrame(() => {
+    const _inp2 = document.getElementById('cartSearchInput');
+    if (_inp2) {
+      _inp2.focus();
+      try { _inp2.setSelectionRange(_pos, _pos); } catch(e){}
+    }
+  });
 }
 
 function renderCarteirasTable() {
