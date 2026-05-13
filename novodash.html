@@ -1635,6 +1635,7 @@ function renderDailyReport() {
       // Big Win: GGR ou NGR caiu (casa perdeu — jogador ganhou)
       bigWin:    d_ggr < -3000 || d_ngr < -3000,
       genDisp, genPct, genLimit, genUsed,
+      acStatus: r.account_status || 'active',
       ims_link: curr.ims_link || r.ims_link || '',
     };
   });
@@ -1974,14 +1975,21 @@ function _drRenderTable() {
     const nameCls = !r.jogou?'dr-neg':r.bigWin?'dr-amber':'';
     const amCol = _DR_AM_COLORS[r.am]||'var(--text-2)';
 
+    // chip de atividade
     let chips = '';
     if (!r.jogou)    chips += `<span class="dr-chip chip-alert">○ Não jogou</span>`;
     if (r.bigWin)    chips += `<span class="dr-chip chip-win">⚡ Big Win</span>`;
     if (r.deposited) chips += `<span class="dr-chip chip-dep">↑ Depositou</span>`;
     if (!chips)      chips  = `<span class="dr-chip chip-ok">● Jogou</span>`;
-    if (r.ggr_curr === 0) chips += `<span class="dr-chip" style="background:rgba(255,84,112,.18);color:var(--down)">✕ Sem GGR</span>`;
-    else if (r.genDisp === 0) chips += `<span class="dr-chip" style="background:rgba(255,180,61,.18);color:var(--neon-amber)">⚑ Teto atingido</span>`;
-    else if (r.genDisp>0) chips += `<span class="dr-chip chip-bonus">+${_drFmtK(r.genDisp).replace('+','')}</span>`;
+    // chip de status da conta (substitui o chip de bônus)
+    const _stMap = {
+      active:        null,
+      frozen:        `<span class="dr-chip" style="background:rgba(0,240,255,.15);color:var(--neon-cyan)">❄ Pausada</span>`,
+      timeout:       `<span class="dr-chip" style="background:rgba(255,180,61,.15);color:var(--neon-amber)">⏸ Timeout</span>`,
+      self_excluded: `<span class="dr-chip" style="background:rgba(255,84,112,.18);color:var(--down)">✕ Auto-excluído</span>`,
+    };
+    const _stChip = _stMap[r.acStatus || 'active'];
+    if (_stChip) chips += _stChip;
 
     return `<tr class="${rowCls}">
       <td>
