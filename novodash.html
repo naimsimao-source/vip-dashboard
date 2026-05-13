@@ -2301,7 +2301,7 @@ function renderMovements() {
     row: r => `<tr>
       <td>${r.fn} ${r.ln}</td>
       <td style="color:var(--text-3);font-family:var(--mono);font-size:12px">${r.u}</td>
-      <td><span style="color:var(--text-3);font-size:12px">VIP ${r.lv}</span></td>
+      <td><span style="color:var(--text-3);font-size:12px">VIP ${r.vip_novo||r.lv||"—"}</span></td>
       <td>${tierBadge(r.de)} ${arrow(r.de,r.para)} ${tierBadge(r.para)}</td>
       <td style="text-align:right;color:var(--text-2)">${fmtN(r.ngr_ant)}</td>
       <td style="text-align:right;color:var(--up)">${fmtN(r.ngr_novo)}</td>
@@ -2315,7 +2315,7 @@ function renderMovements() {
     row: r => `<tr>
       <td>${r.fn} ${r.ln}</td>
       <td style="color:var(--text-3);font-family:var(--mono);font-size:12px">${r.u}</td>
-      <td><span style="color:var(--text-3);font-size:12px">VIP ${r.lv}</span></td>
+      <td><span style="color:var(--text-3);font-size:12px">VIP ${r.vip_novo||r.lv||"—"}</span></td>
       <td>${tierBadge(r.de)} ${arrow(r.de,r.para)} ${tierBadge(r.para)}</td>
       <td style="text-align:right;color:var(--text-2)">${fmtN(r.ngr_ant)}</td>
       <td style="text-align:right;color:var(--down)">${fmtN(r.ngr_novo)}</td>
@@ -2325,25 +2325,26 @@ function renderMovements() {
 
   // NOVOS VIPs
   html += section('Novos VIPs', 'var(--new)', '★', d.novos_vip, {
-    head: `<th>Jogador</th><th>Username</th><th>VIP</th><th>Tier</th><th style="text-align:right">NGR 90d</th>`,
+    head: `<th>Jogador</th><th>Username</th><th>De</th><th>Para</th><th>VIP</th><th style="text-align:right">NGR 90d</th>`,
     row: r => `<tr>
       <td>${r.fn} ${r.ln}</td>
       <td style="color:var(--text-3);font-family:var(--mono);font-size:12px">${r.u}</td>
-      <td><span style="color:var(--text-3);font-size:12px">VIP ${r.lv}</span></td>
-      <td>${tierBadge(r.t)}</td>
-      <td style="text-align:right;color:var(--new)">${fmtN(r.ngr)}</td>
+      <td><span style="color:var(--text-3);font-size:12px">${r.de||'Novo'}</span></td>
+      <td>${tierBadge(r.para||r.t)}</td>
+      <td><span style="color:var(--text-3);font-size:12px">VIP ${r.vip_novo||r.lv||'—'}</span></td>
+      <td style="text-align:right;color:var(--new)">${fmtN(r.ngr_novo||r.ngr||0)}</td>
     </tr>`
   });
 
   // SAÍRAM
   html += section('Saíram do VIP', 'var(--out)', '✕', d.saiu_vip, {
-    head: `<th>Jogador</th><th>Username</th><th>VIP</th><th>Último Tier</th><th style="text-align:right">NGR 90d</th>`,
+    head: `<th>Jogador</th><th>Username</th><th>Último Tier</th><th>Para</th><th style="text-align:right">NGR Ant.</th>`,
     row: r => `<tr>
       <td style="color:var(--text-2)">${r.fn} ${r.ln}</td>
       <td style="color:var(--text-3);font-family:var(--mono);font-size:12px">${r.u}</td>
-      <td><span style="color:var(--text-3);font-size:12px">VIP ${r.lv}</span></td>
-      <td>${tierBadge(r.t)}</td>
-      <td style="text-align:right;color:var(--out)">${fmtN(r.ngr)}</td>
+      <td>${tierBadge(r.de||r.t)}</td>
+      <td><span style="color:var(--text-3);font-size:12px">${r.para||'Saiu'}</span></td>
+      <td style="text-align:right;color:var(--out)">${fmtN(r.ngr_ant||r.ngr||0)}</td>
     </tr>`
   });
 
