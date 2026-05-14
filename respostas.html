@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Pesquisa de Clima & Cultura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E1F5EE; --green-mid: #5DCAA5;
+  --amber: #BA7517; --amber-light: #FAEEDA;
+  --red: #A32D2D; --red-light: #FCEBEB;
+  --bg: #F7F6F2; --surface: #FFFFFF;
+  --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.14);
+  --text: #1A1A18; --text-2: #5A5A56; --text-3: #9A9A94;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+html { font-size: 16px; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+.app { max-width: 780px; margin: 0 auto; padding: 0 16px 80px; }
+
+.site-header { padding: 28px 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark { width: 34px; height: 34px; background: var(--green); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+.logo-mark svg { width: 18px; height: 18px; fill: white; }
+.logo-text { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.logo-sub { font-size: 12px; color: var(--text-3); margin-top: 1px; font-weight: 400; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.reload-btn { padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; background: transparent; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); cursor: pointer; color: var(--text-2); transition: all .12s; }
+.reload-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+.last-update { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-3); }
+
+.dash-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+.metric-val { font-size: 28px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text); line-height: 1; }
+.metric-val.green { color: var(--green); }
+.metric-val.amber { color: var(--amber); }
+.metric-val.red { color: var(--red); }
+.metric-lbl { font-size: 12px; color: var(--text-3); margin-top: 5px; }
+
+.dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 12px; box-shadow: var(--shadow); }
+.dash-card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.dash-card-title span { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-3); font-weight: 400; }
+
+.brow { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.brow-lbl { min-width: 160px; color: var(--text-2); font-size: 12px; text-align: right; }
+.brow-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.brow-fill { height: 100%; background: var(--green); border-radius: 4px; transition: width .6s ease; }
+.brow-val { min-width: 32px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-3); }
+
+.nps-visual { display: flex; gap: 3px; margin: 8px 0 6px; align-items: flex-end; }
+.nps-col { flex: 1; border-radius: 3px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; min-height: 24px; font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500; }
+.nps-axis { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-3); font-family: 'DM Mono', monospace; margin-bottom: 10px; }
+.nps-legend { display: flex; gap: 16px; font-size: 11px; flex-wrap: wrap; }
+.nps-legend span { display: flex; align-items: center; gap: 5px; color: var(--text-2); }
+.nps-legend .dot { width: 8px; height: 8px; border-radius: 2px; }
+
+.verbatim { background: var(--bg); border-left: 3px solid var(--green-mid); padding: 9px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 13px; color: var(--text-2); line-height: 1.6; margin-bottom: 8px; font-style: italic; }
+
+.dash-loading { text-align: center; padding: 60px 24px; color: var(--text-3); font-size: 14px; }
+.spinner { width: 28px; height: 28px; border: 2.5px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 14px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.section-divider { font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500; letter-spacing: .08em; color: var(--text-3); text-transform: uppercase; margin: 24px 0 12px; }
+
+@media (max-width: 500px) { .brow-lbl { min-width: 100px; font-size: 11px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="site-header">
+    <div class="logo">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div>
+        <div class="logo-text">Dashboard — Clima & Cultura</div>
+        <div class="logo-sub" id="dash-subtitle">Carregando...</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="last-update" id="last-update"></span>
+      <button class="reload-btn" onclick="loadDash()">↺ Atualizar</button>
+    </div>
+  </header>
+
+  <div id="dash-content">
+    <div class="dash-loading"><div class="spinner"></div>Carregando respostas...</div>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLQVKINFgCCXZROfpyrKE_z-OrTkf-VlE6thHD2nn7VOVqBM4wDLk9GVcs99sElu3u/exec';
+
+async function loadDash() {
+  const container = document.getElementById('dash-content');
+  container.innerHTML = '<div class="dash-loading"><div class="spinner"></div>Carregando respostas...</div>';
+  document.getElementById('last-update').textContent = '';
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?action=get');
+    const json = await res.json();
+    renderDash(json.rows || [], container);
+    const now = new Date();
+    document.getElementById('last-update').textContent = 'atualizado ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  } catch (err) {
+    container.innerHTML = '<div class="dash-loading">Erro ao carregar dados.<br><button class="reload-btn" style="margin-top:14px" onclick="loadDash()">Tentar novamente</button></div>';
+  }
+}
+
+function avg(arr) { return arr.length ? arr.reduce(function(a,b){ return a+b; }, 0) / arr.length : 0; }
+function pct(n, total) { return total ? Math.round((n / total) * 100) : 0; }
+
+function renderDash(rawRows, container) {
+  var rows = rawRows.map(function(r) {
+    return {
+      nps:     isNaN(r['eNPS (0-10)'])     ? parseInt(r['eNPS (0-10)'])     : r['eNPS (0-10)'],
+      satisf:  isNaN(r['Satisfação (1-5)']) ? parseInt(r['Satisfação (1-5)']) : r['Satisfação (1-5)'],
+      clima:   isNaN(r['Clima (1-5)'])      ? parseInt(r['Clima (1-5)'])      : r['Clima (1-5)'],
+      lider:   isNaN(r['Liderança (1-5)'])  ? parseInt(r['Liderança (1-5)'])  : r['Liderança (1-5)'],
+      comunic: isNaN(r['Comunicação (1-5)'])? parseInt(r['Comunicação (1-5)']):r['Comunicação (1-5)'],
+      cresc:   r['Crescimento'],
+      reconh:  r['Reconhecimento'],
+      prioridade: (r['Prioridades de melhoria'] || '').split(', ').filter(Boolean),
+      ponto_forte: r['Ponto forte'] || '',
+      melhoria: r['Sugestão de melhoria'] || ''
+    };
+  });
+
+  var n = rows.length;
+  var subtitle = document.getElementById('dash-subtitle');
+
+  if (n === 0) {
+    subtitle.textContent = 'Nenhuma resposta ainda';
+    container.innerHTML = '<div class="dash-loading" style="padding:60px">Nenhuma resposta coletada ainda.<br><span style="font-size:12px">Compartilhe o formulário com o time.</span></div>';
+    return;
+  }
+
+  subtitle.textContent = n + ' resposta' + (n > 1 ? 's' : '') + ' coletada' + (n > 1 ? 's' : '');
+
+  var npsVals    = rows.map(function(r){ return r.nps; }).filter(function(v){ return !isNaN(v); });
+  var satisfVals = rows.map(function(r){ return r.satisf; }).filter(function(v){ return !isNaN(v); });
+  var climaVals  = rows.map(function(r){ return r.clima; }).filter(function(v){ return !isNaN(v); });
+  var liderVals  = rows.map(function(r){ return r.lider; }).filter(function(v){ return !isNaN(v); });
+  var comunicVals= rows.map(function(r){ return r.comunic; }).filter(function(v){ return !isNaN(v); });
+
+  var promoters  = npsVals.filter(function(v){ return v >= 9; }).length;
+  var detractors = npsVals.filter(function(v){ return v <= 6; }).length;
+  var neutros    = npsVals.filter(function(v){ return v >= 7 && v <= 8; }).length;
+  var npsScore   = npsVals.length ? Math.round(((promoters - detractors) / npsVals.length) * 100) : 0;
+  var npsColor   = npsScore >= 50 ? 'green' : npsScore >= 0 ? 'amber' : 'red';
+
+  var html = '';
+
+  // Métricas
+  html += '<div class="dash-metrics">';
+  html += '<div class="metric-card"><div class="metric-val">' + n + '</div><div class="metric-lbl">Respostas totais</div></div>';
+  html += '<div class="metric-card"><div class="metric-val ' + npsColor + '">' + npsScore + '</div><div class="metric-lbl">eNPS</div></div>';
+  html += '<div class="metric-card"><div class="metric-val">' + (satisfVals.length ? avg(satisfVals).toFixed(1) : '—') + '</div><div class="metric-lbl">Satisfação /5</div></div>';
+  html += '<div class="metric-card"><div class="metric-val">' + (climaVals.length ? avg(climaVals).toFixed(1) : '—') + '</div><div class="metric-lbl">Clima /5</div></div>';
+  html += '<div class="metric-card"><div class="metric-val">' + (liderVals.length ? avg(liderVals).toFixed(1) : '—') + '</div><div class="metric-lbl">Liderança /5</div></div>';
+  html += '<div class="metric-card"><div class="metric-val">' + (comunicVals.length ? avg(comunicVals).toFixed(1) : '—') + '</div><div class="metric-lbl">Comunicação /5</div></div>';
+  html += '</div>';
+
+  // eNPS
+  html += '<div class="section-divider">eNPS</div>';
+  html += '<div class="dash-card"><div class="dash-card-title">Distribuição de notas <span>' + promoters + ' promotores · ' + neutros + ' neutros · ' + detractors + ' detratores</span></div>';
+  var npsBuckets = {};
+  npsVals.forEach(function(v){ npsBuckets[v] = (npsBuckets[v] || 0) + 1; });
+  var maxBucket = Math.max.apply(null, Object.values(npsBuckets).concat([1]));
+  html += '<div class="nps-visual">';
+  for (var i = 0; i <= 10; i++) {
+    var cnt = npsBuckets[i] || 0;
+    var h = Math.round((cnt / maxBucket) * 70) + 20;
+    var bg = i <= 6 ? '#F7C1C1' : i <= 8 ? '#FAC775' : '#9FE1CB';
+    var fg = i <= 6 ? '#A32D2D' : i <= 8 ? '#BA7517' : '#0F6E56';
+    html += '<div class="nps-col" style="background:' + bg + ';color:' + fg + ';height:' + h + 'px">' + (cnt > 0 ? cnt : '') + '</div>';
+  }
+  html += '</div>';
+  html += '<div class="nps-axis"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>';
+  html += '<div class="nps-legend"><span><span class="dot" style="background:#F7C1C1"></span>Detratores (0–6): ' + detractors + '</span><span><span class="dot" style="background:#FAC775"></span>Neutros (7–8): ' + neutros + '</span><span><span class="dot" style="background:#9FE1CB"></span>Promotores (9–10): ' + promoters + '</span></div>';
+  html += '</div>';
+
+  // Médias
+  html += '<div class="section-divider">Dimensões</div>';
+  html += '<div class="dash-card"><div class="dash-card-title">Médias por dimensão</div>';
+  var dims = [
+    ['Satisfação geral', satisfVals, 5],
+    ['Clima do time', climaVals, 5],
+    ['Relação com liderança', liderVals, 5],
+    ['Comunicação interna', comunicVals, 5]
+  ];
+  dims.forEach(function(d) {
+    var a = d[1].length ? avg(d[1]) : 0;
+    var p = Math.round((a / d[2]) * 100);
+    html += '<div class="brow"><div class="brow-lbl">' + d[0] + '</div><div class="brow-track"><div class="brow-fill" style="width:' + p + '%"></div></div><div class="brow-val">' + a.toFixed(1) + '</div></div>';
+  });
+  html += '</div>';
+
+  // Múltipla escolha
+  function mcSection(field, title) {
+    var counts = {};
+    rows.forEach(function(r){ if (r[field]) counts[r[field]] = (counts[r[field]] || 0) + 1; });
+    if (!Object.keys(counts).length) return '';
+    var s = '<div class="dash-card"><div class="dash-card-title">' + title + '</div>';
+    Object.entries(counts).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(e) {
+      var p = pct(e[1], n);
+      s += '<div class="brow"><div class="brow-lbl">' + e[0] + '</div><div class="brow-track"><div class="brow-fill" style="width:' + p + '%"></div></div><div class="brow-val">' + e[1] + '</div></div>';
+    });
+    return s + '</div>';
+  }
+
+  html += '<div class="section-divider">Múltipla escolha</div>';
+  html += mcSection('cresc', 'Oportunidades de crescimento');
+  html += mcSection('reconh', 'Reconhecimento pelo trabalho');
+
+  // Prioridades
+  var priCounts = {};
+  rows.forEach(function(r){ (r.prioridade || []).forEach(function(v){ priCounts[v] = (priCounts[v] || 0) + 1; }); });
+  if (Object.keys(priCounts).length) {
+    html += '<div class="dash-card"><div class="dash-card-title">Prioridades de melhoria <span>múltipla escolha</span></div>';
+    Object.entries(priCounts).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(e) {
+      var p = pct(e[1], n);
+      html += '<div class="brow"><div class="brow-lbl" style="min-width:190px">' + e[0] + '</div><div class="brow-track"><div class="brow-fill" style="width:' + p + '%"></div></div><div class="brow-val">' + e[1] + '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  // Abertas
+  var fortes   = rows.map(function(r){ return r.ponto_forte; }).filter(function(v){ return v && v.length > 3; });
+  var melhorias= rows.map(function(r){ return r.melhoria; }).filter(function(v){ return v && v.length > 3; });
+
+  if (fortes.length) {
+    html += '<div class="section-divider">Respostas abertas</div>';
+    html += '<div class="dash-card"><div class="dash-card-title">Pontos fortes</div>';
+    fortes.forEach(function(t){ html += '<div class="verbatim">' + t + '</div>'; });
+    html += '</div>';
+  }
+  if (melhorias.length) {
+    if (!fortes.length) html += '<div class="section-divider">Respostas abertas</div>';
+    html += '<div class="dash-card"><div class="dash-card-title">Sugestões de melhoria</div>';
+    melhorias.forEach(function(t){ html += '<div class="verbatim">' + t + '</div>'; });
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+loadDash();
+</script>
+</body>
+</html>

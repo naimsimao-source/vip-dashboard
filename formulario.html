@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesquisa de Clima & Cultura — Galerabet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E1F5EE; --green-mid: #5DCAA5;
+  --bg: #F7F6F2; --surface: #FFFFFF;
+  --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.14);
+  --text: #1A1A18; --text-2: #5A5A56; --text-3: #9A9A94;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+html { font-size: 16px; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+.app { max-width: 680px; margin: 0 auto; padding: 0 16px 80px; }
+.site-header { padding: 28px 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark { width: 34px; height: 34px; background: var(--green); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+.logo-mark svg { width: 18px; height: 18px; fill: white; }
+.logo-text { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.logo-sub { font-size: 12px; color: var(--text-3); margin-top: 1px; font-weight: 400; }
+.anon-badge { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--green-dark); background: var(--green-light); padding: 4px 10px; border-radius: 20px; font-weight: 500; letter-spacing: .02em; }
+.progress-wrap { margin-bottom: 24px; }
+.progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.progress-label { font-size: 12px; color: var(--text-3); font-family: 'DM Mono', monospace; }
+.progress-track { height: 4px; background: var(--border); border-radius: 2px; }
+.progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .3s ease; }
+.section-label { font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500; letter-spacing: .08em; color: var(--text-3); text-transform: uppercase; margin: 28px 0 12px; }
+.section-label:first-child { margin-top: 0; }
+.q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 10px; box-shadow: var(--shadow); transition: border-color .15s; }
+.q-card.answered { border-color: var(--green-mid); }
+.q-text { font-size: 14px; font-weight: 500; line-height: 1.55; margin-bottom: 14px; color: var(--text); }
+.q-hint { font-size: 12px; color: var(--text-3); margin-bottom: 12px; margin-top: -10px; font-weight: 400; }
+.scale-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.scale-btn { width: 38px; height: 38px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; font-family: 'DM Mono', monospace; cursor: pointer; background: transparent; color: var(--text-2); transition: all .12s; }
+.scale-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+.scale-btn.sel { background: var(--green); border-color: var(--green); color: #fff; }
+.scale-ends { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-3); }
+.mc-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px; cursor: pointer; font-size: 14px; transition: all .12s; user-select: none; }
+.mc-option:hover { border-color: var(--green-mid); background: var(--green-light); }
+.mc-option.sel { border-color: var(--green); background: var(--green-light); color: var(--green-dark); font-weight: 500; }
+.mc-radio { width: 16px; height: 16px; border: 1.5px solid var(--border-strong); border-radius: 50%; flex-shrink: 0; transition: all .12s; display: flex; align-items: center; justify-content: center; }
+.mc-option.sel .mc-radio { border-color: var(--green); background: var(--green); }
+.mc-option.sel .mc-radio::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; }
+.mc-check { width: 16px; height: 16px; border: 1.5px solid var(--border-strong); border-radius: 4px; flex-shrink: 0; transition: all .12s; display: flex; align-items: center; justify-content: center; }
+.mc-option.sel .mc-check { border-color: var(--green); background: var(--green); background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+textarea { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); resize: vertical; min-height: 88px; transition: border-color .15s; line-height: 1.6; }
+textarea:focus { outline: none; border-color: var(--green); background: white; }
+textarea::placeholder { color: var(--text-3); }
+.submit-wrap { margin-top: 28px; }
+.submit-btn { width: 100%; padding: 14px; background: var(--green); color: white; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s; letter-spacing: -.01em; }
+.submit-btn:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29,158,117,.3); }
+.submit-btn:active { transform: translateY(0); }
+.submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+.submit-note { text-align: center; margin-top: 10px; font-size: 12px; color: var(--text-3); }
+.success-screen { text-align: center; padding: 48px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.success-icon { width: 56px; height: 56px; background: var(--green-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+.success-icon svg { width: 26px; height: 26px; stroke: var(--green); stroke-width: 2; fill: none; }
+.success-screen h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.success-screen p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+@media (max-width: 500px) { .scale-btn { width: 32px; height: 32px; font-size: 12px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="site-header">
+    <div class="logo">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div>
+        <div class="logo-text">Galerabet</div>
+        <div class="logo-sub">Pesquisa de Clima & Cultura</div>
+      </div>
+    </div>
+    <div class="anon-badge">✦ anônima</div>
+  </header>
+
+  <div id="survey-wrap">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="progress-label" id="progress-text">0 de 7 obrigatórias</span>
+        <span class="progress-label" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="section-label">Satisfação geral</div>
+
+    <div class="q-card" id="qc-nps">
+      <div class="q-text">Em uma escala de 0 a 10, qual a probabilidade de você recomendar a Galerabet como um bom lugar para trabalhar?</div>
+      <div class="scale-row" id="scale-nps"></div>
+      <div class="scale-ends"><span>Não recomendaria</span><span>Recomendaria muito</span></div>
+    </div>
+
+    <div class="q-card" id="qc-satisf">
+      <div class="q-text">Como você avalia sua satisfação geral no trabalho atualmente?</div>
+      <div class="scale-row" id="scale-satisf"></div>
+      <div class="scale-ends"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="section-label">Ambiente e relacionamento</div>
+
+    <div class="q-card" id="qc-clima">
+      <div class="q-text">Como você avalia o clima entre os membros do time?</div>
+      <div class="scale-row" id="scale-clima"></div>
+      <div class="scale-ends"><span>Muito ruim</span><span>Excelente</span></div>
+    </div>
+
+    <div class="q-card" id="qc-lider">
+      <div class="q-text">Como você avalia a sua relação com a liderança direta?</div>
+      <div class="scale-row" id="scale-lider"></div>
+      <div class="scale-ends"><span>Muito ruim</span><span>Excelente</span></div>
+    </div>
+
+    <div class="section-label">Crescimento e reconhecimento</div>
+
+    <div class="q-card" id="qc-cresc">
+      <div class="q-text">Você sente que tem oportunidades reais de crescimento e desenvolvimento na empresa?</div>
+      <div id="mc-cresc">
+        <div class="mc-option" onclick="selectMC('cresc', this, 'Sim, claramente')"><div class="mc-radio"></div>Sim, claramente</div>
+        <div class="mc-option" onclick="selectMC('cresc', this, 'Parcialmente')"><div class="mc-radio"></div>Parcialmente</div>
+        <div class="mc-option" onclick="selectMC('cresc', this, 'Raramente')"><div class="mc-radio"></div>Raramente</div>
+        <div class="mc-option" onclick="selectMC('cresc', this, 'Não vejo oportunidades')"><div class="mc-radio"></div>Não vejo oportunidades</div>
+      </div>
+    </div>
+
+    <div class="q-card" id="qc-reconh">
+      <div class="q-text">Você se sente reconhecido(a) pelo seu trabalho?</div>
+      <div id="mc-reconh">
+        <div class="mc-option" onclick="selectMC('reconh', this, 'Sempre')"><div class="mc-radio"></div>Sempre</div>
+        <div class="mc-option" onclick="selectMC('reconh', this, 'Às vezes')"><div class="mc-radio"></div>Às vezes</div>
+        <div class="mc-option" onclick="selectMC('reconh', this, 'Raramente')"><div class="mc-radio"></div>Raramente</div>
+        <div class="mc-option" onclick="selectMC('reconh', this, 'Nunca')"><div class="mc-radio"></div>Nunca</div>
+      </div>
+    </div>
+
+    <div class="section-label">Comunicação e processos</div>
+
+    <div class="q-card" id="qc-comunic">
+      <div class="q-text">Como você avalia a comunicação interna do time?</div>
+      <div class="scale-row" id="scale-comunic"></div>
+      <div class="scale-ends"><span>Muito ruim</span><span>Excelente</span></div>
+    </div>
+
+    <div class="q-card" id="qc-prioridade">
+      <div class="q-text">O que você considera a maior prioridade de melhoria para o time?</div>
+      <div class="q-hint">Escolha até 2 opções</div>
+      <div id="mc-prioridade">
+        <div class="mc-option" onclick="selectMulti('prioridade', this, 'Processos e organização')"><div class="mc-check"></div>Processos e organização</div>
+        <div class="mc-option" onclick="selectMulti('prioridade', this, 'Comunicação')"><div class="mc-check"></div>Comunicação</div>
+        <div class="mc-option" onclick="selectMulti('prioridade', this, 'Reconhecimento e benefícios')"><div class="mc-check"></div>Reconhecimento e benefícios</div>
+        <div class="mc-option" onclick="selectMulti('prioridade', this, 'Desenvolvimento profissional')"><div class="mc-check"></div>Desenvolvimento profissional</div>
+        <div class="mc-option" onclick="selectMulti('prioridade', this, 'Autonomia')"><div class="mc-check"></div>Autonomia</div>
+        <div class="mc-option" onclick="selectMulti('prioridade', this, 'Ferramentas e recursos')"><div class="mc-check"></div>Ferramentas e recursos</div>
+      </div>
+    </div>
+
+    <div class="section-label">Questões abertas (opcional)</div>
+
+    <div class="q-card">
+      <div class="q-text">Qual é o maior ponto forte do nosso time atualmente?</div>
+      <textarea id="txt-ponto_forte" placeholder="Escreva livremente..."></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">Se você pudesse mudar uma coisa no ambiente de trabalho, o que seria?</div>
+      <textarea id="txt-melhoria" placeholder="Escreva livremente..."></textarea>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">Enviar respostas</button>
+      <p class="submit-note">🔒 Suas respostas são completamente anônimas</p>
+    </div>
+  </div>
+
+  <div id="success-screen" class="success-screen" style="display:none">
+    <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+    <h2>Obrigado pela sua resposta!</h2>
+    <p>Suas respostas foram registradas de forma anônima<br>e vão ajudar a melhorar o nosso ambiente de trabalho.</p>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLQVKINFgCCXZROfpyrKE_z-OrTkf-VlE6thHD2nn7VOVqBM4wDLk9GVcs99sElu3u/exec';
+
+const answers = {};
+const multiSelects = { prioridade: [] };
+const REQUIRED = ['nps', 'satisf', 'clima', 'lider', 'cresc', 'reconh', 'comunic'];
+
+function buildScale(id, min, max) {
+  const wrap = document.getElementById('scale-' + id);
+  if (!wrap) return;
+  for (let i = min; i <= max; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'scale-btn';
+    btn.textContent = i;
+    btn.onclick = function () {
+      wrap.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('sel'));
+      this.classList.add('sel');
+      answers[id] = i;
+      document.getElementById('qc-' + id).classList.add('answered');
+      updateProgress();
+    };
+    wrap.appendChild(btn);
+  }
+}
+buildScale('nps', 0, 10);
+buildScale('satisf', 1, 5);
+buildScale('clima', 1, 5);
+buildScale('lider', 1, 5);
+buildScale('comunic', 1, 5);
+
+function selectMC(key, el, val) {
+  document.querySelectorAll('#mc-' + key + ' .mc-option').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  answers[key] = val;
+  document.getElementById('qc-' + key).classList.add('answered');
+  updateProgress();
+}
+
+function selectMulti(key, el, val) {
+  const arr = multiSelects[key];
+  if (el.classList.contains('sel')) {
+    el.classList.remove('sel');
+    const i = arr.indexOf(val);
+    if (i > -1) arr.splice(i, 1);
+  } else {
+    if (arr.length >= 2) return;
+    el.classList.add('sel');
+    arr.push(val);
+  }
+  answers[key] = arr.slice();
+}
+
+function updateProgress() {
+  const filled = REQUIRED.filter(k => answers[k] !== undefined).length;
+  const p = Math.round((filled / REQUIRED.length) * 100);
+  document.getElementById('progress-fill').style.width = p + '%';
+  document.getElementById('progress-pct').textContent = p + '%';
+  document.getElementById('progress-text').textContent = filled + ' de ' + REQUIRED.length + ' obrigatórias';
+}
+
+async function submitForm() {
+  const missing = REQUIRED.filter(k => answers[k] === undefined);
+  if (missing.length) { alert('Por favor, responda todas as perguntas obrigatórias antes de enviar.'); return; }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  const record = Object.assign({}, answers, {
+    prioridade: multiSelects.prioridade.slice(),
+    ponto_forte: document.getElementById('txt-ponto_forte').value.trim(),
+    melhoria: document.getElementById('txt-melhoria').value.trim(),
+    ts: Date.now()
+  });
+  try {
+    await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(record) });
+    document.getElementById('survey-wrap').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Enviar respostas';
+    alert('Erro ao enviar. Verifique sua conexão e tente novamente.');
+  }
+}
+</script>
+</body>
+</html>
