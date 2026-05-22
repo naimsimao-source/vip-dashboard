@@ -1767,24 +1767,31 @@ function renderDailyReport() {
 
 // ── Entradas e saídas elegíveis da carteira ───────────────────────
 function _drRenderWalletChanges() {
-  // Novos VIPs elegíveis (≥ Platina High) que NÃO estão na carteira
   const cartUserSet = new Set(CARTEIRA.map(r => String(r.Username)));
-  const saiuSet = new Set(SAIU_CARTEIRA.map(r => String(r.Username)));
 
+  // Novos Diamond/Elite que entraram na carteira neste ciclo
   const novosElegiveis = (DIFF.novos_vip || []).filter(r =>
-    (r.t === 'Platina High' || r.t === 'Diamond' || r.t === 'Elite') &&
+    (r.t === 'Diamond' || r.t === 'Elite') &&
     !cartUserSet.has(String(r.u))
   );
 
-  // Jogadores que desceram abaixo de Platina High e ainda estão na carteira
-  const sairamElegiveis = (DIFF.desceram || []).filter(r =>
-    (r.para === 'Platina Low' || r.para === 'Não VIP') &&
-    cartUserSet.has(String(r.u))
-  );
+  // Jogadores que desceram ou saíram da base → agora são RETENÇÃO, não saída
+  // Mostrar como alerta de retenção, não como "saída da carteira"
+  const retencaoAlertas = CARTEIRA.filter(r =>
+    r.retencao && (r.tier_alert || r.retencao_motivo)
+  ).map(r => ({
+    fn: r['First name'] || '', ln: r['Last name'] || '',
+    u: String(r.Username),
+    de: r.tier_alert ? r.tier_alert.split(' → ')[0] : '',
+    para: r.segment || '',
+    ngr: r.NGR || 0,
+    motivo: r.retencao_motivo || r.tier_alert || '',
+    am: r['Account Manager'] || '',
+  }));
 
   const tc2 = t => t==='Elite'?'var(--tier-eli)':t==='Diamond'?'var(--tier-dia)':t==='Platina High'?'var(--tier-ph)':'var(--tier-pl)';
 
-  if (novosElegiveis.length === 0 && sairamElegiveis.length === 0) return;
+  if (novosElegiveis.length === 0 && retencaoAlertas.length === 0) return;
 
   const container = document.getElementById('drWalletChanges');
   if (!container) return;
@@ -1817,34 +1824,32 @@ function _drRenderWalletChanges() {
       </div>`;
   }
 
-  if (sairamElegiveis.length > 0) {
+    if (retencaoAlertas.length > 0) {
     html += `
-      <div style="background:rgba(255,84,112,.06);border:1px solid rgba(255,84,112,.25);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:20px;margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-          <span style="font-size:18px">⚠️</span>
+          <span style="font-size:18px">🎯</span>
           <div>
-            <div style="font-family:var(--mono);font-size:11px;color:var(--down);letter-spacing:.1em;text-transform:uppercase">Saída da carteira</div>
-            <div style="font-size:13px;color:var(--text-2);margin-top:2px">${sairamElegiveis.length} jogador${sairamElegiveis.length>1?'es':''} caíram abaixo de Platina High</div>
+            <div style="font-family:var(--mono);font-size:11px;color:#a855f7;letter-spacing:.1em;text-transform:uppercase">Retenção — permanecem na carteira</div>
+            <div style="font-size:13px;color:var(--text-2);margin-top:2px">${retencaoAlertas.length} jogador${retencaoAlertas.length>1?'es':''} — desceram de tier ou saíram da base · aguardam Draft</div>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px">
-          ${sairamElegiveis.map(r => `
+          ${retencaoAlertas.map(r => `
             <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-2);border-radius:10px;padding:10px 14px">
               <div>
                 <span style="font-weight:700;color:var(--text-1)">${r.fn} ${r.ln}</span>
                 <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);margin-left:8px">${r.u}</span>
+                <span style="font-size:10px;color:#a855f7;margin-left:8px">${r.am}</span>
               </div>
               <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-size:11px;color:var(--text-3)">${r.de}</span>
-                <span style="font-size:12px;color:var(--text-3)">→</span>
-                <span style="background:${tc2(r.para)}22;color:${tc2(r.para)};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">${r.para}</span>
-                <span style="font-family:var(--mono);font-size:12px;color:var(--down)">NGR ${_drFmtN(r.ngr_novo)}</span>
+                <span style="font-size:11px;color:var(--text-3)">${r.motivo}</span>
+                <span style="font-family:var(--mono);font-size:12px;color:var(--text-2)">NGR ${_drFmtN(r.ngr)}</span>
               </div>
             </div>`).join('')}
         </div>
       </div>`;
   }
-
   container.innerHTML = html;
 }
 
