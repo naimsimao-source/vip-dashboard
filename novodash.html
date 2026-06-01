@@ -1244,47 +1244,149 @@
 function renderRecovery() {
   const c = document.getElementById('panel-recovery');
   if (!c) return;
-  const data = (typeof RECOVERY_DATA !== 'undefined') ? RECOVERY_DATA : [];
-  const ST = {active:'Ativa',frozen:'Frozen',timeout:'Pausada',self_excluded:'Auto-excluído'};
+  const all = (typeof RECOVERY_DATA !== 'undefined') ? RECOVERY_DATA : [];
   const tc = t => t==='Elite'?'var(--tier-eli)':t==='Diamond'?'var(--tier-dia)':t==='Platina High'?'var(--tier-ph)':'var(--tier-pl)';
   const fmt = v => v ? 'R$ ' + Math.round(v).toLocaleString('pt-BR') : 'R$ 0';
+  const AMS = ['Ana Paula','Gabriele','Mikael'];
 
-  const byMotivo = {tier: data.filter(r=>r.motivo&&r.motivo.includes('Tier')), conta: data.filter(r=>r.motivo&&r.motivo.includes('Conta'))};
-  const ngr_total = data.reduce((s,r)=>s+(r.ngr||0),0);
+  // Filtros
+  const recAMFilter   = window._recAMFilter   || 'all';
+  const recTierFilter = window._recTierFilter || 'all';
 
-  let html = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px">
-      <div class="stat-card"><div class="stat-label">Total em Recovery</div><div class="stat-value">${data.length}</div></div>
-      <div class="stat-card"><div class="stat-label">NGR acumulado 90d</div><div class="stat-value" style="color:var(--up)">${fmt(ngr_total)}</div></div>
-      <div class="stat-card"><div class="stat-label">Saíram por tier baixo</div><div class="stat-value">${byMotivo.tier.length}</div></div>
-      <div class="stat-card"><div class="stat-label">Saíram por conta restrita</div><div class="stat-value">${byMotivo.conta.length}</div></div>
-    </div>
-    <div style="overflow-x:auto">
-    <table class="dr-table" style="width:100%">
-      <thead><tr>
-        <th>Jogador</th><th>Username</th><th>AM anterior</th><th>Tier</th>
-        <th>Motivo saída</th><th>NGR 90d</th><th>S/ Dep</th><th>S/ Login</th><th>IMS</th>
-      </tr></thead>
-      <tbody>
-        ${data.sort((a,b)=>({'self_excluded':0,'frozen':1,'timeout':2,'active':3}[a.account_status||'active']||3)-({'self_excluded':0,'frozen':1,'timeout':2,'active':3}[b.account_status||'active']||3)||(b.ngr||0)-(a.ngr||0)).map((r,i) => {
-          const ims = r.ims_link || '';
-          const nd = r.days_no_dep !== undefined ? r.days_no_dep+'d' : '—';
-          const nl = r.days_no_login !== undefined ? r.days_no_login+'d' : '—';
-          const ndC = (r.days_no_dep||0)>=14?'color:var(--down)':(r.days_no_dep||0)>=7?'color:var(--neon-amber)':'';
-          return \`<tr style="\${i%2?'background:var(--bg-2)':''}">
-            <td><strong>\${r.nome||((r['First name']||'')+' '+(r['Last name']||''))}</strong></td>
-            <td style="font-family:var(--mono);font-size:11px">\${r.Username||r.u||''}</td>
-            <td>\${r.AM||r['Account Manager']||'—'}</td>
-            <td><span style="background:\${tc(r.tier||'')}22;color:\${tc(r.tier||'')};padding:2px 8px;border-radius:20px;font-size:11px">\${r.tier||''}</span></td>
-            <td style="font-size:11px;color:var(--text-2)">\${r.motivo||''}</td>
-            <td style="color:var(--up);font-family:var(--mono)">\${fmt(r.ngr||0)}</td>
-            <td style="font-family:var(--mono);\${ndC}">\${nd}</td>
-            <td style="font-family:var(--mono)">\${nl}</td>
-            <td>\${ims?'<a href="'+ims+'" target="_blank" style="color:var(--neon-cyan);font-size:11px">IMS ↗</a>':'—'}</td>
-          </tr>\`}).join('')}
-      </tbody>
-    </table></div>`;
-  c.innerHTML = '<div style="padding:0 4px">' + html + '</div>';
+  let data = [...all];
+  if (recAMFilter   !== 'all') data = data.filter(r => r.AM === recAMFilter);
+  if (recTierFilter !== 'all') data = data.filter(r => r.tier === recTierFilter);
+
+  data.sort((a,b) => (b.ngr||0)-(a.ngr||0));
+
+  const ngr_total = data.reduce((s,r) => s+(r.ngr||0), 0);
+  const tierRows  = all.filter(r => r.motivo && r.motivo.includes('Tier'));
+  const contaRows = all.filter(r => r.motivo && r.motivo.includes('Conta'));
+
+  const makeBtn = (label, key, val, cur, color) => {
+    const active = cur === val;
+    const sty = active && color ? `background:${color}33;color:${color};border-color:${color};` : '';
+    return `<button class="filter-btn ${active?'active':''}" style="${sty}"
+      onclick="window._rec${key}Filter='${val}';renderRecovery()">${label}</button>`;
+  };
+
+  c.innerHTML = `
+    <div style="padding:24px 0 8px">
+      <div class="hero-title" style="margin-bottom:6px">🔄 <em>Recovery</em></div>
+      <div style="color:var(--text-2);font-size:14px;margin-bottom:24px">
+        Jogadores saídos no Draft com conta ativa — pipeline de reengajamento para junho
+      </div>
+
+      <!-- KPIs -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px">
+        <div class="stat-card"><div class="stat-label">Em Recovery</div><div class="stat-value">${all.length}</div></div>
+        <div class="stat-card"><div class="stat-label">NGR acumulado 90d</div><div class="stat-value" style="color:var(--up)">${fmt(all.reduce((s,r)=>s+(r.ngr||0),0))}</div></div>
+        <div class="stat-card"><div class="stat-label">Por tier baixo</div><div class="stat-value">${tierRows.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Por conta restrita</div><div class="stat-value">${contaRows.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Filtrados</div><div class="stat-value">${data.length}</div></div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="table-controls" style="margin-bottom:16px;flex-wrap:wrap;gap:6px">
+        ${makeBtn('Todos AMs','AM','all',recAMFilter,'')}
+        ${AMS.map(am => makeBtn(am,'AM',am,recAMFilter,'var(--neon-cyan)')).join('')}
+        <span style="width:1px;height:24px;background:var(--line-2);display:inline-block;vertical-align:middle;margin:0 4px"></span>
+        ${makeBtn('Todos Tiers','Tier','all',recTierFilter,'')}
+        ${makeBtn('Platina High','Tier','Platina High',recTierFilter,'var(--tier-ph)')}
+        ${makeBtn('Platina Low','Tier','Platina Low',recTierFilter,'var(--tier-pl)')}
+        ${makeBtn('Diamond','Tier','Diamond',recTierFilter,'var(--tier-dia)')}
+        ${makeBtn('Elite','Tier','Elite',recTierFilter,'var(--tier-eli)')}
+      </div>
+
+      <!-- Tabela -->
+      <div style="overflow-x:auto">
+      <table class="dr-table" style="width:100%">
+        <thead><tr>
+          <th>Jogador</th><th>Username</th><th>AM anterior</th><th>Tier</th>
+          <th>Motivo</th><th>NGR 90d</th><th>S/ Dep</th><th>S/ Login</th>
+        </tr></thead>
+        <tbody>
+          ${data.map((r,i) => {
+            const nd = (r.days_no_dep ?? '—') + (r.days_no_dep !== undefined ? 'd' : '');
+            const nl = (r.days_no_login ?? '—') + (r.days_no_login !== undefined ? 'd' : '');
+            const ndC = (r.days_no_dep||0)>=14?'color:var(--down)':(r.days_no_dep||0)>=7?'color:var(--neon-amber)':'';
+            return `<tr style="${i%2?'background:var(--bg-2)':''}">
+              <td><strong>${r.nome||r.Username||''}</strong></td>
+              <td style="font-family:var(--mono);font-size:11px">${r.Username||''}</td>
+              <td>${r.AM||'—'}</td>
+              <td><span style="background:${tc(r.tier||'')}22;color:${tc(r.tier||'')};padding:2px 8px;border-radius:20px;font-size:11px">${r.tier||''}</span></td>
+              <td style="font-size:11px;color:var(--text-2)">${r.motivo||''}</td>
+              <td style="color:var(--up);font-family:var(--mono)">${fmt(r.ngr||0)}</td>
+              <td style="font-family:var(--mono);${ndC}">${nd}</td>
+              <td style="font-family:var(--mono)">${nl}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>`;
+}
+
+
+// ── Draft Histórico ────────────────────────────────────────────────
+function renderDraftHist() {
+  const container = document.getElementById('draftHistTable');
+  if (!container) return;
+
+  const amF   = document.getElementById('draftHistAM')?.value   || 'all';
+  const tipoF = document.getElementById('draftHistTipo')?.value || 'all';
+  const tierF = document.getElementById('draftHistTier')?.value || 'all';
+
+  const tc = t => t==='Elite'?'var(--tier-eli)':t==='Diamond'?'var(--tier-dia)':t==='Platina High'?'var(--tier-ph)':'var(--tier-pl)';
+  const fmt = v => v ? 'R$ '+Math.round(v).toLocaleString('pt-BR') : 'R$ 0';
+
+  // Entradas: is_new_cart=True na CARTEIRA
+  const entradas = CARTEIRA
+    .filter(r => r.is_new_cart)
+    .map(r => ({tipo:'entrada', label:'✦ Entrada', color:'var(--neon-cyan)',
+      nome: (r['First name']||r.nome||'') + ' ' + (r['Last name']||''),
+      user: String(r.Username), am: r['Account Manager']||'',
+      tier: r.segment||'', ngr: r.NGR||0, motivo: 'Novo no Draft'}));
+
+  // Saídas: SAIU_CARTEIRA
+  const saidas = (SAIU_CARTEIRA||[]).map(r => ({tipo:'saida', label:'✕ Saída', color:'var(--down)',
+    nome: r.nome || ((r['First name']||'') + ' ' + (r['Last name']||'')),
+    user: String(r.Username||r.u||''), am: r['Account Manager']||r.AM||'',
+    tier: r.segment||r.tier||'', ngr: r.NGR||r.ngr||0, motivo: r.motivo||''}));
+
+  let rows = [...entradas, ...saidas];
+  if (tipoF !== 'all') rows = rows.filter(r => r.tipo === tipoF);
+  if (amF   !== 'all') rows = rows.filter(r => r.am === amF);
+  if (tierF !== 'all') rows = rows.filter(r => r.tier === tierF);
+
+  rows.sort((a,b) => b.ngr - a.ngr);
+
+  const cnt = document.getElementById('draftHistCount');
+  if (cnt) cnt.textContent = `${rows.filter(r=>r.tipo==='entrada').length} entradas · ${rows.filter(r=>r.tipo==='saida').length} saídas`;
+
+  if (!rows.length) {
+    container.innerHTML = '<div style="color:var(--text-3);padding:20px;text-align:center">Nenhum registro encontrado</div>';
+    return;
+  }
+
+  container.innerHTML = `<div style="overflow-x:auto">
+  <table class="dr-table" style="width:100%">
+    <thead><tr>
+      <th>Tipo</th><th>Jogador</th><th>Username</th><th>AM</th>
+      <th>Tier</th><th>NGR 90d</th><th>Motivo</th>
+    </tr></thead>
+    <tbody>
+      ${rows.map((r,i) => `<tr style="${i%2?'background:var(--bg-2)':''}">
+        <td><span style="color:${r.color};font-weight:700;font-size:12px">${r.label}</span></td>
+        <td><strong>${r.nome.trim()}</strong></td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text-3)">${r.user}</td>
+        <td>${r.am}</td>
+        <td><span style="background:${tc(r.tier)}22;color:${tc(r.tier)};padding:2px 8px;border-radius:20px;font-size:11px">${r.tier}</span></td>
+        <td style="font-family:var(--mono);color:var(--up)">${fmt(r.ngr)}</td>
+        <td style="font-size:11px;color:var(--text-2)">${r.motivo}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
 }
 
 </script>
@@ -2459,8 +2561,8 @@ function renderCarteirasTable() {
   let data = cartTab === 'carteira' ? [...CARTEIRA] : [...SAIU_CARTEIRA];
 
   // Filtros
-  if (cartAM !== 'all') data = data.filter(r => r['Account Manager'] === cartAM);
-  if (cartTier !== 'all') data = data.filter(r => r.segment === cartTier);
+  if (cartAM !== 'all') data = data.filter(r => (r['Account Manager'] || r.AM || '') === cartAM);
+  if (cartTier !== 'all') data = data.filter(r => (r.segment || r.tier || '') === cartTier);
   if (cartType !== 'all') data = data.filter(r => (r.client_type||'') === cartType);
   if (cartStatusFilter !== 'all') data = data.filter(r => (r.account_status||'active') === cartStatusFilter);
   if (cartNoDepFilter !== 'all') data = data.filter(r => (r.days_no_dep||0) >= parseInt(cartNoDepFilter));
@@ -2562,8 +2664,9 @@ function renderCarteirasTable() {
               const _draftBadge = _draft ? '<span style="margin-left:6px;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:800;background:rgba(255,84,112,.15);color:var(--down);vertical-align:middle">'+_draftLabel+'</span>' : '';
               // Cor da borda esquerda por prioridade
               const _rowBorder = _isNew ? 'border-left:2px solid var(--neon-cyan)' : _alert ? 'border-left:2px solid var(--neon-amber)' : _retenc ? 'border-left:2px solid #a855f7' : _draft ? 'border-left:2px solid var(--down)' : '';
+              const _nome = (r['First name'] && r['Last name']) ? r['First name']+' '+r['Last name'] : (r.nome||r['First name']||'');
               return `<tr style="${_rowBorder}">
-                <td><strong>${r['First name']||''} ${r['Last name']||''}</strong>${_newBadge}${_alertBadge}${_retBadge}${_draftBadge}</td>
+                <td><strong>${_nome}</strong>${_newBadge}${_alertBadge}${_retBadge}${_draftBadge}</td>
                 <td style="font-family:var(--mono);font-size:11px;color:var(--text-3)">${r.Username}</td>
                 <td style="font-size:12px;font-weight:600">${r['Account Manager']||'—'}</td>
                 <td>${tb(r.segment)}</td>
@@ -3493,7 +3596,37 @@ function renderDraft() {
     ${waitlistHtml}
 
     ${saidasHtml}
+
+    <!-- Histórico de Entradas/Saídas -->
+    <div style="margin-top:40px">
+      <h3 style="font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--text-2);text-transform:uppercase;margin-bottom:16px">📋 Histórico do Draft — Entradas &amp; Saídas</h3>
+
+      <!-- Filtros -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center">
+        <select id="draftHistAM" onchange="renderDraftHist()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--line-2);background:var(--bg-2);color:var(--text-1);font-size:12px">
+          <option value="all">Todos AMs</option>
+          <option value="Ana Paula">Ana Paula</option>
+          <option value="Gabriele">Gabriele</option>
+          <option value="Mikael">Mikael</option>
+        </select>
+        <select id="draftHistTipo" onchange="renderDraftHist()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--line-2);background:var(--bg-2);color:var(--text-1);font-size:12px">
+          <option value="all">Entradas e Saídas</option>
+          <option value="entrada">Apenas Entradas</option>
+          <option value="saida">Apenas Saídas</option>
+        </select>
+        <select id="draftHistTier" onchange="renderDraftHist()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--line-2);background:var(--bg-2);color:var(--text-1);font-size:12px">
+          <option value="all">Todos Tiers</option>
+          <option value="Elite">Elite</option>
+          <option value="Diamond">Diamond</option>
+          <option value="Platina High">Platina High</option>
+          <option value="Platina Low">Platina Low</option>
+        </select>
+        <span id="draftHistCount" style="font-size:11px;color:var(--text-3);margin-left:4px"></span>
+      </div>
+      <div id="draftHistTable"></div>
+    </div>
   `;
+  renderDraftHist();
 }
 
 </script>
