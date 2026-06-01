@@ -1239,157 +1239,11 @@
     .move-card-value { font-size: 48px; }
   }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-// ── Recovery ─────────────────────────────────────────────────────────
-function renderRecovery() {
-  const c = document.getElementById('panel-recovery');
-  if (!c) return;
-  const all = (typeof RECOVERY_DATA !== 'undefined') ? RECOVERY_DATA : [];
-  const tc = t => t==='Elite'?'var(--tier-eli)':t==='Diamond'?'var(--tier-dia)':t==='Platina High'?'var(--tier-ph)':'var(--tier-pl)';
-  const fmt = v => v ? 'R$ ' + Math.round(v).toLocaleString('pt-BR') : 'R$ 0';
-  const AMS = ['Ana Paula','Gabriele','Mikael'];
-
-  // Filtros
-  const recAMFilter   = window._recAMFilter   || 'all';
-  const recTierFilter = window._recTierFilter || 'all';
-
-  let data = [...all];
-  if (recAMFilter   !== 'all') data = data.filter(r => r.AM === recAMFilter);
-  if (recTierFilter !== 'all') data = data.filter(r => r.tier === recTierFilter);
-
-  data.sort((a,b) => (b.ngr||0)-(a.ngr||0));
-
-  const ngr_total = data.reduce((s,r) => s+(r.ngr||0), 0);
-  const tierRows  = all.filter(r => r.motivo && r.motivo.includes('Tier'));
-  const contaRows = all.filter(r => r.motivo && r.motivo.includes('Conta'));
-
-  const makeBtn = (label, key, val, cur, color) => {
-    const active = cur === val;
-    const sty = active && color ? `background:${color}33;color:${color};border-color:${color};` : '';
-    return `<button class="filter-btn ${active?'active':''}" style="${sty}"
-      onclick="window._rec${key}Filter='${val}';renderRecovery()">${label}</button>`;
-  };
-
-  c.innerHTML = `
-    <div style="padding:24px 0 8px">
-      <div class="hero-title" style="margin-bottom:6px">🔄 <em>Recovery</em></div>
-      <div style="color:var(--text-2);font-size:14px;margin-bottom:24px">
-        Jogadores saídos no Draft com conta ativa — pipeline de reengajamento para junho
-      </div>
-
-      <!-- KPIs -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px">
-        <div class="stat-card"><div class="stat-label">Em Recovery</div><div class="stat-value">${all.length}</div></div>
-        <div class="stat-card"><div class="stat-label">NGR acumulado 90d</div><div class="stat-value" style="color:var(--up)">${fmt(all.reduce((s,r)=>s+(r.ngr||0),0))}</div></div>
-        <div class="stat-card"><div class="stat-label">Por tier baixo</div><div class="stat-value">${tierRows.length}</div></div>
-        <div class="stat-card"><div class="stat-label">Por conta restrita</div><div class="stat-value">${contaRows.length}</div></div>
-        <div class="stat-card"><div class="stat-label">Filtrados</div><div class="stat-value">${data.length}</div></div>
-      </div>
-
-      <!-- Filtros -->
-      <div class="table-controls" style="margin-bottom:16px;flex-wrap:wrap;gap:6px">
-        ${makeBtn('Todos AMs','AM','all',recAMFilter,'')}
-        ${AMS.map(am => makeBtn(am,'AM',am,recAMFilter,'var(--neon-cyan)')).join('')}
-        <span style="width:1px;height:24px;background:var(--line-2);display:inline-block;vertical-align:middle;margin:0 4px"></span>
-        ${makeBtn('Todos Tiers','Tier','all',recTierFilter,'')}
-        ${makeBtn('Platina High','Tier','Platina High',recTierFilter,'var(--tier-ph)')}
-        ${makeBtn('Platina Low','Tier','Platina Low',recTierFilter,'var(--tier-pl)')}
-        ${makeBtn('Diamond','Tier','Diamond',recTierFilter,'var(--tier-dia)')}
-        ${makeBtn('Elite','Tier','Elite',recTierFilter,'var(--tier-eli)')}
-      </div>
-
-      <!-- Tabela -->
-      <div style="overflow-x:auto">
-      <table class="dr-table" style="width:100%">
-        <thead><tr>
-          <th>Jogador</th><th>Username</th><th>AM anterior</th><th>Tier</th>
-          <th>Motivo</th><th>NGR 90d</th><th>S/ Dep</th><th>S/ Login</th>
-        </tr></thead>
-        <tbody>
-          ${data.map((r,i) => {
-            const nd = (r.days_no_dep ?? '—') + (r.days_no_dep !== undefined ? 'd' : '');
-            const nl = (r.days_no_login ?? '—') + (r.days_no_login !== undefined ? 'd' : '');
-            const ndC = (r.days_no_dep||0)>=14?'color:var(--down)':(r.days_no_dep||0)>=7?'color:var(--neon-amber)':'';
-            return `<tr style="${i%2?'background:var(--bg-2)':''}">
-              <td><strong>${r.nome||r.Username||''}</strong></td>
-              <td style="font-family:var(--mono);font-size:11px">${r.Username||''}</td>
-              <td>${r.AM||'—'}</td>
-              <td><span style="background:${tc(r.tier||'')}22;color:${tc(r.tier||'')};padding:2px 8px;border-radius:20px;font-size:11px">${r.tier||''}</span></td>
-              <td style="font-size:11px;color:var(--text-2)">${r.motivo||''}</td>
-              <td style="color:var(--up);font-family:var(--mono)">${fmt(r.ngr||0)}</td>
-              <td style="font-family:var(--mono);${ndC}">${nd}</td>
-              <td style="font-family:var(--mono)">${nl}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>
-      </div>
-    </div>`;
-}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">// ── Recovery ─────────────────────────────────────────────────────────
 
 
-// ── Draft Histórico ────────────────────────────────────────────────
-function renderDraftHist() {
-  const container = document.getElementById('draftHistTable');
-  if (!container) return;
 
-  const amF   = document.getElementById('draftHistAM')?.value   || 'all';
-  const tipoF = document.getElementById('draftHistTipo')?.value || 'all';
-  const tierF = document.getElementById('draftHistTier')?.value || 'all';
-
-  const tc = t => t==='Elite'?'var(--tier-eli)':t==='Diamond'?'var(--tier-dia)':t==='Platina High'?'var(--tier-ph)':'var(--tier-pl)';
-  const fmt = v => v ? 'R$ '+Math.round(v).toLocaleString('pt-BR') : 'R$ 0';
-
-  // Entradas: is_new_cart=True na CARTEIRA
-  const entradas = CARTEIRA
-    .filter(r => r.is_new_cart)
-    .map(r => ({tipo:'entrada', label:'✦ Entrada', color:'var(--neon-cyan)',
-      nome: (r['First name']||r.nome||'') + ' ' + (r['Last name']||''),
-      user: String(r.Username), am: r['Account Manager']||'',
-      tier: r.segment||'', ngr: r.NGR||0, motivo: 'Novo no Draft'}));
-
-  // Saídas: SAIU_CARTEIRA
-  const saidas = (SAIU_CARTEIRA||[]).map(r => ({tipo:'saida', label:'✕ Saída', color:'var(--down)',
-    nome: r.nome || ((r['First name']||'') + ' ' + (r['Last name']||'')),
-    user: String(r.Username||r.u||''), am: r['Account Manager']||r.AM||'',
-    tier: r.segment||r.tier||'', ngr: r.NGR||r.ngr||0, motivo: r.motivo||''}));
-
-  let rows = [...entradas, ...saidas];
-  if (tipoF !== 'all') rows = rows.filter(r => r.tipo === tipoF);
-  if (amF   !== 'all') rows = rows.filter(r => r.am === amF);
-  if (tierF !== 'all') rows = rows.filter(r => r.tier === tierF);
-
-  rows.sort((a,b) => b.ngr - a.ngr);
-
-  const cnt = document.getElementById('draftHistCount');
-  if (cnt) cnt.textContent = `${rows.filter(r=>r.tipo==='entrada').length} entradas · ${rows.filter(r=>r.tipo==='saida').length} saídas`;
-
-  if (!rows.length) {
-    container.innerHTML = '<div style="color:var(--text-3);padding:20px;text-align:center">Nenhum registro encontrado</div>';
-    return;
-  }
-
-  container.innerHTML = `<div style="overflow-x:auto">
-  <table class="dr-table" style="width:100%">
-    <thead><tr>
-      <th>Tipo</th><th>Jogador</th><th>Username</th><th>AM</th>
-      <th>Tier</th><th>NGR 90d</th><th>Motivo</th>
-    </tr></thead>
-    <tbody>
-      ${rows.map((r,i) => `<tr style="${i%2?'background:var(--bg-2)':''}">
-        <td><span style="color:${r.color};font-weight:700;font-size:12px">${r.label}</span></td>
-        <td><strong>${r.nome.trim()}</strong></td>
-        <td style="font-family:var(--mono);font-size:11px;color:var(--text-3)">${r.user}</td>
-        <td>${r.am}</td>
-        <td><span style="background:${tc(r.tier)}22;color:${tc(r.tier)};padding:2px 8px;border-radius:20px;font-size:11px">${r.tier}</span></td>
-        <td style="font-family:var(--mono);color:var(--up)">${fmt(r.ngr)}</td>
-        <td style="font-size:11px;color:var(--text-2)">${r.motivo}</td>
-      </tr>`).join('')}
-    </tbody>
-  </table></div>`;
-}
-
-</script>
+// ── Draft Histórico ────────────────────────────────────────────────</script>
 </head>
 <body class="locked">
 
@@ -1515,8 +1369,7 @@ function renderDraftHist() {
 
 </div><!-- /#appWrap -->
 
-<script>
-// ====================== AUTH ======================
+<script>// ====================== AUTH ======================
 const BASE_USERS = [
   {login:'admin',           name:'Admin',           password:'admin@2026',     role:'admin'},
   {login:'joao.avila',      name:'João Ávila',      password:'galera@2026',    role:'CMO'},
@@ -3565,25 +3418,31 @@ function renderDraft() {
   </div>`;
 
   // ── Saídas no último ciclo ────────────────────────────────
-  const saidasHtml = SAIU_CARTEIRA.length ? `
-  <div style="background:var(--bg-1);border:1px solid var(--line);border-radius:16px;padding:28px;margin-bottom:32px">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">Último ciclo</div>
-    <div style="font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:4px">Saíram da carteira</div>
-    <div style="font-size:12px;color:var(--text-3);margin-bottom:20px">${SAIU_CARTEIRA.length} jogadores removidos · permaneceriam até fim de mês na nova lógica</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
-      ${SAIU_CARTEIRA.map(r=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg-2);border-radius:10px;border-left:3px solid var(--down)">
-          <div>
-            <div style="font-size:12px;font-weight:600;color:var(--text-1)">${r['First name']||''} ${r['Last name']||''}</div>
-            <div style="font-size:10px;color:var(--text-3);margin-top:2px">${r['Account Manager']||'—'}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-            ${tb(r.de||r.segment||'')}
-            <span style="font-size:9px;color:var(--down)">→ ${r.para||'Saiu'}</span>
-          </div>
-        </div>`).join('')}
-    </div>
-  </div>` : '';
+  let _saiuCards = '';
+  SAIU_CARTEIRA.forEach(function(r) {
+    const _nome = r.nome || ((r['First name']||'') + ' ' + (r['Last name']||'')).trim() || r.Username || '—';
+    const _am   = r['Account Manager'] || r.AM || '—';
+    const _tier = r.de || r.segment || r.tier || '';
+    const _mot  = r.motivo || ('→ ' + (r.para || 'Saiu'));
+    _saiuCards += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg-2);border-radius:10px;border-left:3px solid var(--down)">'
+      + '<div>'
+        + '<div style="font-size:12px;font-weight:600;color:var(--text-1)">' + _nome + '</div>'
+        + '<div style="font-size:10px;color:var(--text-3);margin-top:2px">' + _am + '</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
+        + tb(_tier)
+        + '<span style="font-size:9px;color:var(--down)">' + _mot + '</span>'
+      + '</div>'
+    + '</div>';
+  });
+  const saidasHtml = SAIU_CARTEIRA.length
+    ? '<div style="background:var(--bg-1);border:1px solid var(--line);border-radius:16px;padding:28px;margin-bottom:32px">'
+        + '<div style="font-family:var(--mono);font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">Último ciclo</div>'
+        + '<div style="font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:4px">Saíram da carteira</div>'
+        + '<div style="font-size:12px;color:var(--text-3);margin-bottom:20px">' + SAIU_CARTEIRA.length + ' jogadores removidos no Draft</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">' + _saiuCards + '</div>'
+      + '</div>'
+    : '';
 
   // ── Montar tudo ───────────────────────────────────────────
   c.innerHTML = `
@@ -3627,6 +3486,160 @@ function renderDraft() {
     </div>
   `;
   renderDraftHist();
+}
+
+// ── Recovery ────────────────────────────────────────────
+
+
+// ── Draft Histórico ─────────────────────────────────────
+
+
+
+
+// ── Recovery ────────────────────────────────────────────
+function renderRecovery() {
+  const c = document.getElementById('panel-recovery');
+  if (!c) { return; }
+  const all = (typeof RECOVERY_DATA !== 'undefined') ? RECOVERY_DATA : [];
+  if (!all.length) {
+    c.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-3)">Nenhum jogador em Recovery neste ciclo.</div>';
+    return;
+  }
+
+  const tc = t => t==='Elite'?'var(--tier-eli)':t==='Diamond'?'var(--tier-dia)':t==='Platina High'?'var(--tier-ph)':'var(--tier-pl)';
+  const fmt = v => 'R$ ' + Math.round(v||0).toLocaleString('pt-BR');
+  const AMS = ['Ana Paula','Gabriele','Mikael'];
+
+  const recAMFilter   = window._recAMFilter   || 'all';
+  const recTierFilter = window._recTierFilter || 'all';
+
+  let data = all.filter(r =>
+    (recAMFilter   === 'all' || r.AM === recAMFilter) &&
+    (recTierFilter === 'all' || r.tier === recTierFilter)
+  ).sort((a,b) => (b.ngr||0)-(a.ngr||0));
+
+  const tierRows  = all.filter(r => r.motivo && r.motivo.includes('Tier'));
+  const contaRows = all.filter(r => r.motivo && r.motivo.includes('Conta'));
+  const ngr_total = all.reduce((s,r)=>s+(r.ngr||0),0);
+
+  const makeBtn = (label, key, val, cur, color) => {
+    const active = cur === val;
+    const sty = active && color ? 'background:'+color+'33;color:'+color+';border-color:'+color+';' : '';
+    return '<button class="filter-btn '+(active?'active':'')+'" style="'+sty+'" onclick="window._rec'+key+'Filter=\''+val+'\';renderRecovery()">'+label+'</button>';
+  };
+
+  // KPI cards
+  let kpiHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px">';
+  kpiHtml += '<div class="stat-card"><div class="stat-label">Em Recovery</div><div class="stat-value">'+all.length+'</div></div>';
+  kpiHtml += '<div class="stat-card"><div class="stat-label">NGR acumulado 90d</div><div class="stat-value" style="color:var(--up)">'+fmt(ngr_total)+'</div></div>';
+  kpiHtml += '<div class="stat-card"><div class="stat-label">Por tier baixo</div><div class="stat-value">'+tierRows.length+'</div></div>';
+  kpiHtml += '<div class="stat-card"><div class="stat-label">Por conta restrita</div><div class="stat-value">'+contaRows.length+'</div></div>';
+  kpiHtml += '<div class="stat-card"><div class="stat-label">Filtrados</div><div class="stat-value">'+data.length+'</div></div>';
+  kpiHtml += '</div>';
+
+  // Filtros
+  let filtersHtml = '<div class="table-controls" style="margin-bottom:16px;flex-wrap:wrap;gap:6px">';
+  filtersHtml += makeBtn('Todos AMs','AM','all',recAMFilter,'');
+  AMS.forEach(am => { filtersHtml += makeBtn(am,'AM',am,recAMFilter,'var(--neon-cyan)'); });
+  filtersHtml += '<span style="width:1px;height:24px;background:var(--line-2);display:inline-block;vertical-align:middle;margin:0 4px"></span>';
+  filtersHtml += makeBtn('Todos Tiers','Tier','all',recTierFilter,'');
+  ['Platina High','Diamond','Elite','Platina Low'].forEach(t => {
+    filtersHtml += makeBtn(t,'Tier',t,recTierFilter,tc(t));
+  });
+  filtersHtml += '</div>';
+
+  // Tabela
+  let tableHtml = '<div style="overflow-x:auto"><table class="dr-table" style="width:100%"><thead><tr>';
+  tableHtml += '<th>Jogador</th><th>Username</th><th>AM anterior</th><th>Tier</th><th>Motivo</th><th>NGR 90d</th><th>S/ Dep</th><th>S/ Login</th>';
+  tableHtml += '</tr></thead><tbody>';
+  data.forEach(function(r, i) {
+    const nd = r.days_no_dep !== undefined ? r.days_no_dep+'d' : '—';
+    const nl = r.days_no_login !== undefined ? r.days_no_login+'d' : '—';
+    const ndC = (r.days_no_dep||0)>=14?'color:var(--down)':(r.days_no_dep||0)>=7?'color:var(--neon-amber)':'';
+    const tierBg = 'background:'+tc(r.tier||'')+'22;color:'+tc(r.tier||'')+';padding:2px 8px;border-radius:20px;font-size:11px';
+    const rowBg = i%2 ? 'background:var(--bg-2)' : '';
+    tableHtml += '<tr style="'+rowBg+'">';
+    tableHtml += '<td><strong>'+(r.nome||r.Username||'')+'</strong></td>';
+    tableHtml += '<td style="font-family:var(--mono);font-size:11px;color:var(--text-3)">'+(r.Username||'')+'</td>';
+    tableHtml += '<td>'+(r.AM||'—')+'</td>';
+    tableHtml += '<td><span style="'+tierBg+'">'+(r.tier||'')+'</span></td>';
+    tableHtml += '<td style="font-size:11px;color:var(--text-2)">'+(r.motivo||'')+'</td>';
+    tableHtml += '<td style="font-family:var(--mono);color:var(--up)">'+fmt(r.ngr||0)+'</td>';
+    tableHtml += '<td style="font-family:var(--mono);'+ndC+'">'+nd+'</td>';
+    tableHtml += '<td style="font-family:var(--mono)">'+nl+'</td>';
+    tableHtml += '</tr>';
+  });
+  tableHtml += '</tbody></table></div>';
+
+  c.innerHTML = '<div style="padding:24px 0 8px">'
+    + '<div class="hero-title" style="margin-bottom:6px">🔄 <em>Recovery</em></div>'
+    + '<div style="color:var(--text-2);font-size:14px;margin-bottom:24px">Jogadores saídos no Draft com conta ativa — pipeline de reengajamento</div>'
+    + kpiHtml + filtersHtml + tableHtml + '</div>';
+}
+
+// ── Draft Histórico ─────────────────────────────────────
+function renderDraftHist() {
+  const container = document.getElementById('draftHistTable');
+  if (!container) return;
+
+  const amF   = (document.getElementById('draftHistAM')   || {}).value || 'all';
+  const tipoF = (document.getElementById('draftHistTipo') || {}).value || 'all';
+  const tierF = (document.getElementById('draftHistTier') || {}).value || 'all';
+
+  const tc = t => t==='Elite'?'var(--tier-eli)':t==='Diamond'?'var(--tier-dia)':t==='Platina High'?'var(--tier-ph)':'var(--tier-pl)';
+  const fmt = v => 'R$ '+Math.round(v||0).toLocaleString('pt-BR');
+
+  const entradas = CARTEIRA.filter(r => r.is_new_cart).map(r => ({
+    tipo:'entrada', label:'✦ Entrada', color:'var(--neon-cyan)',
+    nome: ((r['First name']||r.nome||'')+' '+(r['Last name']||'')).trim(),
+    user: String(r.Username), am: r['Account Manager']||'',
+    tier: r.segment||'', ngr: r.NGR||0, motivo: 'Entrou no Draft'
+  }));
+
+  const saidas = (SAIU_CARTEIRA||[]).map(r => ({
+    tipo:'saida', label:'✕ Saída', color:'var(--down)',
+    nome: r.nome || ((r['First name']||'')+' '+(r['Last name']||'')).trim(),
+    user: String(r.Username||''), am: r['Account Manager']||r.AM||'',
+    tier: r.segment||r.tier||'', ngr: r.NGR||r.ngr||0, motivo: r.motivo||''
+  }));
+
+  let rows = [...entradas, ...saidas];
+  if (tipoF === 'entrada') rows = rows.filter(r => r.tipo === 'entrada');
+  if (tipoF === 'saida')   rows = rows.filter(r => r.tipo === 'saida');
+  if (amF   !== 'all')     rows = rows.filter(r => r.am === amF);
+  if (tierF !== 'all')     rows = rows.filter(r => r.tier === tierF);
+  rows.sort((a,b) => (b.ngr||0)-(a.ngr||0));
+
+  const cnt = document.getElementById('draftHistCount');
+  if (cnt) {
+    const ne = rows.filter(r=>r.tipo==='entrada').length;
+    const ns = rows.filter(r=>r.tipo==='saida').length;
+    cnt.textContent = ne+' entradas · '+ns+' saídas';
+  }
+
+  if (!rows.length) {
+    container.innerHTML = '<div style="color:var(--text-3);padding:20px;text-align:center">Nenhum registro encontrado</div>';
+    return;
+  }
+
+  let html = '<div style="overflow-x:auto"><table class="dr-table" style="width:100%"><thead><tr>';
+  html += '<th>Tipo</th><th>Jogador</th><th>Username</th><th>AM</th><th>Tier</th><th>NGR 90d</th><th>Motivo</th>';
+  html += '</tr></thead><tbody>';
+  rows.forEach(function(r, i) {
+    const tierBg = 'background:'+tc(r.tier)+'22;color:'+tc(r.tier)+';padding:2px 8px;border-radius:20px;font-size:11px';
+    const rowBg = i%2 ? 'background:var(--bg-2)' : '';
+    html += '<tr style="'+rowBg+'">';
+    html += '<td><span style="color:'+r.color+';font-weight:700;font-size:12px">'+r.label+'</span></td>';
+    html += '<td><strong>'+r.nome+'</strong></td>';
+    html += '<td style="font-family:var(--mono);font-size:11px;color:var(--text-3)">'+r.user+'</td>';
+    html += '<td>'+r.am+'</td>';
+    html += '<td><span style="'+tierBg+'">'+r.tier+'</span></td>';
+    html += '<td style="font-family:var(--mono);color:var(--up)">'+fmt(r.ngr)+'</td>';
+    html += '<td style="font-size:11px;color:var(--text-2)">'+r.motivo+'</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
 </script>
