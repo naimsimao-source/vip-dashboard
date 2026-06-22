@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galerabet VIP · Alternativas de Gamificação v4</title>
+<style>
+  :root {
+    --bg: #0A0C10;
+    --surface: #111318;
+    --card: #16191F;
+    --border: #232730;
+    --gold: #C9A84C;
+    --gold-dim: #8A6E2E;
+    --text: #E8EAF0;
+    --muted: #7A8090;
+    --green: #4CAF7D;
+    --red: #E85B5B;
+    --a1: #C9A84C;
+    --a2: #7EDCE2;
+    --a3: #B47FEB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.6; }
+
+  header { border-bottom: 1px solid var(--border); padding: 40px 60px 32px; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+  .logo-area h1 { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .logo-area .title { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .logo-area .title span { color: var(--gold); }
+  .meta { text-align: right; font-size: 12px; color: var(--muted); line-height: 1.8; }
+  .meta strong { color: var(--text); }
+
+  .context-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 60px; display: flex; gap: 48px; flex-wrap: wrap; }
+  .kpi-item label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); display: block; margin-bottom: 3px; }
+  .kpi-item .val { font-size: 18px; font-weight: 700; color: var(--gold); }
+  .kpi-item .sub { font-size: 11px; color: var(--muted); }
+
+  /* compliance notice */
+  .compliance-bar { background: rgba(232,91,91,.07); border-bottom: 1px solid rgba(232,91,91,.2); padding: 14px 60px; display: flex; gap: 32px; flex-wrap: wrap; }
+  .comp-tag { font-size: 12px; color: #E85B5B; display: flex; align-items: center; gap: 6px; }
+  .comp-tag.ok { color: var(--green); }
+
+  .intro { padding: 40px 60px 28px; max-width: 880px; }
+  .intro p { color: var(--muted); font-size: 14px; line-height: 1.8; }
+  .intro p + p { margin-top: 10px; }
+  .intro strong { color: var(--text); }
+
+  /* breakeven callout */
+  .breakeven { margin: 0 60px 40px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 32px; }
+  .breakeven h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 16px; }
+  .be-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .be-item label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 4px; }
+  .be-item .val { font-size: 16px; font-weight: 700; }
+  .be-item .sub { font-size: 11px; color: var(--muted); }
+  .be-item .val.pos { color: var(--green); }
+  .be-item .val.gold { color: var(--gold); }
+  .be-note { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .be-note strong { color: var(--text); }
+
+  .alt-section { padding: 0 60px 64px; }
+  .alt-header { display: flex; align-items: center; gap: 20px; padding: 40px 0 28px; border-top: 1px solid var(--border); }
+  .alt-number { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; flex-shrink: 0; }
+  .alt-1 .alt-number { background: rgba(201,168,76,.15); color: var(--a1); border: 1.5px solid var(--a1); }
+  .alt-2 .alt-number { background: rgba(126,220,226,.1); color: var(--a2); border: 1.5px solid var(--a2); }
+  .alt-3 .alt-number { background: rgba(180,127,235,.1); color: var(--a3); border: 1.5px solid var(--a3); }
+  .alt-title-block h2 { font-size: 22px; font-weight: 700; line-height: 1.2; }
+  .alt-title-block .tagline { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .alt-1 h2 { color: var(--a1); }
+  .alt-2 h2 { color: var(--a2); }
+  .alt-3 h2 { color: var(--a3); }
+
+  .concept-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin-bottom: 20px; }
+  .concept-card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 12px; }
+  .concept-card p { font-size: 14px; color: var(--text); line-height: 1.75; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+  .lifecycle { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+  .lifecycle-header { padding: 16px 24px; background: rgba(255,255,255,.03); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .cycle-row { display: grid; grid-template-columns: 110px 1fr 1fr; border-bottom: 1px solid var(--border); }
+  .cycle-row:last-child { border-bottom: none; }
+  .cycle-cell { padding: 14px 20px; font-size: 13.5px; line-height: 1.6; border-right: 1px solid var(--border); }
+  .cycle-cell:last-child { border-right: none; }
+  .cycle-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 600; padding: 14px 20px; display: flex; align-items: center; border-right: 1px solid var(--border); }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-right: 4px; white-space: nowrap; }
+  .badge-d { background: rgba(201,168,76,.15); color: var(--a1); }
+  .badge-s { background: rgba(76,175,125,.12); color: var(--green); }
+  .badge-m { background: rgba(232,124,106,.12); color: #E87C6A; }
+  .badge-x { background: rgba(126,220,226,.1); color: var(--a2); }
+  .badge-c { background: rgba(180,127,235,.1); color: var(--a3); }
+
+  /* compliance inline flag */
+  .ok-flag { display: inline-block; font-size: 10px; background: rgba(76,175,125,.12); color: var(--green); border-radius: 4px; padding: 1px 6px; margin-left: 4px; font-weight: 600; }
+
+  .ui-frame { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .ui-frame h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 20px; }
+  .ui-mockup { background: #0D0F14; border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .ui-nav { display: flex; gap: 6px; margin-bottom: 16px; }
+  .ui-tab { padding: 6px 14px; border-radius: 20px; font-size: 11px; border: 1px solid var(--border); color: var(--muted); font-family: 'Segoe UI', sans-serif; }
+  .alt-1 .ui-tab.active { background: rgba(201,168,76,.12); border-color: var(--a1); color: var(--a1); }
+  .alt-2 .ui-tab.active { background: rgba(126,220,226,.08); border-color: var(--a2); color: var(--a2); }
+  .alt-3 .ui-tab.active { background: rgba(180,127,235,.1); border-color: var(--a3); color: var(--a3); }
+  .ui-mission-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ui-mission { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .ui-mission .m-label { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 6px; font-family: 'Segoe UI', sans-serif; }
+  .ui-mission .m-title { font-size: 12px; color: var(--text); margin-bottom: 8px; font-weight: 600; font-family: 'Segoe UI', sans-serif; }
+  .progress-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-bar { height: 100%; border-radius: 2px; }
+  .alt-1 .progress-bar { background: var(--a1); }
+  .alt-2 .progress-bar { background: var(--a2); }
+  .alt-3 .progress-bar { background: var(--a3); }
+  .m-reward { font-size: 10px; color: var(--muted); font-family: 'Segoe UI', sans-serif; }
+  .ui-journey { display: flex; align-items: flex-start; gap: 0; margin-top: 16px; }
+  .journey-node { flex: 1; text-align: center; position: relative; }
+  .journey-node::after { content: ''; position: absolute; top: 14px; left: 50%; width: 100%; height: 2px; background: var(--border); }
+  .journey-node:last-child::after { display: none; }
+  .j-circle { width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-family: 'Segoe UI', sans-serif; position: relative; z-index: 1; }
+  .j-done { background: var(--green); color: #000; font-weight: 700; }
+  .alt-1 .j-active { border: 2px solid var(--a1); color: var(--a1); background: rgba(201,168,76,.1); font-weight: 700; }
+  .alt-2 .j-active { border: 2px solid var(--a2); color: var(--a2); background: rgba(126,220,226,.08); font-weight: 700; }
+  .alt-3 .j-active { border: 2px solid var(--a3); color: var(--a3); background: rgba(180,127,235,.1); font-weight: 700; }
+  .j-locked { border: 1px solid var(--border); color: var(--muted); background: var(--surface); }
+  .j-label { font-size: 9px; color: var(--muted); font-family: 'Segoe UI', sans-serif; line-height: 1.4; }
+
+  .cost-table { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+  .cost-table-header { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; background: rgba(255,255,255,.03); border-bottom: 1px solid var(--border); padding: 12px 24px; }
+  .cost-table-header span { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 600; }
+  .cost-row { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; padding: 13px 24px; border-bottom: 1px solid var(--border); font-size: 13.5px; align-items: center; }
+  .cost-row:last-child { border-bottom: none; }
+  .cost-row.total { background: rgba(255,255,255,.025); font-weight: 700; }
+  .cost-row .item { color: var(--text); }
+  .cost-row .num { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cost-row .num.pos { color: var(--green); }
+  .cost-row.total .num { color: var(--text); }
+  .cost-row.be-row { background: rgba(76,175,125,.04); }
+  .cost-row.be-row .item { color: var(--green); font-size: 13px; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tag { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid; }
+  .tag-pos { border-color: var(--green); color: var(--green); background: rgba(76,175,125,.08); }
+  .tag-neg { border-color: var(--red); color: var(--red); background: rgba(232,91,91,.08); }
+  .tag-neu { border-color: var(--muted); color: var(--muted); background: transparent; }
+
+  /* comparison */
+  .comparison { margin: 64px 60px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .comparison h2 { padding: 28px 32px 20px; font-size: 20px; font-weight: 700; border-bottom: 1px solid var(--border); }
+  .comp-table { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; }
+  .comp-head { padding: 14px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); font-weight: 600; background: rgba(255,255,255,.02); }
+  .comp-head:last-child { border-right: none; }
+  .comp-cell { padding: 13px 20px; font-size: 13px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); color: var(--text); line-height: 1.5; }
+  .comp-cell:last-child { border-right: none; }
+  .comp-cell.label { color: var(--muted); font-size: 12px; background: rgba(255,255,255,.01); }
+  .hl-1 { color: var(--a1); font-weight: 600; }
+  .hl-2 { color: var(--a2); font-weight: 600; }
+  .hl-3 { color: var(--a3); font-weight: 600; }
+  .neg { color: var(--red); }
+  .pos { color: var(--green); }
+
+  .rec-section { margin: 0 60px 80px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 36px 40px; }
+  .rec-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--gold); }
+  .rec-section p { font-size: 14px; color: var(--muted); line-height: 1.8; max-width: 800px; }
+  .rec-section p + p { margin-top: 12px; }
+  .rec-section strong { color: var(--text); }
+
+  footer { border-top: 1px solid var(--border); padding: 24px 60px; display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <h1>Galerabet · VIP Operations</h1>
+    <div class="title">Gamificação <span>VIP</span> — 3 Alternativas</div>
+  </div>
+  <div class="meta">
+    <div><strong>Plataforma:</strong> CaptainUp</div>
+    <div><strong>Base:</strong> 1.721 VIPs ativos · Junho/2026</div>
+    <div><strong>Referência NGR:</strong> Mai/26 R$ 3.789.880</div>
+    <div><strong>Versão:</strong> v4 · 22/06/2026</div>
+  </div>
+</header>
+
+<!-- KPIs -->
+<div class="context-bar">
+  <div class="kpi-item"><label>NGR Jun (D22 parcial)</label><div class="val">R$ 2,5M</div><div class="sub">~R$ 114K / dia</div></div>
+  <div class="kpi-item"><label>Valor Apostado</label><div class="val">R$ 44,8M</div><div class="sub">~R$ 2,04M / dia</div></div>
+  <div class="kpi-item"><label>Depósitos</label><div class="val">R$ 8,7M</div><div class="sub">~R$ 397K / dia · R$ 5.070/player</div></div>
+  <div class="kpi-item"><label>GGR (apostado × 3%)</label><div class="val">R$ 1,34M</div><div class="sub">~R$ 61K / dia</div></div>
+  <div class="kpi-item"><label>Bônus Resgatado</label><div class="val">R$ 727K</div><div class="sub">R$ 423 / player</div></div>
+  <div class="kpi-item"><label>Valor Apost. / Player</label><div class="val">R$ 26K</div><div class="sub">média mensal · R$ 1.183/dia</div></div>
+</div>
+
+<!-- Compliance flags -->
+<div class="compliance-bar">
+  <div class="comp-tag">✗ Removido: metas de NGR visíveis ao cliente</div>
+  <div class="comp-tag">✗ Removido: "tier-down protection" atrelada a perda</div>
+  <div class="comp-tag ok">✓ Metas reescritas em Valor Apostado + Dias Ativos</div>
+  <div class="comp-tag ok">✓ Turnover → Valor Apostado em toda comunicação</div>
+  <div class="comp-tag ok">✓ Custo do programa inferior ao NGR incremental esperado</div>
+</div>
+
+<!-- Intro -->
+<div class="intro">
+  <p>As missões do programa são estruturadas exclusivamente em torno de <strong>valor apostado</strong> e <strong>dias ativos</strong> — métricas que o jogador controla e entende sem qualquer referência a quanto ele precisa perder. Os objetivos financeiros internos (NGR, GGR, margem) ficam no back-office e nunca aparecem na comunicação com o cliente.</p>
+  <p>A premissa comum: jogadores acumulam a moeda da alternativa escolhida ao apostar, e trocam essa moeda por experiências, merchan, bônus e cashback. O programa aumenta <strong>valor de depósito</strong>, <strong>dias ativos</strong> e <strong>frequência de apostas</strong> como consequência natural da mecânica — sem expor a lógica de rentabilidade.</p>
+</div>
+
+<!-- Break-even callout -->
+<div class="breakeven">
+  <h3>📊 Break-even — Valor Apostado Mínimo para Cobrir o Custo do Programa</h3>
+  <div class="be-grid">
+    <div class="be-item">
+      <label>Valor apostado atual / player / mês</label>
+      <div class="val gold">R$ 26.036</div>
+      <div class="sub">média da base ativa</div>
+    </div>
+    <div class="be-item">
+      <label>Break-even Alt. 1 — Clube Galera</label>
+      <div class="val pos">R$ 4.164 / player</div>
+      <div class="sub">custo R$ 215K ÷ 3% ÷ 1.721 players</div>
+    </div>
+    <div class="be-item">
+      <label>Break-even Alt. 2 — Círculo de Ouro</label>
+      <div class="val pos">R$ 6.936 / player</div>
+      <div class="sub">custo R$ 358K ÷ 3% ÷ 1.721 players</div>
+    </div>
+    <div class="be-item">
+      <label>Break-even Alt. 3 — Cofre VIP</label>
+      <div class="val pos">R$ 5.857 / player</div>
+      <div class="sub">custo R$ 302K ÷ 3% ÷ 1.721 players</div>
+    </div>
+  </div>
+  <div class="be-note">
+    <strong>O valor apostado atual (R$ 26K/player/mês) supera o break-even das 3 alternativas em 4× a 6×.</strong> Ou seja: o programa se paga mesmo que o engajamento não aumente nada. Qualquer incremento em dias ativos ou depósitos gera NGR adicional líquido. As metas de missão foram calibradas abaixo do valor médio atual para ser alcançáveis pela maioria da base, criando hábito antes de escalar.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ -->
+<!--  ALT 1 — CLUBE GALERA             -->
+<!-- ══════════════════════════════════ -->
+<div class="alt-section alt-1">
+  <div class="alt-header">
+    <div class="alt-number">1</div>
+    <div class="alt-title-block">
+      <h2>Clube Galera</h2>
+      <div class="tagline">Moeda: Jóias 💎 — loyalty por missões + shop permanente · cobertura de 100% da base VIP</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <h3>Conceito Central</h3>
+    <p>O <strong>Clube Galera</strong> transforma cada aposta em <strong>Jóias</strong> acumuladas no perfil do jogador. Missões diárias e semanais curtas guiam o comportamento sem interromper a experiência de jogo. O shop de recompensas funciona como catálogo permanente — o jogador troca Jóias quando quiser, mantendo sensação de controle e autonomia. Streaks de dias ativos consecutivos criam o hábito de retorno diário. Desafios surpresa personalizados por tipo de jogo (Casino ou Esportes) geram engajamento pontual sem custo fixo elevado.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card" style="margin-bottom:0">
+      <h3>Mecânica de Jóias</h3>
+      <p>
+        <strong>1 Jóia = R$ 1 apostado</strong> <span class="ok-flag">✓ linguagem cliente</span><br><br>
+        Casino: +10% Jóias nas quartas e domingos (dias de pico)<br><br>
+        Esportes: Jóias por mercados apostados (mínimo odd 1.5)<br><br>
+        Depósito: 50 Jóias por depósito ≥ R$ 100<br><br>
+        Streak de login: D1 → 20 · D7 → 200 · D14 → 500 · D30 → 1.500 Jóias
+      </p>
+    </div>
+    <div class="concept-card" style="margin-bottom:0">
+      <h3>Shop de Recompensas</h3>
+      <p>
+        <strong>Cashback em bônus:</strong> 1.000 Jóias → R$ 50 (limite semanal por tier)<br><br>
+        <strong>Free Spins:</strong> 500 Jóias → 50 giros no slot do mês<br><br>
+        <strong>Merchan Galerabet:</strong> 2.000 → camiseta · 5.000 → kit premium<br><br>
+        <strong>Experiências:</strong> 10.000 Jóias → ingresso em evento parceiro<br><br>
+        <strong>Boost de apostas:</strong> 3.000 Jóias → odd incrementada em 0,1 por 48h (Esportes)
+      </p>
+    </div>
+  </div>
+
+  <div class="lifecycle">
+    <div class="lifecycle-header">Lifecycle de Missões — Clube Galera</div>
+    <div class="cycle-row">
+      <div class="cycle-label">Diário</div>
+      <div class="cycle-cell">
+        <span class="badge badge-d">Casino</span> Aposte em 3 jogos diferentes → +150 💎<br>
+        <span class="badge badge-d">Casino</span> Sessão ≥ 30 min → +80 💎<br>
+        <span class="badge badge-x">Surpresa</span> Desafio relâmpago (2h): aposte R$ 50 em jogo específico → ×2 Jóias na sessão
+      </div>
+      <div class="cycle-cell">
+        <span class="badge badge-d">Esportes</span> Aposte em 2+ eventos ao vivo → +150 💎<br>
+        <span class="badge badge-d">Esportes</span> 3 apostas pré-jogo no dia → +100 💎<br>
+        <span class="badge badge-x">Surpresa</span> Aposte em jogo específico indicado pelo AM → +500 💎 bônus
+      </div>
+    </div>
+    <div class="cycle-row">
+      <div class="cycle-label">Semanal</div>
+      <div class="cycle-cell">
+        <span class="badge badge-s">Casino</span> Aposte R$ 1.000 na semana → +800 💎 <span class="ok-flag">✓ valor apostado</span><br>
+        <span class="badge badge-s">Casino</span> Jogue em 5 dias distintos → +400 💎<br>
+        <span class="badge badge-s">Casino</span> Experimente 1 jogo novo → +200 💎
+      </div>
+      <div class="cycle-cell">
+        <span class="badge badge-s">Esportes</span> Aposte em 3 modalidades diferentes → +600 💎<br>
+        <span class="badge badge-s">Esportes</span> Aposte R$ 500 em esportes na semana → +500 💎 <span class="ok-flag">✓</span><br>
+        <span class="badge badge-s">Esportes</span> 1 aposta múltipla (3+ seleções) → +300 💎
+      </div>
+    </div>
+    <div class="cycle-row">
+      <div class="cycle-label">Mensal</div>
+      <div class="cycle-cell" style="grid-column: span 2">
+        <span class="badge badge-m">Todos</span> <strong>Meta de atividade:</strong> 18+ dias ativos no mês → badge "Jogador do Mês" + 3.000 💎 <span class="ok-flag">✓ dias ativos</span><br>
+        <span class="badge badge-m">Todos</span> <strong>Meta de volume apostado:</strong> Platina R$ 20K · Diamond R$ 80K · Elite R$ 150K → Jóias em cascata (5K / 15K / 35K) <span class="ok-flag">✓ valor apostado</span><br>
+        <span class="badge badge-m">Todos</span> <strong>Ranking do mês:</strong> top 10 por volume apostado por tier → troféu + convite para evento Galerabet
+      </div>
+    </div>
+  </div>
+
+  <div class="ui-frame">
+    <h3>UI/UX — Widget Clube Galera (CaptainUp)</h3>
+    <div class="ui-mockup">
+      <div class="ui-nav">
+        <div class="ui-tab active">Missões</div>
+        <div class="ui-tab">Shop</div>
+        <div class="ui-tab">Ranking</div>
+        <div class="ui-tab">Streak</div>
+      </div>
+      <div class="ui-mission-grid">
+        <div class="ui-mission">
+          <div class="m-label">🎰 Diária · Casino</div>
+          <div class="m-title">3 jogos diferentes hoje</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:66%"></div></div>
+          <div class="m-reward">2/3 · +150 💎</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">⚽ Diária · Esportes</div>
+          <div class="m-title">2 apostas ao vivo</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:50%"></div></div>
+          <div class="m-reward">1/2 · +150 💎</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">⚡ Surpresa · 1h50m</div>
+          <div class="m-title">Aposte R$ 50 em Fortune Tiger</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:0%"></div></div>
+          <div class="m-reward">Recompensa: ×2 Jóias</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">📅 Semanal</div>
+          <div class="m-title">Apostar R$ 1.000</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:72%"></div></div>
+          <div class="m-reward">R$ 720 / R$ 1.000 · +800 💎</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">🔥 Streak</div>
+          <div class="m-title">Ativo por 7 dias seguidos</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:85%"></div></div>
+          <div class="m-reward">Dia 6/7 · +200 💎 amanhã</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">🏆 Meta Mensal</div>
+          <div class="m-title">R$ 20.000 apostados (Platina)</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:40%"></div></div>
+          <div class="m-reward">R$ 8K / R$ 20K · +5.000 💎</div>
+        </div>
+      </div>
+      <div class="ui-journey" style="margin-top:16px">
+        <div class="journey-node"><div class="j-circle j-done">✓</div><div class="j-label">Iniciante</div></div>
+        <div class="journey-node"><div class="j-circle j-done">✓</div><div class="j-label">Regular</div></div>
+        <div class="journey-node"><div class="j-circle j-active">▶</div><div class="j-label">Veterano</div></div>
+        <div class="journey-node"><div class="j-circle j-locked">🔒</div><div class="j-label">Expert</div></div>
+        <div class="journey-node"><div class="j-circle j-locked">🔒</div><div class="j-label">Lenda</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cost-table">
+    <div class="cost-table-header">
+      <span>Item de Custo</span><span>Base de Cálculo</span><span>Custo Diário</span><span>Custo Mensal</span>
+    </div>
+    <div class="cost-row"><div class="item">Cashback via Jóias resgatadas</div><div class="num">5% da base · R$ 50/resgate</div><div class="num">R$ 4.303</div><div class="num">R$ 129.075</div></div>
+    <div class="cost-row"><div class="item">Free Spins (custo operacional)</div><div class="num">10% da base · R$ 10/lote</div><div class="num">R$ 1.721</div><div class="num">R$ 51.630</div></div>
+    <div class="cost-row"><div class="item">Merchan + Experiências</div><div class="num">1% da base · R$ 80 custo médio</div><div class="num">R$ 460</div><div class="num">R$ 13.768</div></div>
+    <div class="cost-row"><div class="item">Boost de aposta Esportes</div><div class="num">2% da base · perda margem em R$ 500 apostado</div><div class="num">R$ 516</div><div class="num">R$ 15.489</div></div>
+    <div class="cost-row"><div class="item">Evento / Ranking mensal</div><div class="num">10 vencedores · R$ 500 custo médio</div><div class="num">R$ 167</div><div class="num">R$ 5.000</div></div>
+    <div class="cost-row total"><div class="item">TOTAL ESTIMADO</div><div class="num">—</div><div class="num">R$ 7.167</div><div class="num">R$ 214.962</div></div>
+    <div class="cost-row be-row"><div class="item">Break-even: valor apostado mínimo para cobrir</div><div class="num">R$ 214.962 ÷ 3%</div><div class="num pos">R$ 238.847/dia</div><div class="num pos">R$ 7,17M/mês</div></div>
+    <div class="cost-row be-row"><div class="item">Valor apostado atual (base ativa)</div><div class="num">—</div><div class="num pos">R$ 2,04M/dia</div><div class="num pos">R$ 44,8M/mês ✓</div></div>
+    <div class="cost-row be-row"><div class="item">NGR incremental estimado (+3% retenção)</div><div class="num">Ref. R$ 3,79M/mês</div><div class="num pos">+R$ 3.801</div><div class="num pos">+R$ 113.696</div></div>
+  </div>
+
+  <div class="tag-row">
+    <span class="tag tag-pos">✓ Menor custo absoluto — R$ 215K/mês</span>
+    <span class="tag tag-pos">✓ 100% da base coberta</span>
+    <span class="tag tag-pos">✓ Time to market: 2–3 semanas</span>
+    <span class="tag tag-pos">✓ Break-even em 16% do valor apostado atual</span>
+    <span class="tag tag-neg">✗ Menor diferenciação percebida</span>
+    <span class="tag tag-neu">⟳ Foco: aumentar dias ativos + frequência de depósito</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ -->
+<!--  ALT 2 — CÍRCULO DE OURO          -->
+<!-- ══════════════════════════════════ -->
+<div class="alt-section alt-2">
+  <div class="alt-header">
+    <div class="alt-number">2</div>
+    <div class="alt-title-block">
+      <h2>Círculo de Ouro</h2>
+      <div class="tagline">Moeda: Troféus 🏆 — ascensão por círculos de elite · torneios sazonais · exclusividade percebida</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <h3>Conceito Central</h3>
+    <p>O <strong>Círculo de Ouro</strong> é um programa de ascensão por estágios com estética de clube fechado de alto padrão. O jogador sobe de círculo acumulando <strong>Troféus</strong> — a moeda da exclusividade — através de volume de apostas e dias ativos. Cada círculo desbloqueia uma camada de benefícios mais exclusiva e visualmente distinta no perfil do jogador. Torneios semanais com leaderboard ao vivo criam FOMO e competitividade saudável. A personalização por tipo de jogo é mantida de forma elegante: jogadores de Casino seguem a trilha <em>Salão</em>, jogadores de Esportes seguem a trilha <em>Tribuna</em>. Ambos convergem no <strong>Círculo Máximo</strong> mensal — evento exclusivo de reconhecimento.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card" style="margin-bottom:0">
+      <h3>Mecânica de Troféus</h3>
+      <p>
+        <strong>1 Troféu = R$ 2 apostados</strong> <span class="ok-flag">✓ linguagem cliente</span><br><br>
+        Casino (Salão): Troféus extras em jogos em destaque rotacionados semanalmente<br><br>
+        Esportes (Tribuna): Troféus bônus em apostas com 3+ seleções<br><br>
+        Progresso por círculo: cada círculo tem uma meta de Troféus acumulados + dias ativos mínimos<br><br>
+        Jackpot do Círculo: pool alimentado por 0,1% do valor apostado total → sorteio semanal entre os top 20% em Troféus
+      </p>
+    </div>
+    <div class="concept-card" style="margin-bottom:0">
+      <h3>Os 5 Círculos</h3>
+      <p>
+        <strong>Círculo Bronze:</strong> entrada — free spins + badge exclusivo<br><br>
+        <strong>Círculo Prata:</strong> cashback de 5% em bônus desbloqueado<br><br>
+        <strong>Círculo Ouro:</strong> acesso antecipado a torneios VIP · kit físico Galerabet<br><br>
+        <strong>Círculo Platina:</strong> convite para experiência presencial exclusiva<br><br>
+        <strong>Círculo Diamante:</strong> cashback elevado + AM dedicado + acesso ao Círculo Máximo mensal
+      </p>
+    </div>
+  </div>
+
+  <div class="lifecycle">
+    <div class="lifecycle-header">Lifecycle de Missões — Círculo de Ouro</div>
+    <div class="cycle-row">
+      <div class="cycle-label">Diário</div>
+      <div class="cycle-cell">
+        <span class="badge badge-d">Salão</span> Aposte em 1 jogo em destaque do dia → +10 🏆<br>
+        <span class="badge badge-d">Salão</span> Sessão ≥ 20 min → +5 🏆<br>
+        <span class="badge badge-x">Surpresa</span> "Momento Dourado" (aleatório, 2h): multiplicador ×1,5 em Troféus ativos
+      </div>
+      <div class="cycle-cell">
+        <span class="badge badge-d">Tribuna</span> Aposte em jogo ao vivo → +10 🏆<br>
+        <span class="badge badge-d">Tribuna</span> 2 apostas pré-jogo ≥ R$ 50 → +8 🏆<br>
+        <span class="badge badge-x">Surpresa</span> "Palpite do Dia": indicação do AM para apostar em evento específico → +50 🏆 bônus
+      </div>
+    </div>
+    <div class="cycle-row">
+      <div class="cycle-label">Semanal</div>
+      <div class="cycle-cell">
+        <span class="badge badge-s">Torneio</span> Leaderboard semanal de Troféus por tier → top 3 recebem: R$ 200 / R$ 100 / R$ 50 em bônus<br>
+        <span class="badge badge-s">Salão</span> Aposte R$ 2.000 na semana → +40 🏆 <span class="ok-flag">✓ valor apostado</span>
+      </div>
+      <div class="cycle-cell">
+        <span class="badge badge-s">Tribuna</span> Aposte em 4 modalidades distintas na semana → +35 🏆<br>
+        <span class="badge badge-s">Tribuna</span> Aposte R$ 1.000 em esportes → +30 🏆 <span class="ok-flag">✓ valor apostado</span>
+      </div>
+    </div>
+    <div class="cycle-row">
+      <div class="cycle-label">Mensal</div>
+      <div class="cycle-cell" style="grid-column: span 2">
+        <span class="badge badge-m">Todos</span> <strong>Círculo Máximo:</strong> ranking único por Troféus acumulados → top 10 por tier recebem recompensa física + acesso ao próximo círculo em Early Access<br>
+        <span class="badge badge-m">Todos</span> <strong>Jackpot do Círculo:</strong> sorteio entre jogadores com ≥ 250 Troféus no mês → pool de ~R$ 45K (0,1% do valor apostado mensal estimado)<br>
+        <span class="badge badge-m">Todos</span> <strong>Meta de presença:</strong> 18+ dias ativos no mês → +200 Troféus bônus + proteção de nível no programa por 30 dias <span class="ok-flag">✓ dias ativos</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ui-frame">
+    <h3>UI/UX — Painel Círculo de Ouro (CaptainUp Journey + Tournaments)</h3>
+    <div class="ui-mockup">
+      <div class="ui-nav">
+        <div class="ui-tab active">Meu Círculo</div>
+        <div class="ui-tab">Torneio</div>
+        <div class="ui-tab">Jackpot</div>
+        <div class="ui-tab">Benefícios</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--a2);border-radius:8px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;font-family:'Segoe UI',sans-serif">CÍRCULO OURO — TRILHA SALÃO</div>
+        <div style="font-size:13px;color:var(--text);margin-bottom:10px;font-family:'Segoe UI',sans-serif">Você está a <strong style="color:var(--a2)">240 Troféus</strong> do Círculo Platina</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:60%"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'Segoe UI',sans-serif">360 / 600 Troféus · Próximo benefício: convite presencial</div>
+      </div>
+      <div class="ui-mission-grid">
+        <div class="ui-mission">
+          <div class="m-label">🎰 Salão · Diária</div>
+          <div class="m-title">Aposte em Sweet Bonanza</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:100%"></div></div>
+          <div class="m-reward">✓ Concluída · +10 🏆</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">✨ Momento Dourado · 3h</div>
+          <div class="m-title">Multiplicador ×1,5 Ativo</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:40%"></div></div>
+          <div class="m-reward">Expira em 3h · aproveite!</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">🏆 Torneio Semanal</div>
+          <div class="m-title">Ranking de Troféus</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:55%"></div></div>
+          <div class="m-reward">#7 · Top 3 = R$ 200 bônus</div>
+        </div>
+      </div>
+      <div class="ui-journey" style="margin-top:16px">
+        <div class="journey-node"><div class="j-circle j-done">✓</div><div class="j-label">Bronze</div></div>
+        <div class="journey-node"><div class="j-circle j-done">✓</div><div class="j-label">Prata</div></div>
+        <div class="journey-node"><div class="j-circle j-active">●</div><div class="j-label">Ouro</div></div>
+        <div class="journey-node"><div class="j-circle j-locked">○</div><div class="j-label">Platina</div></div>
+        <div class="journey-node"><div class="j-circle j-locked">◇</div><div class="j-label">Diamante</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cost-table">
+    <div class="cost-table-header">
+      <span>Item de Custo</span><span>Base de Cálculo</span><span>Custo Diário</span><span>Custo Mensal</span>
+    </div>
+    <div class="cost-row"><div class="item">Cashback por Círculo (Prata→Diamante)</div><div class="num">~30% base elegível · 5–8% sobre apostas</div><div class="num">R$ 8.222</div><div class="num">R$ 246.648</div></div>
+    <div class="cost-row"><div class="item">Prêmios do Torneio Semanal</div><div class="num">3 vencedores × R$ 117 × 4 semanas</div><div class="num">R$ 500</div><div class="num">R$ 15.000</div></div>
+    <div class="cost-row"><div class="item">Jackpot do Círculo (pool mensal)</div><div class="num">0,1% × R$ 44,8M valor apostado</div><div class="num">R$ 1.493</div><div class="num">R$ 44.808</div></div>
+    <div class="cost-row"><div class="item">Kit físico + experiências (Ouro→Diamante)</div><div class="num">~5% da base avançada · R$ 120 médio</div><div class="num">R$ 344</div><div class="num">R$ 10.332</div></div>
+    <div class="cost-row"><div class="item">Free Spins + "Momento Dourado"</div><div class="num">8% da base · R$ 12/evento</div><div class="num">R$ 1.377</div><div class="num">R$ 41.304</div></div>
+    <div class="cost-row total"><div class="item">TOTAL ESTIMADO</div><div class="num">—</div><div class="num">R$ 11.936</div><div class="num">R$ 358.092</div></div>
+    <div class="cost-row be-row"><div class="item">Break-even: valor apostado mínimo</div><div class="num">R$ 358.092 ÷ 3%</div><div class="num pos">R$ 397.880/dia</div><div class="num pos">R$ 11,9M/mês</div></div>
+    <div class="cost-row be-row"><div class="item">Valor apostado atual (base ativa)</div><div class="num">—</div><div class="num pos">R$ 2,04M/dia ✓</div><div class="num pos">R$ 44,8M/mês ✓</div></div>
+    <div class="cost-row be-row"><div class="item">NGR incremental estimado (+5% retenção)</div><div class="num">Ref. R$ 3,79M/mês</div><div class="num pos">+R$ 6.335</div><div class="num pos">+R$ 189.994</div></div>
+  </div>
+
+  <div class="tag-row">
+    <span class="tag tag-pos">✓ Maior engajamento e FOMO semanal</span>
+    <span class="tag tag-pos">✓ Jackpot cria expectativa orgânica</span>
+    <span class="tag tag-pos">✓ Estética de clube exclusivo — diferenciação alta</span>
+    <span class="tag tag-pos">✓ Break-even em 26% do valor apostado atual</span>
+    <span class="tag tag-neg">✗ Custo mensal mais alto das 3</span>
+    <span class="tag tag-neg">✗ Configuração de Circles + Tournaments: 4–6 semanas</span>
+    <span class="tag tag-neu">⟳ Foco: aumentar valor apostado + depósito recorrente</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ -->
+<!--  ALT 3 — COFRE VIP                -->
+<!-- ══════════════════════════════════ -->
+<div class="alt-section alt-3">
+  <div class="alt-header">
+    <div class="alt-number">3</div>
+    <div class="alt-title-block">
+      <h2>Cofre VIP</h2>
+      <div class="tagline">Moeda: Fichas 🎴 — gamificação de alto valor para Diamond e Elite · missões 1:1 com AM</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <h3>Conceito Central</h3>
+    <p>O <strong>Cofre VIP</strong> é um programa fechado e ultrapersonalizado para jogadores Diamond e Elite — aqueles que representam a maior concentração de valor da base. Jogadores Platina recebem o Clube Galera como programa-base. No Cofre, o acúmulo de <strong>Fichas</strong> é calculado sobre volume de apostas, e os AMs têm poder de enviar desafios exclusivos 1:1 via CaptainUp Messages — transformando o relacionamento humano em gatilho de engajamento. O ciclo mensal culmina no <strong>Concierge Galerabet</strong>: uma chamada ou mensagem personalizada do AM com o extrato de Fichas e sugestão de troca, criando um momento de reconhecimento que nenhum concorrente replica.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card" style="margin-bottom:0">
+      <h3>Mecânica de Fichas</h3>
+      <p>
+        <strong>1 Ficha = R$ 10 apostados</strong> <span class="ok-flag">✓ linguagem cliente</span><br><br>
+        Diamond: +20% Fichas nas quartas e domingos (pico histórico identificado)<br><br>
+        Elite: Fichas dobradas nos dias de maior atividade do jogador (via Custom Attributes CaptainUp)<br><br>
+        Depósito: 10 Fichas por depósito ≥ R$ 500<br><br>
+        Desafio AM: AM envia missão 2×/semana via push → +50 Fichas se concluída em 24h
+      </p>
+    </div>
+    <div class="concept-card" style="margin-bottom:0">
+      <h3>Cofre — Catálogo de Alto Valor</h3>
+      <p>
+        <strong>Cashback premium:</strong> 300 Fichas → 3% do volume apostado na semana devolvido<br><br>
+        <strong>Jantar parceiro:</strong> 500 Fichas → jantar para 2 em restaurante parceiro<br><br>
+        <strong>Ingresso VIP:</strong> 800 Fichas → evento esportivo, show ou festival<br><br>
+        <strong>Gadget:</strong> 1.200 Fichas → iPhone, Smart TV ou similar<br><br>
+        <strong>Viagem:</strong> 5.000 Fichas → pacote para 2 pessoas<br><br>
+        <strong>Acesso early:</strong> 100 Fichas → jogo novo antes do lançamento público
+      </p>
+    </div>
+  </div>
+
+  <div class="lifecycle">
+    <div class="lifecycle-header">Lifecycle de Missões — Cofre VIP (Diamond + Elite)</div>
+    <div class="cycle-row">
+      <div class="cycle-label">Diário</div>
+      <div class="cycle-cell">
+        <span class="badge badge-c">Casino</span> Sessão de 45 min em qualquer jogo → +5 🎴<br>
+        <span class="badge badge-x">Desafio AM</span> Push às 18h: desafio privado personalizado → ex.: aposte R$ 200 em blackjack ao vivo → +30 🎴 (24h para cumprir)
+      </div>
+      <div class="cycle-cell">
+        <span class="badge badge-c">Esportes</span> Aposta ao vivo com odd ≥ 2.0 → +5 🎴<br>
+        <span class="badge badge-x">Desafio AM</span> Missão baseada no histórico individual → ex.: aposte em 3 mercados de futebol → +40 🎴 (personalizado por jogador)
+      </div>
+    </div>
+    <div class="cycle-row">
+      <div class="cycle-label">Semanal</div>
+      <div class="cycle-cell">
+        <span class="badge badge-s">Diamond</span> Aposte R$ 8.000 na semana → +50 🎴 <span class="ok-flag">✓ valor apostado</span><br>
+        <span class="badge badge-s">Elite</span> Aposte R$ 20.000 na semana → +120 🎴 + acesso Early ao novo jogo <span class="ok-flag">✓</span><br>
+        <span class="badge badge-s">Todos</span> 5 dias ativos na semana → +20 🎴
+      </div>
+      <div class="cycle-cell">
+        <span class="badge badge-s">Mini-torneio</span> Torneio exclusivo Diamond/Elite (20 vagas, 72h) → leaderboard de valor apostado → top 5 ganham Fichas em cascata<br>
+        <span class="badge badge-s">Esportes</span> Acumulada certeira (5+ seleções) → ×2 Fichas na semana
+      </div>
+    </div>
+    <div class="cycle-row">
+      <div class="cycle-label">Mensal</div>
+      <div class="cycle-cell" style="grid-column: span 2">
+        <span class="badge badge-m">Concierge</span> <strong>Concierge Galerabet:</strong> AM agenda call ou WhatsApp com cada Diamond/Elite ativo → apresenta extrato de Fichas e guia a escolha da recompensa — contato humano como diferencial<br>
+        <span class="badge badge-m">Elite</span> <strong>Cofre Exclusivo:</strong> top 5 Elites em volume apostado recebem oferta personalizada única (viagem, gadget high-end) custeada pela margem gerada <span class="ok-flag">✓ valor apostado</span><br>
+        <span class="badge badge-m">Diamond+</span> <strong>Badge "Guardião do Cofre":</strong> 18+ dias ativos no mês → badge raro + proteção de nível no Cofre por 60 dias <span class="ok-flag">✓ dias ativos</span><br>
+        <span class="badge badge-m">Recovery</span> <strong>Reativação:</strong> Diamond/Elite sem atividade há 10+ dias → push com 200 Fichas grátis para reativar
+      </div>
+    </div>
+  </div>
+
+  <div class="ui-frame">
+    <h3>UI/UX — Interface Cofre VIP (design diferenciado, separado do lobby geral)</h3>
+    <div class="ui-mockup">
+      <div class="ui-nav">
+        <div class="ui-tab active">Meu Cofre</div>
+        <div class="ui-tab">Catálogo</div>
+        <div class="ui-tab">Desafios do AM</div>
+        <div class="ui-tab">Mini-Torneio</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div style="background:var(--surface);border:1px solid var(--a3);border-radius:8px;padding:14px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;font-family:'Segoe UI',sans-serif">Suas Fichas</div>
+          <div style="font-size:26px;font-weight:800;color:var(--a3);font-family:'Segoe UI',sans-serif">347 <span style="font-size:13px;color:var(--muted)">🎴</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:'Segoe UI',sans-serif">+120 essa semana · nível Diamond</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;font-family:'Segoe UI',sans-serif">Desafio do seu AM · ⏳ 18h42m</div>
+          <div style="font-size:12px;color:var(--text);margin-bottom:8px;font-family:'Segoe UI',sans-serif">Aposte R$ 300 em roleta ao vivo hoje</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:67%"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;font-family:'Segoe UI',sans-serif">R$ 200 / R$ 300 · Recompensa: +30 🎴</div>
+        </div>
+      </div>
+      <div class="ui-mission-grid">
+        <div class="ui-mission">
+          <div class="m-label">🔐 Semanal · Diamond</div>
+          <div class="m-title">R$ 8.000 apostados</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:82%"></div></div>
+          <div class="m-reward">R$ 6.560 / R$ 8.000 · +50 🎴</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">🎯 Mini-Torneio · 72h</div>
+          <div class="m-title">Top 5 em volume apostado</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:60%"></div></div>
+          <div class="m-reward">#4 atual · prêmio: 80 🎴</div>
+        </div>
+        <div class="ui-mission">
+          <div class="m-label">🛍️ Próxima troca</div>
+          <div class="m-title">Jantar parceiro (500 🎴)</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:69%"></div></div>
+          <div class="m-reward">Faltam 153 🎴 · ~2 semanas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cost-table">
+    <div class="cost-table-header">
+      <span>Item de Custo</span><span>Base de Cálculo</span><span>Custo Diário</span><span>Custo Mensal</span>
+    </div>
+    <div class="cost-row"><div class="item">Cashback premium Diamond/Elite</div><div class="num">3% sobre apostas Diamond (~40% da base)</div><div class="num">R$ 6.841</div><div class="num">R$ 205.248</div></div>
+    <div class="cost-row"><div class="item">Experiências físicas + viagens (catálogo)</div><div class="num">3% base ativa · custo médio R$ 350</div><div class="num">R$ 1.806</div><div class="num">R$ 54.180</div></div>
+    <div class="cost-row"><div class="item">Mini-torneios exclusivos (premiação)</div><div class="num">4×/mês · pool R$ 2.000 cada</div><div class="num">R$ 267</div><div class="num">R$ 8.000</div></div>
+    <div class="cost-row"><div class="item">Gadgets (iPhone, TV, etc.)</div><div class="num">0,5% da base Diamond/Elite · R$ 2.500 médio</div><div class="num">R$ 688</div><div class="num">R$ 20.640</div></div>
+    <div class="cost-row"><div class="item">Concierge + Oferta Elite top 5</div><div class="num">5 Elite × R$ 800 custo operacional</div><div class="num">R$ 133</div><div class="num">R$ 4.000</div></div>
+    <div class="cost-row"><div class="item">Fichas de reativação (churn recovery)</div><div class="num">~10% de churnados · 200 Fichas = R$ 20 custo</div><div class="num">R$ 344</div><div class="num">R$ 10.320</div></div>
+    <div class="cost-row total"><div class="item">TOTAL ESTIMADO</div><div class="num">—</div><div class="num">R$ 10.079</div><div class="num">R$ 302.388</div></div>
+    <div class="cost-row be-row"><div class="item">Break-even: valor apostado mínimo</div><div class="num">R$ 302.388 ÷ 3%</div><div class="num pos">R$ 335.987/dia</div><div class="num pos">R$ 10,1M/mês</div></div>
+    <div class="cost-row be-row"><div class="item">Valor apostado atual (base ativa)</div><div class="num">—</div><div class="num pos">R$ 2,04M/dia ✓</div><div class="num pos">R$ 44,8M/mês ✓</div></div>
+    <div class="cost-row be-row"><div class="item">NGR incremental estimado (+7% retenção D/E)</div><div class="num">~30% da base gera ~70% do NGR</div><div class="num pos">+R$ 7.981</div><div class="num pos">+R$ 239.428</div></div>
+  </div>
+
+  <div class="tag-row">
+    <span class="tag tag-pos">✓ Maior NGR incremental estimado</span>
+    <span class="tag tag-pos">✓ Integra gamificação ao trabalho dos AMs</span>
+    <span class="tag tag-pos">✓ Reativação de churn Diamond/Elite nativa</span>
+    <span class="tag tag-pos">✓ Break-even em 22% do valor apostado atual</span>
+    <span class="tag tag-neg">✗ Platina fica em programa secundário (Clube Galera)</span>
+    <span class="tag tag-neg">✗ Custo de experiências físicas menos previsível</span>
+    <span class="tag tag-neu">⟳ Foco: aumentar depósito Diamond/Elite + reativar churnados</span>
+  </div>
+</div>
+
+
+<!-- ─── COMPARATIVO ─── -->
+<div class="comparison">
+  <h2>Comparativo Geral — 3 Alternativas</h2>
+  <div class="comp-table">
+    <div class="comp-head">Critério</div>
+    <div class="comp-head"><span class="hl-1">Alt. 1 · Clube Galera</span></div>
+    <div class="comp-head"><span class="hl-2">Alt. 2 · Círculo de Ouro</span></div>
+    <div class="comp-head"><span class="hl-3">Alt. 3 · Cofre VIP</span></div>
+
+    <div class="comp-cell label">Moeda</div>
+    <div class="comp-cell">Jóias 💎</div>
+    <div class="comp-cell">Troféus 🏆</div>
+    <div class="comp-cell">Fichas 🎴</div>
+
+    <div class="comp-cell label">Custo Mensal Estimado</div>
+    <div class="comp-cell"><span class="hl-1 pos">R$ 215K</span></div>
+    <div class="comp-cell">R$ 358K</div>
+    <div class="comp-cell">R$ 302K</div>
+
+    <div class="comp-cell label">Custo % NGR Mensal</div>
+    <div class="comp-cell"><span class="pos">~5,7%</span></div>
+    <div class="comp-cell">~9,4%</div>
+    <div class="comp-cell">~7,9%</div>
+
+    <div class="comp-cell label">Break-even (valor apostado / mês)</div>
+    <div class="comp-cell"><span class="pos">R$ 7,2M</span></div>
+    <div class="comp-cell">R$ 11,9M</div>
+    <div class="comp-cell">R$ 10,1M</div>
+
+    <div class="comp-cell label">Valor apostado atual / mês</div>
+    <div class="comp-cell"><span class="pos">R$ 44,8M ✓ (6×)</span></div>
+    <div class="comp-cell"><span class="pos">R$ 44,8M ✓ (3,7×)</span></div>
+    <div class="comp-cell"><span class="pos">R$ 44,8M ✓ (4,4×)</span></div>
+
+    <div class="comp-cell label">NGR Incremental Est. / mês</div>
+    <div class="comp-cell">+R$ 114K</div>
+    <div class="comp-cell">+R$ 190K</div>
+    <div class="comp-cell"><span class="pos">+R$ 239K</span></div>
+
+    <div class="comp-cell label">Cobertura de Base</div>
+    <div class="comp-cell"><span class="pos">100% VIPs</span></div>
+    <div class="comp-cell"><span class="pos">100% VIPs</span></div>
+    <div class="comp-cell">Diamond + Elite<br><span style="font-size:11px;color:var(--muted)">(Platina → Clube Galera)</span></div>
+
+    <div class="comp-cell label">Compliance — Metas ao cliente</div>
+    <div class="comp-cell"><span class="pos">Valor apostado + dias ativos ✓</span></div>
+    <div class="comp-cell"><span class="pos">Valor apostado + dias ativos ✓</span></div>
+    <div class="comp-cell"><span class="pos">Valor apostado + dias ativos ✓</span></div>
+
+    <div class="comp-cell label">Personalização por Tipo de Jogo</div>
+    <div class="comp-cell">Missões Casino / Esportes</div>
+    <div class="comp-cell">Trilhas Salão / Tribuna</div>
+    <div class="comp-cell"><span class="pos">Desafios 1:1 via AM</span></div>
+
+    <div class="comp-cell label">Torneio / Jackpot competitivo</div>
+    <div class="comp-cell"><span class="neg">Não</span></div>
+    <div class="comp-cell"><span class="pos">Sim — semanal + jackpot mensal</span></div>
+    <div class="comp-cell">Mini-torneio exclusivo D/E</div>
+
+    <div class="comp-cell label">Integração com AM Team</div>
+    <div class="comp-cell">Baixa</div>
+    <div class="comp-cell">Média (leaderboards)</div>
+    <div class="comp-cell"><span class="pos">Alta — Concierge + desafios</span></div>
+
+    <div class="comp-cell label">Reativação de Churn</div>
+    <div class="comp-cell">Streak de login</div>
+    <div class="comp-cell">Meta de presença mensal</div>
+    <div class="comp-cell"><span class="pos">Vault Recovery + push 1:1</span></div>
+
+    <div class="comp-cell label">Diferenciação de Mercado</div>
+    <div class="comp-cell">Baixa</div>
+    <div class="comp-cell"><span class="pos">Alta — estética de clube fechado</span></div>
+    <div class="comp-cell"><span class="pos">Muito alta — única no mercado BR</span></div>
+
+    <div class="comp-cell label">Time to Market</div>
+    <div class="comp-cell"><span class="pos">2–3 semanas</span></div>
+    <div class="comp-cell"><span class="neg">4–6 semanas</span></div>
+    <div class="comp-cell">3–5 semanas</div>
+  </div>
+</div>
+
+<!-- ─── RECOMENDAÇÃO ─── -->
+<div class="rec-section">
+  <h2>💡 Recomendação Estratégica</h2>
+  <p>Os três programas se pagam com folga: o valor apostado atual (R$ 44,8M/mês) é <strong>3,7× a 6× superior ao break-even de qualquer alternativa</strong>. O custo do programa é inferior ao NGR incremental esperado em todas as opções, o que garante que o investimento em gamificação gera retorno mesmo com incremento conservador de retenção.</p>
+  <p>A recomendação é <strong>implementar em fases</strong>: lançar o <strong>Clube Galera</strong> nos primeiros 30 dias como fundação rápida para 100% da base — calibra o comportamento e gera dados reais de engajamento. Em paralelo, configurar o <strong>Cofre VIP</strong> exclusivamente para Diamond e Elite, integrando os AMs como protagonistas do programa. O <strong>Círculo de Ouro</strong> entra como evolução planejada no segundo bimestre, após validar as mecânicas base com dados reais.</p>
+  <p>Esta combinação <strong>Clube Galera + Cofre VIP</strong> cobre 100% da base, diferencia o topo da pirâmide, integra o time de AMs, e mantém o custo total combinado dentro de <strong>~7–8% do NGR mensal</strong> — bem dentro dos tetos de generosidade já praticados por tier (15% a 20%).</p>
+</div>
+
+<footer>
+  <span>Galerabet · VIP Operations &amp; Marketing Intelligence</span>
+  <span>v4 · Compliance: metas em valor apostado + dias ativos · 22/06/2026</span>
+</footer>
+
+</body>
+</html>
