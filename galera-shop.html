@@ -39,8 +39,7 @@ button,select,input{font-family:'DM Sans',sans-serif;}
 .pts-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:4px;}
 .pts-val{font-family:'JetBrains Mono',monospace;font-size:25px;font-weight:600;color:var(--gold);line-height:1;}
 .pts-sub{font-size:11px;color:var(--muted);margin-top:4px;}
-.pts-bar-w{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden;}
-.pts-bar{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));width:72%;}
+.vip-badge-sm{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.08em;background:linear-gradient(135deg,#3B0D8F,#6B21A8);color:#e0d0ff;border:1px solid rgba(167,139,250,.4);}
 .pts-bl{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--dim);}
 .sidebar-nav{padding:12px 8px;flex:1;}
 .nav-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);padding:0 10px;margin-bottom:5px;}
@@ -385,13 +384,11 @@ button,select,input{font-family:'DM Sans',sans-serif;}
     <div class="shop-badge">◆ Galera Shop</div>
   </div>
   <div class="sidebar-profile">
-    <div class="av-row"><div class="av">R</div><div><div class="pn">Rafael Mendes</div><div class="pt"><span class="td"></span>Elite VIP · Diamond</div></div></div>
+    <div class="av-row"><div class="av">R</div><div><div class="pn">Rafael Mendes</div><div class="pt"><span class="vip-badge-sm">◆ VIP</span></div></div></div>
     <div class="pts-card">
       <div class="pts-lbl">Jóias disponíveis</div>
       <div class="pts-val" id="sidebarPts">12.840</div>
       <div class="pts-sub">+340 esta semana 🔥</div>
-      <div class="pts-bar-w"><div class="pts-bar"></div></div>
-      <div class="pts-bl"><span>Nível atual</span><span>Próximo: 14.000</span></div>
     </div>
   </div>
   <nav class="sidebar-nav">
@@ -558,7 +555,7 @@ button,select,input{font-family:'DM Sans',sans-serif;}
     <div class="products-sec">
       <div class="sec-hdr"><div class="sec-ttl">Perfil VIP</div></div>
       <div class="pf-grid">
-        <div class="pf-card"><label>Nível VIP</label><div class="pf-v gd">Diamond</div><div class="pf-s">Membro desde Mar/2024</div></div>
+        <div class="pf-card"><label>Status</label><div class="pf-v gd">◆ VIP</div><div class="pf-s">Membro desde Mar/2024</div></div>
         <div class="pf-card"><label>Total de Jóias Ganhas</label><div class="pf-v mn">48.340</div><div class="pf-s">+12.840 disponíveis</div></div>
         <div class="pf-card"><label>Resgates Realizados</label><div class="pf-v mn">7</div><div class="pf-s">≈ R$ 1.850 em prêmios</div></div>
         <div class="pf-card"><label>Streak Atual</label><div class="pf-v gd">🔥 14 dias</div><div class="pf-s">Bônus de 500 Jóias em 14 dias</div></div>
