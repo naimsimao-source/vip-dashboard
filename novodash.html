@@ -1654,10 +1654,12 @@ function renderDailyReport() {
     const prev = prevMap[u] || {};
     // Usar D-1 real se disponível; fallback para delta de snapshot
     const _d1 = hasDailyData ? (dailyMap[u] || null) : null;
-    const d_ngr = _d1 ? (_d1.ngr||0) : (curr.ngr||0) - (prev.ngr||0);
-    const d_ggr = _d1 ? (_d1.ggr||0) : (curr.ggr||0) - (prev.ggr||0);
-    const d_dp  = _d1 ? (_d1.dp ||0) : (curr.dp ||0) - (prev.dp ||0);
-    const d_bn  = _d1 ? (_d1.bn ||0) : (curr.bn ||0) - (prev.bn ||0);
+    // Se DAILY_DATA disponível: usar D-1 real; jogador ausente do D-1 = zero (não jogou)
+    // Se DAILY_DATA indisponível: fallback para delta de snapshot (compatibilidade)
+    const d_ngr = hasDailyData ? (_d1 ? (_d1.ngr||0) : 0) : (curr.ngr||0) - (prev.ngr||0);
+    const d_ggr = hasDailyData ? (_d1 ? (_d1.ggr||0) : 0) : (curr.ggr||0) - (prev.ggr||0);
+    const d_dp  = hasDailyData ? (_d1 ? (_d1.dp ||0) : 0) : (curr.dp ||0) - (prev.dp ||0);
+    const d_bn  = hasDailyData ? (_d1 ? (_d1.bn ||0) : 0) : (curr.bn ||0) - (prev.bn ||0);
     const d_ad  = (curr.ad ||0) - (prev.ad ||0);
     // Usar gen_margem/gen_limite/gen_usado da CARTEIRA (consistente com aba Carteiras)
     const genPct   = (r.gen_teto_pct || 0) / 100;
