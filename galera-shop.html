@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galera Shop · VIP</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0B0F;--surface:#13151C;--surface2:#1A1D26;--border:#252836;--border-light:#2E3245;
+  --gold:#F0C040;--gold-dim:#8A6E1E;--gold-glow:rgba(240,192,64,.15);
+  --red:#C0392B;--red-bright:#E53935;--text:#E8E0D0;--text-muted:#7A7F96;--text-dim:#4A4F66;
+  --green:#2ECC71;--sidebar-w:272px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;overflow-x:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100vh;position:sticky;top:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;z-index:100;}
+.sidebar-logo{padding:26px 22px 18px;border-bottom:1px solid var(--border);}
+.logo-wordmark{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);line-height:1;}
+.logo-wordmark span{color:var(--gold);}
+.shop-badge{display:inline-flex;align-items:center;gap:5px;margin-top:8px;background:linear-gradient(135deg,#1a1400,#2a2000);border:1px solid var(--gold-dim);border-radius:5px;padding:4px 10px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+.shop-badge::before{content:'◆';font-size:7px;}
+
+.sidebar-profile{padding:20px 22px;border-bottom:1px solid var(--border);}
+.avatar-wrap{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dim),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#0A0B0F;flex-shrink:0;box-shadow:0 0 0 2px rgba(240,192,64,.25);}
+.profile-name{font-size:14px;font-weight:600;color:var(--text);}
+.profile-tier{font-size:11px;color:var(--gold);font-weight:500;display:flex;align-items:center;gap:4px;margin-top:2px;}
+.tier-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold);}
+
+.pts-card{background:linear-gradient(135deg,#1a1400,#0f1020);border:1px solid var(--gold-dim);border-radius:10px;padding:14px 16px;}
+.pts-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text-muted);margin-bottom:4px;}
+.pts-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;color:var(--gold);letter-spacing:-.02em;line-height:1;}
+.pts-sub{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.pts-bar-wrap{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden;}
+.pts-bar{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;width:72%;}
+.pts-bar-labels{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--text-dim);}
+
+.sidebar-nav{padding:14px 10px;flex:1;}
+.nav-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-dim);padding:0 10px;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all .15s;margin-bottom:1px;text-decoration:none;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:var(--gold-glow);color:var(--gold);border:1px solid rgba(240,192,64,.18);}
+.nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;}
+
+.earn-block{margin-top:16px;}
+.earn-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;font-size:12px;color:var(--text-dim);}
+.earn-row .e-pts{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);font-weight:600;margin-left:auto;white-space:nowrap;}
+
+.sidebar-foot{padding:14px 22px;border-top:1px solid var(--border);}
+.sidebar-foot p{font-size:11px;color:var(--text-dim);line-height:1.6;}
+
+/* MAIN */
+.main{flex:1;min-width:0;overflow-y:auto;height:100vh;}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(10,11,15,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:14px 36px;display:flex;align-items:center;gap:14px;}
+.topbar-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);flex:1;}
+.topbar-title span{color:var(--gold);}
+.topbar-search{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 13px;width:200px;}
+.topbar-search input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);width:100%;}
+.topbar-search input::placeholder{color:var(--text-dim);}
+.topbar-pts{display:flex;align-items:center;gap:7px;background:var(--gold-glow);border:1px solid rgba(240,192,64,.22);border-radius:8px;padding:7px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);font-weight:600;}
+
+/* HERO */
+.hero{padding:28px 36px 0;}
+.banners-row{display:flex;gap:14px;}
+.banner-main{flex:2;border-radius:16px;overflow:hidden;position:relative;background:linear-gradient(135deg,#0d1a0a 0%,#0a100a 50%,#060d18 100%);min-height:188px;padding:32px 36px;border:1px solid var(--border);display:flex;flex-direction:column;justify-content:flex-end;}
+.banner-main::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 75% 50%,rgba(240,192,64,.1) 0%,transparent 55%);}
+.b-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold);margin-bottom:7px;font-weight:600;}
+.b-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:8px;}
+.b-sub{font-size:13px;color:var(--text-muted);margin-bottom:18px;max-width:320px;}
+.b-emoji-bg{position:absolute;right:36px;top:50%;transform:translateY(-50%);font-size:88px;opacity:.1;pointer-events:none;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .16s;text-decoration:none;}
+.btn-gold{background:var(--gold);color:#0A0B0F;}
+.btn-gold:hover{background:#f5cc55;transform:translateY(-1px);}
+.btn-outline{background:transparent;border:1px solid var(--border-light);color:var(--text);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+
+.banner-side{flex:1;display:flex;flex-direction:column;gap:14px;}
+.banner-sm{flex:1;border-radius:14px;padding:20px 22px;position:relative;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:border-color .16s;display:flex;flex-direction:column;justify-content:flex-end;}
+.banner-sm:hover{border-color:var(--gold-dim);}
+.banner-sm.b-loot{background:linear-gradient(135deg,#0d0a1a,#1a0a28);}
+.banner-sm.b-loot::before{content:'';position:absolute;inset:0;background:radial-gradient(at 80% 20%,rgba(138,43,226,.22),transparent 60%);}
+.banner-sm.b-promo{background:linear-gradient(135deg,#1a0800,#2a0a00);}
+.banner-sm.b-promo::before{content:'';position:absolute;inset:0;background:radial-gradient(at 80% 20%,rgba(192,57,43,.28),transparent 60%);}
+.b-sm-emoji{position:absolute;right:14px;top:14px;font-size:32px;opacity:.65;}
+.bsm-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--text-muted);margin-bottom:4px;}
+.bsm-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:3px;}
+.bsm-sub{font-size:11px;color:var(--text-muted);}
+.countdown-row{display:flex;gap:8px;margin-top:10px;align-items:center;}
+.cd-unit{text-align:center;}
+.cd-num{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:600;color:var(--gold);display:block;line-height:1;}
+.cd-lbl{font-size:8px;text-transform:uppercase;color:var(--text-dim);letter-spacing:.1em;}
+.cd-sep{font-size:16px;color:var(--gold-dim);padding-bottom:6px;}
+
+/* FILTERS */
+.filter-section{padding:24px 36px 0;}
+.filter-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+.filter-lbl{font-size:11px;color:var(--text-dim);margin-right:3px;white-space:nowrap;}
+.pill{padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:500;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;transition:all .14s;white-space:nowrap;background:none;font-family:'DM Sans',sans-serif;}
+.pill:hover{border-color:var(--border-light);color:var(--text);}
+.pill.active{background:var(--gold-glow);border-color:rgba(240,192,64,.38);color:var(--gold);}
+.sort-wrap{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-muted);}
+.sort-wrap select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;}
+
+/* SECTION HEADERS */
+.sec-header{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;}
+.sec-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);}
+.sec-sub{font-size:12px;color:var(--text-muted);}
+.sec-action{margin-left:auto;font-size:12.5px;color:var(--gold);cursor:pointer;text-decoration:none;font-weight:500;}
+.sec-action:hover{text-decoration:underline;}
+
+/* PRODUCTS */
+.products-section{padding:28px 36px;}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .18s;position:relative;}
+.card:hover{border-color:var(--border-light);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);}
+.card.featured{border-color:rgba(240,192,64,.28);}
+.card-tag{position:absolute;top:10px;right:10px;z-index:2;font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:4px;text-transform:uppercase;}
+.tag-dest{background:var(--gold);color:#0A0B0F;}
+.tag-rare{background:linear-gradient(135deg,#6B21A8,#A855F7);color:#fff;}
+.tag-hot{background:var(--red);color:#fff;}
+.card-img{height:148px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.card-img-bg{position:absolute;inset:0;}
+.card-emoji{position:relative;z-index:1;font-size:64px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));}
+.card-body{padding:14px;}
+.card-cat{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-dim);margin-bottom:5px;font-weight:600;}
+.card-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.3;}
+.card-desc{font-size:11.5px;color:var(--text-muted);line-height:1.5;margin-bottom:12px;}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.price-wrap{display:flex;align-items:baseline;gap:4px;}
+.price-num{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--gold);}
+.price-lbl{font-size:10px;color:var(--text-dim);}
+.stock-row{display:flex;align-items:center;gap:5px;font-size:10.5px;margin-top:2px;}
+.stock-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.stock-green{background:var(--green);}
+.stock-orange{background:#E87C2A;}
+.stock-red{background:var(--red);}
+.stock-text{color:var(--text-dim);}
+.stock-text.urgent{color:#E87C2A;font-weight:600;}
+.btn-sm{padding:6px 13px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .14s;}
+.btn-sm-gold{background:var(--gold);color:#0A0B0F;}
+.btn-sm-gold:hover{background:#f5cc55;}
+.btn-sm-out{background:none;border:1px solid var(--border-light);color:var(--text-muted);}
+.btn-sm-out:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ═══ LOOT BOX CS2 STYLE ═══ */
+#section-loot{display:none;}
+.loot-wrapper{padding:28px 36px;}
+.cs-box-area{
+  background:linear-gradient(180deg,#08090e 0%,#0f101a 100%);
+  border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative;
+}
+.cs-box-area::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(240,192,64,.06),transparent 60%);pointer-events:none;}
+
+.cs-header{text-align:center;padding:36px 36px 28px;}
+.cs-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:var(--gold);margin-bottom:8px;font-weight:600;}
+.cs-title{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--text);margin-bottom:6px;}
+.cs-title em{color:var(--gold);font-style:normal;}
+.cs-sub{font-size:14px;color:var(--text-muted);max-width:460px;margin:0 auto;}
+
+/* REEL CONTAINER */
+.reel-outer{position:relative;padding:0;overflow:hidden;margin:0;}
+/* gradient fade left/right */
+.reel-outer::before,.reel-outer::after{
+  content:'';position:absolute;top:0;bottom:0;width:160px;z-index:5;pointer-events:none;
+}
+.reel-outer::before{left:0;background:linear-gradient(90deg,#08090e 0%,transparent 100%);}
+.reel-outer::after{right:0;background:linear-gradient(270deg,#08090e 0%,transparent 100%);}
+
+/* CENTER MARKER */
+.reel-marker{
+  position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);
+  width:3px;background:var(--gold);z-index:10;
+  box-shadow:0 0 16px rgba(240,192,64,.8),0 0 40px rgba(240,192,64,.3);
+}
+.reel-marker::before,.reel-marker::after{
+  content:'';position:absolute;left:50%;transform:translateX(-50%);
+  width:0;height:0;
+}
+.reel-marker::before{top:-10px;border-left:8px solid transparent;border-right:8px solid transparent;border-top:10px solid var(--gold);}
+.reel-marker::after{bottom:-10px;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:10px solid var(--gold);}
+
+.reel-track-wrap{overflow:hidden;}
+.reel-track{
+  display:flex;gap:8px;padding:20px 8px;
+  transition:none;
+  will-change:transform;
+}
+.reel-item{
+  flex-shrink:0;width:160px;height:180px;
+  border-radius:12px;border:2px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  position:relative;overflow:hidden;transition:border-color .2s;
+  cursor:default;
+}
+.reel-item .ri-bg{position:absolute;inset:0;}
+.reel-item .ri-emoji{font-size:56px;position:relative;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));}
+.reel-item .ri-name{font-size:11px;font-weight:600;color:var(--text);text-align:center;padding:0 8px;position:relative;z-index:1;line-height:1.3;}
+.reel-item .ri-rarity{font-size:9px;text-transform:uppercase;letter-spacing:.1em;position:relative;z-index:1;font-weight:700;}
+
+/* rarity colors */
+.r-common{border-color:#4a5568!important;}.r-common .ri-rarity{color:#718096;}
+.r-uncommon{border-color:#2563eb!important;}.r-uncommon .ri-rarity{color:#60a5fa;}
+.r-rare{border-color:#7c3aed!important;}.r-rare .ri-rarity{color:#a78bfa;}
+.r-epic{border-color:#db2777!important;}.r-epic .ri-rarity{color:#f472b6;}
+.r-legendary{border-color:var(--gold)!important;box-shadow:0 0 20px rgba(240,192,64,.3)!important;}.r-legendary .ri-rarity{color:var(--gold);}
+
+.r-common .ri-bg{background:linear-gradient(135deg,#0f111a,#161820);}
+.r-uncommon .ri-bg{background:linear-gradient(135deg,#0a0f2e,#0f1538);}
+.r-rare .ri-bg{background:linear-gradient(135deg,#150a2e,#1e0a3a);}
+.r-epic .ri-bg{background:linear-gradient(135deg,#2a0a1e,#1a0a28);}
+.r-legendary .ri-bg{background:linear-gradient(135deg,#1a1400,#2a1e00);}
+
+/* reel item when winning */
+.reel-item.winner{
+  border-color:var(--gold)!important;
+  box-shadow:0 0 0 2px var(--gold),0 0 40px rgba(240,192,64,.5)!important;
+  animation:winnerPulse 1s ease-in-out infinite;
+}
+@keyframes winnerPulse{0%,100%{box-shadow:0 0 0 2px var(--gold),0 0 30px rgba(240,192,64,.4);}50%{box-shadow:0 0 0 3px var(--gold),0 0 60px rgba(240,192,64,.7);}}
+
+/* CHANCES TABLE */
+.chances-wrap{padding:20px 36px 0;}
+.chances-title{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-dim);margin-bottom:10px;font-weight:600;}
+.chances-row{display:flex;gap:8px;flex-wrap:wrap;}
+.chance-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);font-size:11px;}
+.chance-chip .cc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.chance-chip .cc-name{color:var(--text-muted);}
+.chance-chip .cc-pct{font-family:'JetBrains Mono',monospace;color:var(--text);font-weight:600;margin-left:auto;}
+
+/* OPEN BUTTON AREA */
+.cs-open-area{padding:28px 36px 36px;display:flex;align-items:center;gap:20px;justify-content:center;}
+.btn-open{
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+  color:#0A0B0F;font-size:16px;font-weight:700;
+  padding:15px 36px;border-radius:10px;cursor:pointer;border:none;
+  font-family:'DM Sans',sans-serif;transition:all .2s;
+  box-shadow:0 4px 24px rgba(240,192,64,.3);
+}
+.btn-open:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(240,192,64,.45);}
+.btn-open:active{transform:translateY(0);}
+.btn-open:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.open-meta{font-size:12px;color:var(--text-dim);text-align:center;line-height:1.7;}
+.open-meta strong{color:var(--text-muted);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;animation:mIn .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes mIn{from{opacity:0;transform:scale(.9)translateY(16px);}to{opacity:1;transform:none;}}
+.m-head{padding:26px 26px 0;display:flex;align-items:flex-start;gap:14px;}
+.m-emoji{font-size:52px;line-height:1;}
+.m-head-txt{flex:1;}
+.m-cat{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-dim);margin-bottom:3px;}
+.m-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);}
+.m-close{background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;padding:4px;}
+.m-close:hover{color:var(--text);}
+.m-body{padding:18px 26px 26px;}
+.m-desc{font-size:13.5px;color:var(--text-muted);line-height:1.75;margin-bottom:18px;}
+.m-details{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px;}
+.detail{background:var(--surface2);border-radius:8px;padding:11px 13px;}
+.detail label{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);display:block;margin-bottom:3px;}
+.detail span{font-size:13.5px;font-weight:600;color:var(--text);}
+.m-stock-warning{display:flex;align-items:center;gap:8px;background:rgba(232,124,42,.08);border:1px solid rgba(232,124,42,.25);border-radius:8px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#E87C2A;line-height:1.5;}
+.m-price-row{display:flex;align-items:center;justify-content:space-between;background:var(--gold-glow);border:1px solid rgba(240,192,64,.18);border-radius:9px;padding:14px 18px;margin-bottom:14px;}
+.m-price-row .lbl{font-size:11.5px;color:var(--text-muted);}
+.m-price-row .pr{font-family:'JetBrains Mono',monospace;font-size:21px;color:var(--gold);font-weight:600;}
+.m-price-row .pr span{font-size:11px;color:var(--text-dim);font-weight:400;}
+.m-warn-red{display:flex;gap:7px;background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.18);border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:12px;color:#E87C6A;line-height:1.5;}
+.m-actions{display:flex;gap:9px;}
+.m-actions .btn{flex:1;justify-content:center;padding:12px 18px;font-size:13.5px;}
+
+/* RESULT OVERLAY */
+.result-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);align-items:center;justify-content:center;}
+.result-overlay.show{display:flex;}
+.result-card{background:linear-gradient(145deg,#15120a,#1a1600,#100e14);border-radius:24px;padding:44px 52px;text-align:center;position:relative;overflow:hidden;max-width:420px;width:90%;animation:rIn .55s cubic-bezier(.34,1.56,.64,1);}
+@keyframes rIn{from{opacity:0;transform:scale(.55);}to{opacity:1;transform:scale(1);}}
+.result-card .r-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(240,192,64,.25),transparent 70%);}
+.result-card .r-border{position:absolute;inset:0;border-radius:24px;border:1px solid var(--gold);}
+.r-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--gold);margin-bottom:10px;font-weight:600;position:relative;}
+.r-emoji{font-size:80px;display:block;margin:4px 0 12px;filter:drop-shadow(0 0 24px rgba(240,192,64,.6));animation:ePop .8s .1s both;position:relative;}
+@keyframes ePop{0%{transform:scale(0)rotate(-20deg);}65%{transform:scale(1.2)rotate(4deg);}100%{transform:scale(1)rotate(0);}}
+.r-rarity-badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.r-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text);margin-bottom:6px;position:relative;}
+.r-desc{font-size:13px;color:var(--text-muted);margin-bottom:22px;line-height:1.65;position:relative;}
+.r-value{display:inline-block;background:var(--gold-glow);border:1px solid rgba(240,192,64,.28);border-radius:8px;padding:7px 18px;margin-bottom:22px;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);font-weight:600;position:relative;}
+.r-actions{display:flex;gap:9px;justify-content:center;position:relative;}
+.r-close{position:absolute;top:14px;right:18px;font-size:19px;color:var(--text-dim);cursor:pointer;background:none;border:none;}
+.r-close:hover{color:var(--text);}
+
+/* CONFETTI */
+.confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:299;}
+
+/* HISTORY */
+.history-section{padding:0 36px 44px;}
+.hist-list{display:flex;flex-direction:column;gap:9px;}
+.hist-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 16px;}
+.hi-icon{font-size:22px;width:36px;text-align:center;}
+.hi-info{flex:1;}
+.hi-name{font-size:13.5px;font-weight:500;color:var(--text);}
+.hi-date{font-size:10.5px;color:var(--text-dim);}
+.hi-pts{font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:600;}
+.hi-pts.debit{color:var(--red);}
+.hi-pts.credit{color:var(--green);}
+.hi-status{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;}
+.hi-status.ok{background:rgba(46,204,113,.1);color:var(--green);}
+.hi-status.pend{background:rgba(240,192,64,.1);color:var(--gold);}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:11px;box-shadow:0 8px 28px rgba(0,0,0,.55);transform:translateY(110px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:300px;}
+.toast.show{transform:none;opacity:1;}
+.t-icon{font-size:19px;}
+.t-text{font-size:12.5px;color:var(--text);line-height:1.4;}
+.t-text strong{display:block;margin-bottom:1px;}
+
+/* PROFILE SECTION */
+#section-perfil{display:none;}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:660px;}
+.pf-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+.pf-card label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);display:block;margin-bottom:6px;}
+.pf-val{font-size:24px;font-weight:700;}
+.pf-val.gold{font-family:'Playfair Display',serif;color:var(--gold);}
+.pf-val.mono{font-family:'JetBrains Mono',monospace;color:var(--text);}
+.pf-sub{font-size:12px;color:var(--text-muted);margin-top:3px;}
+
+@media(max-width:900px){.sidebar{display:none;}.banners-row{flex-direction:column;}.topbar,.hero,.filter-section,.products-section,.loot-wrapper,.history-section{padding-left:18px;padding-right:18px;}.product-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-wordmark">Galera<span>bet</span></div>
+    <div class="shop-badge">Galera Shop</div>
+  </div>
+  <div class="sidebar-profile">
+    <div class="avatar-wrap">
+      <div class="avatar">R</div>
+      <div>
+        <div class="profile-name">Rafael Mendes</div>
+        <div class="profile-tier"><span class="tier-dot"></span>Elite VIP · Diamond</div>
+      </div>
+    </div>
+    <div class="pts-card">
+      <div class="pts-lbl">Jóias disponíveis</div>
+      <div class="pts-val" id="sidebarPts">12.840</div>
+      <div class="pts-sub">+340 esta semana 🔥</div>
+      <div class="pts-bar-wrap"><div class="pts-bar"></div></div>
+      <div class="pts-bar-labels"><span>Nível atual</span><span>Próximo: 14.000</span></div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-lbl">Menu</div>
+    <button class="nav-item active" onclick="showSection('loja')"><span class="nav-icon">🏪</span>Loja</button>
+    <button class="nav-item" onclick="showSection('loot')"><span class="nav-icon">📦</span>Caixa Diária<span class="nav-badge">1</span></button>
+    <button class="nav-item" onclick="showSection('historico')"><span class="nav-icon">📋</span>Histórico</button>
+    <button class="nav-item" onclick="showSection('perfil')"><span class="nav-icon">⭐</span>Perfil VIP</button>
+    <div class="nav-lbl earn-block" style="margin-top:18px;">Como ganhar Jóias</div>
+    <div class="earn-row"><span>💰</span>R$ 1 apostado<span class="e-pts">= 1 💎</span></div>
+    <div class="earn-row"><span>📥</span>Depósito ≥ R$100<span class="e-pts">+50 💎</span></div>
+    <div class="earn-row"><span>🔥</span>7 dias seguidos<span class="e-pts">+200 💎</span></div>
+    <div class="earn-row"><span>📦</span>Caixa diária<span class="e-pts">Grátis</span></div>
+  </nav>
+  <div class="sidebar-foot"><p>Jóias expiram após 12 meses sem atividade. Exclusivo para clientes VIP Galerabet.</p></div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Galera <span>Shop</span></div>
+    <div class="topbar-search">
+      <span style="color:var(--text-dim);font-size:13px">🔍</span>
+      <input type="text" placeholder="Buscar recompensas..." id="searchInput" oninput="filterProducts()">
+    </div>
+    <div class="topbar-pts">💎 <span id="topbarPts">12.840</span></div>
+  </div>
+
+  <!-- SEÇÃO: LOJA -->
+  <div id="section-loja">
+    <div class="hero">
+      <div class="banners-row">
+        <div class="banner-main">
+          <div class="b-emoji-bg">🎰</div>
+          <div class="b-eyebrow">✈️ Destino da temporada</div>
+          <div class="b-title">Las Vegas te chama.<br>Suas Jóias pagam.</div>
+          <div class="b-sub">5 noites em hotel Strip para 2 pessoas. Voo incluso. 3 disponíveis.</div>
+          <div style="display:flex;gap:9px;">
+            <button class="btn btn-gold" onclick="openModal('viagem-vegas')">Ver detalhes →</button>
+            <button class="btn btn-outline" onclick="showSection('loot')">Abrir Caixa 📦</button>
+          </div>
+        </div>
+        <div class="banner-side">
+          <div class="banner-sm b-loot" onclick="showSection('loot')">
+            <div class="b-sm-emoji">📦</div>
+            <div class="bsm-eyebrow">Novo · Caixa Diária</div>
+            <div class="bsm-title">Roleta Exclusiva</div>
+            <div class="bsm-sub">iPhone 17, PS5, viagens — abra agora</div>
+          </div>
+          <div class="banner-sm b-promo">
+            <div class="b-sm-emoji">⚡</div>
+            <div class="bsm-eyebrow">Promoção Relâmpago</div>
+            <div class="bsm-title">Termina em</div>
+            <div class="countdown-row">
+              <div class="cd-unit"><span class="cd-num" id="cd-h">08</span><div class="cd-lbl">hrs</div></div>
+              <span class="cd-sep">:</span>
+              <div class="cd-unit"><span class="cd-num" id="cd-m">34</span><div class="cd-lbl">min</div></div>
+              <span class="cd-sep">:</span>
+              <div class="cd-unit"><span class="cd-num" id="cd-s">17</span><div class="cd-lbl">seg</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-row">
+        <span class="filter-lbl">Filtrar:</span>
+        <button class="pill active" onclick="setFilter(this,'todos')">Todos</button>
+        <button class="pill" onclick="setFilter(this,'viagens')">✈️ Viagens</button>
+        <button class="pill" onclick="setFilter(this,'eletronicos')">📱 Eletrônicos</button>
+        <button class="pill" onclick="setFilter(this,'uniformes')">👕 Uniformes</button>
+        <button class="pill" onclick="setFilter(this,'shows')">🎵 Shows</button>
+        <button class="pill" onclick="setFilter(this,'jantares')">🍽️ Jantares</button>
+        <button class="pill" onclick="setFilter(this,'giftcards')">🎁 Gift Cards</button>
+        <button class="pill" onclick="setFilter(this,'bonus')">💰 Bônus</button>
+        <div class="sort-wrap"><span>Ordenar:</span>
+          <select onchange="sortProducts(this.value)">
+            <option value="destaque">Em destaque</option>
+            <option value="menor">Menor preço</option>
+            <option value="maior">Maior preço</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="products-section">
+      <div class="sec-header">
+        <div class="sec-title">Recompensas</div>
+        <div class="sec-sub" id="productCount">24 disponíveis</div>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO: LOOT BOX CS2 STYLE -->
+  <div id="section-loot">
+    <div class="loot-wrapper">
+      <div class="cs-box-area">
+        <div class="cs-header">
+          <div class="cs-eyebrow">◆ Caixa Exclusiva VIP · 1 abertura por dia · Gratuita</div>
+          <div class="cs-title">Caixa <em>Dourada</em></div>
+          <div class="cs-sub">Role a faixa e descubra seu prêmio. iPhone 17, PS5 e viagens internacionais com chance real de cair.</div>
+        </div>
+
+        <!-- REEL -->
+        <div class="reel-outer">
+          <div class="reel-marker"></div>
+          <div class="reel-track-wrap">
+            <div class="reel-track" id="reelTrack"></div>
+          </div>
+        </div>
+
+        <!-- CHANCES -->
+        <div class="chances-wrap">
+          <div class="chances-title">Probabilidades</div>
+          <div class="chances-row">
+            <div class="chance-chip"><div class="cc-dot" style="background:#718096"></div><span class="cc-name">Jóias Bônus</span><span class="cc-pct" style="margin-left:8px">40%</span></div>
+            <div class="chance-chip"><div class="cc-dot" style="background:#60a5fa"></div><span class="cc-name">Free Spins</span><span class="cc-pct" style="margin-left:8px">25%</span></div>
+            <div class="chance-chip"><div class="cc-dot" style="background:#a78bfa"></div><span class="cc-name">Bônus R$</span><span class="cc-pct" style="margin-left:8px">20%</span></div>
+            <div class="chance-chip"><div class="cc-dot" style="background:#f472b6"></div><span class="cc-name">Gift Card</span><span class="cc-pct" style="margin-left:8px">10%</span></div>
+            <div class="chance-chip"><div class="cc-dot" style="background:#E87C2A"></div><span class="cc-name">PS5 / iPhone 17</span><span class="cc-pct" style="margin-left:8px">3%</span></div>
+            <div class="chance-chip"><div class="cc-dot" style="background:var(--gold)"></div><span class="cc-name">Viagem Internacional</span><span class="cc-pct" style="margin-left:8px">2%</span></div>
+          </div>
+        </div>
+
+        <!-- OPEN BTN -->
+        <div class="cs-open-area">
+          <div style="text-align:center">
+            <button class="btn-open" id="openBoxBtn" onclick="spinReel()">
+              📦 Abrir Caixa Dourada
+            </button>
+            <div class="open-meta" style="margin-top:12px;">
+              <strong id="nextOpenTxt">Disponível agora · Grátis</strong><br>
+              Abertura diária gratuita · sem custo de Jóias
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÚLTIMAS ABERTURAS -->
+      <div style="margin-top:28px;">
+        <div class="sec-header"><div class="sec-title" style="font-size:20px;">Suas Últimas Aberturas</div></div>
+        <div class="hist-list">
+          <div class="hist-item"><div class="hi-icon">💎</div><div class="hi-info"><div class="hi-name">200 Jóias bônus</div><div class="hi-date">Ontem · 21/06</div></div><div class="hi-pts credit">+200</div><div class="hi-status ok">Creditado</div></div>
+          <div class="hist-item"><div class="hi-icon">🎰</div><div class="hi-info"><div class="hi-name">50 Free Spins — Fortune Tiger</div><div class="hi-date">20/06</div></div><div class="hi-pts credit">Ativado</div><div class="hi-status ok">Creditado</div></div>
+          <div class="hist-item"><div class="hi-icon">💰</div><div class="hi-info"><div class="hi-name">Bônus R$ 25,00</div><div class="hi-date">19/06</div></div><div class="hi-pts credit">+R$25</div><div class="hi-status ok">Creditado</div></div>
+          <div class="hist-item"><div class="hi-icon">🎁</div><div class="hi-info"><div class="hi-name">Gift Card iFood R$ 50</div><div class="hi-date">18/06</div></div><div class="hi-pts credit">Enviado</div><div class="hi-status pend">Pendente</div></div>
+          <div class="hist-item"><div class="hi-icon">💎</div><div class="hi-info"><div class="hi-name">500 Jóias bônus</div><div class="hi-date">17/06</div></div><div class="hi-pts credit">+500</div><div class="hi-status ok">Creditado</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO: HISTÓRICO -->
+  <div id="section-historico" style="display:none;">
+    <div class="history-section" style="padding-top:28px;">
+      <div class="sec-header"><div class="sec-title">Histórico de Jóias</div><div class="sec-sub">Últimos 30 dias</div></div>
+      <div class="hist-list">
+        <div class="hist-item"><div class="hi-icon">📥</div><div class="hi-info"><div class="hi-name">Depósito R$ 500</div><div class="hi-date">22/06</div></div><div class="hi-pts credit">+50</div><div class="hi-status ok">Creditado</div></div>
+        <div class="hist-item"><div class="hi-icon">🎰</div><div class="hi-info"><div class="hi-name">Apostas Casino — Semana 25</div><div class="hi-date">22/06</div></div><div class="hi-pts credit">+1.200</div><div class="hi-status ok">Creditado</div></div>
+        <div class="hist-item"><div class="hi-icon">🛍️</div><div class="hi-info"><div class="hi-name">Resgate — Gift Card Steam R$ 100</div><div class="hi-date">21/06</div></div><div class="hi-pts debit">−800</div><div class="hi-status ok">Entregue</div></div>
+        <div class="hist-item"><div class="hi-icon">📦</div><div class="hi-info"><div class="hi-name">Caixa Diária — 200 Jóias</div><div class="hi-date">21/06</div></div><div class="hi-pts credit">+200</div><div class="hi-status ok">Creditado</div></div>
+        <div class="hist-item"><div class="hi-icon">⚽</div><div class="hi-info"><div class="hi-name">Apostas Esportes — Rodada 38</div><div class="hi-date">20/06</div></div><div class="hi-pts credit">+3.400</div><div class="hi-status ok">Creditado</div></div>
+        <div class="hist-item"><div class="hi-icon">🔥</div><div class="hi-info"><div class="hi-name">Streak 7 dias</div><div class="hi-date">20/06</div></div><div class="hi-pts credit">+200</div><div class="hi-status ok">Creditado</div></div>
+        <div class="hist-item"><div class="hi-icon">🛍️</div><div class="hi-info"><div class="hi-name">Resgate — Jantar Fogo de Chão</div><div class="hi-date">18/06</div></div><div class="hi-pts debit">−2.800</div><div class="hi-status pend">Em preparo</div></div>
+        <div class="hist-item"><div class="hi-icon">🎰</div><div class="hi-info"><div class="hi-name">Apostas Casino — Semana 24</div><div class="hi-date">15/06</div></div><div class="hi-pts credit">+4.600</div><div class="hi-status ok">Creditado</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO: PERFIL -->
+  <div id="section-perfil">
+    <div class="products-section">
+      <div class="sec-header"><div class="sec-title">Perfil VIP</div></div>
+      <div class="profile-grid">
+        <div class="pf-card"><label>Nível VIP</label><div class="pf-val gold">Diamond</div><div class="pf-sub">Membro desde Mar/2024</div></div>
+        <div class="pf-card"><label>Total de Jóias Ganhas</label><div class="pf-val mono">48.340</div><div class="pf-sub">+12.840 disponíveis</div></div>
+        <div class="pf-card"><label>Resgates Realizados</label><div class="pf-val mono">7</div><div class="pf-sub">≈ R$ 1.850 em prêmios</div></div>
+        <div class="pf-card"><label>Streak Atual</label><div class="pf-val gold">🔥 14 dias</div><div class="pf-sub">Bônus de 500 Jóias em 14 dias</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL PRODUTO -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-emoji" id="mEmoji">🌍</div>
+      <div class="m-head-txt"><div class="m-cat" id="mCat">Viagens</div><div class="m-title" id="mTitle">Las Vegas</div></div>
+      <button class="m-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-body">
+      <p class="m-desc" id="mDesc"></p>
+      <div class="m-details" id="mDetails"></div>
+      <div class="m-stock-warning" id="mStockWarn" style="display:none">⚠️ <span id="mStockTxt"></span></div>
+      <div class="m-price-row">
+        <div><div class="lbl">Valor em Jóias</div><div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">Saldo: <span id="mBalance" style="color:var(--gold)">12.840</span> 💎</div></div>
+        <div class="pr" id="mPrice">8.500 <span>Jóias</span></div>
+      </div>
+      <div class="m-warn-red" id="mWarnRed" style="display:none">⚠️ Saldo insuficiente. Faltam <span id="mMissing">0</span> Jóias.</div>
+      <div class="m-actions">
+        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-gold" id="redeemBtn" onclick="redeemItem()">Resgatar agora</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTADO LOOT -->
+<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card">
+    <div class="r-glow"></div>
+    <div class="r-border"></div>
+    <button class="r-close" onclick="closeResult()">✕</button>
+    <div class="r-eyebrow">🎉 Você ganhou!</div>
+    <span class="r-emoji" id="rEmoji">💎</span>
+    <div class="r-rarity-badge" id="rRarityBadge">Comum</div>
+    <div class="r-name" id="rName">200 Jóias</div>
+    <p class="r-desc" id="rDesc">Creditado automaticamente.</p>
+    <div class="r-value" id="rValue">+200 Jóias</div>
+    <div class="r-actions">
+      <button class="btn btn-outline" onclick="closeResult()">Fechar</button>
+      <button class="btn btn-gold" onclick="closeResult();showSection('loja')">Ir para a Loja →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="t-icon" id="tIcon">✅</div><div class="t-text" id="tText"><strong>Sucesso!</strong></div></div>
+
+<script>
+// ── STATE ──
+let userPoints = 12840;
+let currentFilter = 'todos';
+let currentModalProduct = null;
+let lootOpened = false;
+let isSpinning = false;
+
+// ── PRODUCTS ──
+const products = [
+  // VIAGENS
+  {id:'viagem-vegas',category:'viagens',emoji:'🎰',name:'Las Vegas · 5 Noites',desc:'Voo + hotel Strip 4★ para 2 pessoas, saindo de São Paulo. Inclui transfer aeroporto e 1 jantar premium. Apenas 3 pacotes disponíveis.',price:9500,featured:true,stock:3,stockLabel:'3 disponíveis',details:[['Duração','5 noites'],['Pessoas','2'],['Inclui','Voo + Hotel Strip'],['Validade','Até Fev/2027']]},
+  {id:'viagem-disney',category:'viagens',emoji:'🏰',name:'Disney Orlando · 7 Noites',desc:'7 noites em hotel Disney Resort para família (2 adultos + 1 criança). Passagens aéreas, park hopper e transfer incluso. 2 pacotes restantes.',price:14500,featured:true,stock:2,stockLabel:'2 disponíveis',details:[['Duração','7 noites'],['Pessoas','2 adultos + 1 criança'],['Inclui','Voo + Hotel Disney + Ingressos'],['Validade','Até Jan/2027']]},
+  {id:'viagem-punta',category:'viagens',emoji:'🌊',name:'Punta del Este · 4 Noites',desc:'4 noites em resort beira-mar para 2 pessoas. Café da manhã incluso e acesso ao spa. 5 disponíveis.',price:6800,featured:false,stock:5,stockLabel:'5 disponíveis',details:[['Duração','4 noites'],['Pessoas','2'],['Inclui','Hotel + café da manhã + spa'],['Validade','Até Dez/2026']]},
+  {id:'viagem-rj',category:'viagens',emoji:'🌅',name:'Rio de Janeiro · 3 Noites',desc:'3 noites em hotel 5★ em Ipanema para 2 pessoas com café da manhã e passeio de barco. 8 disponíveis.',price:3800,featured:false,stock:8,stockLabel:'8 disponíveis',details:[['Duração','3 noites'],['Pessoas','2'],['Inclui','Hotel 5★ + passeio barco'],['Validade','Até Out/2026']]},
+  // ELETRÔNICOS
+  {id:'iphone17',category:'eletronicos',emoji:'📱',name:'iPhone 17 Pro Max 256GB',desc:'iPhone 17 Pro Max 256GB lacrado. Nota fiscal inclusa. Escolha a cor: Titânio, Preto ou Branco. Entrega em 5 dias úteis.',price:11500,featured:true,stock:2,stockLabel:'2 disponíveis',details:[['Memória','256GB'],['Garantia','Apple 1 ano'],['Entrega','5 dias úteis'],['Cor','A escolher']]},
+  {id:'ps5',category:'eletronicos',emoji:'🎮',name:'PlayStation 5 Slim + 2 Jogos',desc:'PS5 Slim com 2 controles e 2 jogos à escolha. Produto lacrado com nota fiscal. Entrega em 7 dias úteis.',price:8200,featured:true,stock:3,stockLabel:'3 disponíveis',details:[['Console','PS5 Slim'],['Inclui','2 controles + 2 jogos'],['Entrega','7 dias úteis'],['Garantia','1 ano']]},
+  {id:'smarttv',category:'eletronicos',emoji:'📺',name:'Smart TV 65" 4K QLED',desc:'Smart TV 65 polegadas QLED com HDR. Samsung ou LG. Entrega e instalação em capitais.',price:7200,featured:false,stock:4,stockLabel:'4 disponíveis',details:[['Tela','65" QLED 4K'],['Sistema','Smart TV'],['Entrega','Capitais + instalação'],['Garantia','1 ano']]},
+  {id:'airpods',category:'eletronicos',emoji:'🎧',name:'AirPods Pro 2ª geração',desc:'AirPods Pro com cancelamento de ruído e estojo MagSafe. Produto lacrado com nota fiscal.',price:3200,featured:false,stock:6,stockLabel:'6 disponíveis',details:[['Modelo','AirPods Pro 2ª Gen'],['Case','MagSafe'],['Garantia','Apple 1 ano'],['Entrega','5 dias úteis']]},
+  // UNIFORMES
+  {id:'camisa-selecao',category:'uniformes',emoji:'💛',name:'Camisa Seleção Brasileira Copa 2026',desc:'Camisa oficial da Seleção Brasileira Copa do Mundo 2026. Nike licenciada com personalização de nome e número.',price:1500,featured:true,stock:999,stockLabel:'Ilimitado',details:[['Produto','Nike Oficial CBF'],['Personalização','Nome + número'],['Tamanhos','P ao GGG'],['Entrega','10 dias úteis']]},
+  {id:'camisa-flamengo',category:'uniformes',emoji:'⚫🔴',name:'Camisa Flamengo Oficial 25/26',desc:'Camisa oficial Flamengo temporada 25/26 personalizada com seu nome e número. Produto Adidas licenciado.',price:1200,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Produto','Adidas Oficial'],['Personalização','Nome + número'],['Tamanhos','P ao GGG'],['Entrega','10 dias úteis']]},
+  {id:'kit-nba',category:'uniformes',emoji:'🏀',name:'Kit NBA Oficial · Time à escolha',desc:'Jersey + shorts oficiais NBA, time de sua preferência. Produto importado 100% original.',price:2200,featured:false,stock:15,stockLabel:'15 disponíveis',details:[['Produto','Nike Official NBA'],['Inclui','Jersey + shorts'],['Time','À escolha'],['Entrega','15 dias úteis']]},
+  // SHOWS
+  {id:'show-camarote',category:'shows',emoji:'🎵',name:'Camarote VIP · Show Premium SP',desc:'2 ingressos camarote VIP para o próximo grande show em São Paulo. Open bar e couvert artístico incluso.',price:4500,featured:true,stock:4,stockLabel:'4 disponíveis',details:[['Ingressos','2 (camarote VIP)'],['Inclui','Open bar + couvert'],['Local','São Paulo'],['Data','A confirmar']]},
+  {id:'festival',category:'shows',emoji:'🎪',name:'Festival de Música · Passe 3 dias',desc:'Passe VIP de 3 dias em festival de música para 2 pessoas com estacionamento e área exclusiva.',price:3800,featured:false,stock:6,stockLabel:'6 disponíveis',details:[['Duração','3 dias'],['Pessoas','2'],['Inclui','Área VIP + estacionamento'],['Data','Ago/2026']]},
+  // JANTARES
+  {id:'jantar-chef',category:'jantares',emoji:'👨‍🍳',name:'Jantar com Chef Renomado',desc:'Jantar privativo degustação 7 etapas para 2 pessoas. Chef com passagem internacional, harmonização inclusa.',price:6500,featured:true,stock:2,stockLabel:'2 disponíveis',details:[['Pessoas','2'],['Formato','Degustação 7 etapas'],['Inclui','Harmonização completa'],['Validade','4 meses']]},
+  {id:'jantar-prime',category:'jantares',emoji:'🍽️',name:'Jantar Fine Dining · 2 pessoas',desc:'Jantar completo (entrada + principal + sobremesa + vinho) para 2 em restaurante premium parceiro.',price:3800,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Pessoas','2'],['Inclui','Menu completo + vinho'],['Restaurantes','10 opções SP/RJ/BH'],['Validade','6 meses']]},
+  {id:'churrasco',category:'jantares',emoji:'🥩',name:'Fogo de Chão · Rodízio para 2',desc:'Rodízio completo para 2 pessoas na Fogo de Chão com drinks de entrada e sobremesa.',price:2800,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Pessoas','2'],['Inclui','Rodízio + drinks'],['Unidades','SP, RJ, BH, BSB'],['Validade','3 meses']]},
+  // GIFT CARDS
+  {id:'gc-amazon',category:'giftcards',emoji:'📦',name:'Gift Card Amazon R$ 300',desc:'Crédito de R$ 300 na Amazon para comprar o que quiser. Código digital em até 24h.',price:2400,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Valor','R$ 300,00'],['Validade','2 anos'],['Entrega','Código em 24h'],['Plataforma','Amazon.com.br']]},
+  {id:'gc-steam',category:'giftcards',emoji:'🎮',name:'Gift Card Steam R$ 100',desc:'R$ 100 em créditos Steam. Código imediato após resgate.',price:800,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Valor','R$ 100,00'],['Validade','Sem validade'],['Entrega','Código imediato'],['Plataforma','Steam']]},
+  {id:'gc-ifood',category:'giftcards',emoji:'🛵',name:'Gift Card iFood R$ 150',desc:'R$ 150 de crédito iFood para delivery ou pickup. Código em até 24h.',price:1200,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Valor','R$ 150,00'],['Validade','1 ano'],['Entrega','Código em 24h'],['Plataforma','iFood']]},
+  {id:'gc-netflix',category:'giftcards',emoji:'🎬',name:'Netflix Premium · 6 meses',desc:'6 meses de Netflix plano Premium (4K, 4 telas). Código digital em 24h.',price:2400,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Plano','Premium 4K'],['Duração','6 meses'],['Entrega','Código em 24h'],['Telas','4 simultâneas']]},
+  // BÔNUS
+  {id:'bonus-200',category:'bonus',emoji:'💵',name:'Bônus R$ 200 em saldo',desc:'R$ 200 em bônus de apostas. Sem rollover para clientes VIP Diamond e Elite. Creditado imediatamente.',price:1500,featured:true,stock:999,stockLabel:'Ilimitado',details:[['Valor','R$ 200,00'],['Rollover','Sem (Diamond/Elite)'],['Validade','7 dias'],['Crédito','Imediato']]},
+  {id:'freespins',category:'bonus',emoji:'🎰',name:'100 Free Spins — Slot à escolha',desc:'100 giros grátis no slot de sua preferência (exceto jackpots progressivos). Crédito imediato.',price:800,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Giros','100'],['Jogo','À escolha'],['Validade','48 horas'],['Crédito','Imediato']]},
+  {id:'cashback',category:'bonus',emoji:'🔄',name:'Cashback 10% por 7 dias',desc:'10% de cashback em todas as apostas durante 7 dias consecutivos. Crédito semanal automático.',price:3000,featured:false,stock:999,stockLabel:'Ilimitado',details:[['Percentual','10%'],['Duração','7 dias'],['Tipo','Todas apostas'],['Crédito','Semanal']]},
+];
+
+// ── LOOT PRIZES (weighted) ──
+const lootPrizes = [
+  // COMMON (40%)
+  {emoji:'💎',name:'100 Jóias',desc:'Jóias creditadas automaticamente.',value:'+100 Jóias',pts:100,rarity:'common',rarityLabel:'Comum',rarityColor:'#718096',weight:20},
+  {emoji:'💎',name:'200 Jóias',desc:'Jóias creditadas na sua conta.',value:'+200 Jóias',pts:200,rarity:'common',rarityLabel:'Comum',rarityColor:'#718096',weight:20},
+  // UNCOMMON (25%)
+  {emoji:'🎰',name:'50 Free Spins',desc:'50 giros no Fortune Tiger. Creditados em 5 minutos.',value:'50 Free Spins ativados',pts:0,rarity:'uncommon',rarityLabel:'Incomum',rarityColor:'#60a5fa',weight:15},
+  {emoji:'🎰',name:'100 Free Spins',desc:'100 giros no slot à sua escolha.',value:'100 Free Spins ativados',pts:0,rarity:'uncommon',rarityLabel:'Incomum',rarityColor:'#60a5fa',weight:10},
+  // RARE (20%)
+  {emoji:'💰',name:'Bônus R$ 25',desc:'R$ 25 em bônus. Válido 48h.',value:'R$ 25 creditados',pts:0,rarity:'rare',rarityLabel:'Raro',rarityColor:'#a78bfa',weight:12},
+  {emoji:'💵',name:'Bônus R$ 100',desc:'R$ 100 em bônus. Válido 7 dias.',value:'R$ 100 creditados',pts:0,rarity:'rare',rarityLabel:'Raro',rarityColor:'#a78bfa',weight:8},
+  // EPIC (10%)
+  {emoji:'🎁',name:'Gift Card R$ 50',desc:'Gift Card iFood R$ 50. Código no seu e-mail em 24h.',value:'Gift Card enviado',pts:0,rarity:'epic',rarityLabel:'Épico',rarityColor:'#f472b6',weight:6},
+  {emoji:'📦',name:'Gift Card Amazon R$ 100',desc:'R$ 100 na Amazon. Código digital em 24h.',value:'Gift Card R$100 enviado',pts:0,rarity:'epic',rarityLabel:'Épico',rarityColor:'#f472b6',weight:4},
+  // LEGENDARY (5%) — PS5, iPhone, Viagens
+  {emoji:'🎮',name:'PlayStation 5',desc:'PS5 Slim com 2 controles. Entregue em até 7 dias úteis. RARO!',value:'PS5 — seu AM vai entrar em contato!',pts:0,rarity:'legendary',rarityLabel:'Lendário',rarityColor:'#F0C040',weight:2},
+  {emoji:'📱',name:'iPhone 17 Pro Max',desc:'iPhone 17 Pro Max 256GB lacrado. ULTRA RARO!',value:'iPhone 17 — seu AM vai entrar em contato!',pts:0,rarity:'legendary',rarityLabel:'Lendário',rarityColor:'#F0C040',weight:1},
+  {emoji:'🎰',name:'Las Vegas · 5 Noites',desc:'Viagem para Las Vegas para 2 pessoas. Voo + hotel Strip 4★. MEGA RARO!',value:'Las Vegas — seu AM vai entrar em contato!',pts:0,rarity:'legendary',rarityLabel:'Lendário',rarityColor:'#F0C040',weight:1},
+];
+
+const rarityBgStyle = {
+  common:'background:rgba(113,128,150,.2);color:#718096;',
+  uncommon:'background:rgba(96,165,250,.15);color:#60a5fa;',
+  rare:'background:rgba(167,139,250,.15);color:#a78bfa;',
+  epic:'background:linear-gradient(135deg,rgba(219,39,119,.15),rgba(168,85,247,.15));color:#f472b6;',
+  legendary:'background:linear-gradient(135deg,rgba(240,192,64,.2),rgba(200,140,30,.15));color:var(--gold);border:1px solid rgba(240,192,64,.3);',
+};
+
+// WEIGHTED RANDOM
+function weightedRandom(){
+  const total = lootPrizes.reduce((s,p)=>s+p.weight,0);
+  let r = Math.random()*total;
+  for(const p of lootPrizes){r-=p.weight;if(r<=0)return p;}
+  return lootPrizes[0];
+}
+
+// ── REEL SETUP ──
+// Build a long array of items for the reel visual
+const reelPool = [
+  {emoji:'💎',name:'100 Jóias',rarity:'common'},{emoji:'🎰',name:'50 Spins',rarity:'uncommon'},
+  {emoji:'💰',name:'Bônus R$25',rarity:'rare'},{emoji:'💎',name:'200 Jóias',rarity:'common'},
+  {emoji:'🎁',name:'Gift Card',rarity:'epic'},{emoji:'🎮',name:'PlayStation 5',rarity:'legendary'},
+  {emoji:'💎',name:'100 Jóias',rarity:'common'},{emoji:'💵',name:'Bônus R$100',rarity:'rare'},
+  {emoji:'📱',name:'iPhone 17',rarity:'legendary'},{emoji:'💎',name:'200 Jóias',rarity:'common'},
+  {emoji:'📦',name:'Gift Amazon',rarity:'epic'},{emoji:'🎰',name:'100 Spins',rarity:'uncommon'},
+  {emoji:'💎',name:'100 Jóias',rarity:'common'},{emoji:'🎰',name:'Las Vegas',rarity:'legendary'},
+  {emoji:'💰',name:'Bônus R$25',rarity:'rare'},{emoji:'💎',name:'200 Jóias',rarity:'common'},
+  {emoji:'🎁',name:'Gift iFood',rarity:'epic'},{emoji:'💵',name:'Bônus R$100',rarity:'rare'},
+  {emoji:'💎',name:'100 Jóias',rarity:'common'},{emoji:'🎰',name:'50 Spins',rarity:'uncommon'},
+  {emoji:'🎮',name:'PS5',rarity:'legendary'},{emoji:'💎',name:'200 Jóias',rarity:'common'},
+  {emoji:'📦',name:'Gift Amazon',rarity:'epic'},{emoji:'💰',name:'Bônus R$25',rarity:'rare'},
+  {emoji:'💎',name:'100 Jóias',rarity:'common'},{emoji:'📱',name:'iPhone 17',rarity:'legendary'},
+  {emoji:'💎',name:'200 Jóias',rarity:'common'},{emoji:'🎁',name:'Gift Card',rarity:'epic'},
+  {emoji:'🎰',name:'100 Spins',rarity:'uncommon'},{emoji:'💎',name:'100 Jóias',rarity:'common'},
+  {emoji:'💵',name:'Bônus R$100',rarity:'rare'},{emoji:'💎',name:'200 Jóias',rarity:'common'},
+  {emoji:'🎰',name:'50 Spins',rarity:'uncommon'},{emoji:'💎',name:'100 Jóias',rarity:'common'},
+  {emoji:'💎',name:'200 Jóias',rarity:'common'},{emoji:'🎰',name:'50 Spins',rarity:'uncommon'},
+];
+
+const ITEM_W = 168; // width + gap
+const ITEM_GAP = 8;
+
+function buildReel(winnerIdx){
+  const track = document.getElementById('reelTrack');
+  // Build 60 items, with winner placed at a specific index
+  const items = [];
+  for(let i=0;i<60;i++){
+    const src = reelPool[i % reelPool.length];
+    items.push(src);
+  }
+  // Place winner at position 50 (will scroll there)
+  if(winnerIdx !== undefined) items[50] = winnerIdx;
+
+  track.innerHTML = items.map((item,i)=>`
+    <div class="reel-item r-${item.rarity}" id="reel-item-${i}">
+      <div class="ri-bg"></div>
+      <div class="ri-emoji">${item.emoji}</div>
+      <div class="ri-name">${item.name}</div>
+      <div class="ri-rarity">${item.rarity==='legendary'?'★ Lendário':item.rarity==='epic'?'Épico':item.rarity==='rare'?'Raro':item.rarity==='uncommon'?'Incomum':'Comum'}</div>
+    </div>
+  `).join('');
+  return items;
+}
+
+function spinReel(){
+  if(lootOpened){
+    showToast('⏰','<strong>Já aberta hoje!</strong>Volte amanhã para novo prêmio.');
+    return;
+  }
+  if(isSpinning) return;
+  isSpinning = true;
+
+  const btn = document.getElementById('openBoxBtn');
+  btn.disabled=true;
+  btn.textContent='Girando...';
+
+  const prize = weightedRandom();
+
+  // Map prize to a reel item for position 50
+  const winnerReelItem = {emoji:prize.emoji,name:prize.name,rarity:prize.rarity};
+  buildReel(winnerReelItem);
+
+  const track = document.getElementById('reelTrack');
+  const containerW = track.parentElement.offsetWidth;
+  const centerOffset = Math.floor(containerW/2);
+
+  // Winner is at index 50
+  // Target: winner item center aligns with container center
+  const winnerPos = 50 * (ITEM_W + ITEM_GAP);
+  const targetX = winnerPos - centerOffset + (ITEM_W/2);
+
+  // Start from 0
+  track.style.transform = 'translateX(0)';
+  track.style.transition = 'none';
+
+  // Force reflow
+  track.getBoundingClientRect();
+
+  // Animate
+  const duration = 4800;
+  const startTime = performance.now();
+  const startX = 0;
+
+  // Easing: fast then slow (ease-out with initial fast phase)
+  function easeOut(t){
+    // Custom: fast start, very slow end
+    return 1 - Math.pow(1-t, 4);
+  }
+
+  function animate(now){
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed/duration, 1);
+    const ease = easeOut(t);
+    const currentX = startX + (targetX - startX) * ease;
+
+    track.style.transform = `translateX(-${currentX}px)`;
+
+    if(t < 1){
+      requestAnimationFrame(animate);
+    } else {
+      // Landed
+      track.style.transform = `translateX(-${targetX}px)`;
+      // Highlight winner
+      const winEl = document.getElementById(`reel-item-50`);
+      if(winEl) winEl.classList.add('winner');
+
+      // Grant prize
+      if(prize.pts>0){userPoints+=prize.pts;updatePtsUI();}
+      lootOpened=true;
+      btn.textContent='✓ Aberta hoje';
+      document.getElementById('nextOpenTxt').textContent='Disponível amanhã';
+
+      setTimeout(()=>showResult(prize), 900);
+      isSpinning=false;
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+// Init reel on load
+buildReel();
+
+// ── PRODUCTS ──
+function catGrad(cat){
+  return {viagens:'linear-gradient(135deg,#061228,#081c10)',eletronicos:'linear-gradient(135deg,#080818,#0c1030)',uniformes:'linear-gradient(135deg,#1a0808,#20060a)',shows:'linear-gradient(135deg,#100828,#0a0a1a)',jantares:'linear-gradient(135deg,#1a1000,#120800)',giftcards:'linear-gradient(135deg,#081a08,#061208)',bonus:'linear-gradient(135deg,#1a1600,#100e00)'}[cat]||'linear-gradient(135deg,#0f1018,#0a0b10)';
+}
+function catLbl(cat){
+  return {viagens:'✈️ Viagens',eletronicos:'📱 Eletrônicos',uniformes:'👕 Uniformes',shows:'🎵 Shows',jantares:'🍽️ Jantares',giftcards:'🎁 Gift Cards',bonus:'💰 Bônus'}[cat]||cat;
+}
+function stockColor(s){
+  if(s===999) return 'stock-green';
+  if(s<=2) return 'stock-red';
+  if(s<=5) return 'stock-orange';
+  return 'stock-green';
+}
+function stockText(p){
+  if(p.stock===999) return {cls:'',txt:'Em estoque'};
+  if(p.stock<=2) return {cls:'urgent',txt:`⚡ Apenas ${p.stockLabel}!`};
+  if(p.stock<=5) return {cls:'urgent',txt:`Restam apenas ${p.stockLabel}`};
+  return {cls:'',txt:p.stockLabel};
+}
+function isRare(p){return ['iphone17','ps5','viagem-vegas','viagem-disney'].includes(p.id);}
+function renderProducts(list){
+  const grid=document.getElementById('productGrid');
+  document.getElementById('productCount').textContent=`${list.length} disponíveis`;
+  grid.innerHTML=list.map(p=>{
+    const st=stockText(p);
+    const rare=isRare(p);
+    let tagHtml='';
+    if(p.featured&&rare) tagHtml=`<div class="card-tag tag-rare">✨ Raro</div>`;
+    else if(p.featured) tagHtml=`<div class="card-tag tag-dest">Destaque</div>`;
+    if(p.stock<=2&&p.stock!==999) tagHtml=`<div class="card-tag tag-hot">🔥 Últimas unidades</div>`;
+    return `
+    <div class="card${p.featured?' featured':''}" onclick="openModal('${p.id}')">
+      ${tagHtml}
+      <div class="card-img"><div class="card-img-bg" style="background:${catGrad(p.category)}"></div><div class="card-emoji">${p.emoji}</div></div>
+      <div class="card-body">
+        <div class="card-cat">${catLbl(p.category)}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.desc.substring(0,75)}...</div>
+        <div class="card-bottom">
+          <div class="price-wrap"><div class="price-num">${p.price.toLocaleString('pt-BR')}</div><div class="price-lbl">Jóias</div></div>
+          <button class="btn-sm ${userPoints>=p.price?'btn-sm-gold':'btn-sm-out'}" onclick="event.stopPropagation();openModal('${p.id}')">${userPoints>=p.price?'Resgatar':'Ver mais'}</button>
+        </div>
+        <div class="stock-row">
+          <div class="stock-dot ${stockColor(p.stock)}"></div>
+          <span class="stock-text ${st.cls}">${st.txt}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── FILTER / SORT ──
+let currentSort='destaque';
+function setFilter(btn,cat){
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter=cat;applyFilterSort();
+}
+function filterProducts(){applyFilterSort();}
+function sortProducts(val){currentSort=val;applyFilterSort();}
+function applyFilterSort(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let list=[...products];
+  if(currentFilter!=='todos') list=list.filter(p=>p.category===currentFilter);
+  if(q) list=list.filter(p=>p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q));
+  if(currentSort==='menor') list.sort((a,b)=>a.price-b.price);
+  else if(currentSort==='maior') list.sort((a,b)=>b.price-a.price);
+  else list.sort((a,b)=>b.featured-a.featured);
+  renderProducts(list);
+}
+
+// ── MODAL ──
+function openModal(id){
+  const p=products.find(x=>x.id===id);
+  if(!p) return;
+  currentModalProduct=p;
+  document.getElementById('mEmoji').textContent=p.emoji;
+  document.getElementById('mCat').textContent=catLbl(p.category);
+  document.getElementById('mTitle').textContent=p.name;
+  document.getElementById('mDesc').textContent=p.desc;
+  document.getElementById('mPrice').innerHTML=`${p.price.toLocaleString('pt-BR')} <span>Jóias</span>`;
+  document.getElementById('mBalance').textContent=userPoints.toLocaleString('pt-BR');
+  document.getElementById('mDetails').innerHTML=p.details.map(([k,v])=>`<div class="detail"><label>${k}</label><span>${v}</span></div>`).join('');
+  // stock warning
+  const sw=document.getElementById('mStockWarn');
+  if(p.stock!==999&&p.stock<=5){sw.style.display='flex';document.getElementById('mStockTxt').textContent=`Apenas ${p.stockLabel} disponíveis. Reserve agora!`;}
+  else sw.style.display='none';
+  // balance check
+  const wr=document.getElementById('mWarnRed');
+  const rb=document.getElementById('redeemBtn');
+  if(userPoints<p.price){wr.style.display='flex';document.getElementById('mMissing').textContent=(p.price-userPoints).toLocaleString('pt-BR');rb.disabled=true;rb.style.opacity='.4';rb.style.cursor='not-allowed';}
+  else{wr.style.display='none';rb.disabled=false;rb.style.opacity='1';rb.style.cursor='pointer';}
+  document.getElementById('productModal').classList.add('show');
+}
+function closeModal(){document.getElementById('productModal').classList.remove('show');}
+function redeemItem(){
+  if(!currentModalProduct) return;
+  userPoints-=currentModalProduct.price;
+  // decrement stock display
+  updatePtsUI();
+  closeModal();
+  showToast('🎉',`<strong>${currentModalProduct.name} resgatado!</strong>Seu AM entrará em contato em breve.`);
+}
+
+// ── PTS UI ──
+function updatePtsUI(){
+  const fmt=userPoints.toLocaleString('pt-BR');
+  document.getElementById('sidebarPts').textContent=fmt;
+  document.getElementById('topbarPts').textContent=fmt;
+  applyFilterSort();
+}
+
+// ── SECTIONS ──
+function showSection(sec){
+  ['loja','loot','historico','perfil'].forEach(s=>{
+    document.getElementById(`section-${s}`).style.display=s===sec?'block':'none';
+  });
+  document.querySelectorAll('.nav-item').forEach((n,i)=>{
+    n.classList.toggle('active',['loja','loot','historico','perfil'][i]===sec);
+  });
+  if(sec==='loot') buildReel();
+}
+
+// ── RESULT ──
+function showResult(prize){
+  document.getElementById('rEmoji').textContent=prize.emoji;
+  const badge=document.getElementById('rRarityBadge');
+  badge.textContent=prize.rarityLabel;
+  badge.style.cssText=rarityBgStyle[prize.rarity]||'';
+  badge.style.padding='4px 14px';badge.style.borderRadius='20px';
+  document.getElementById('rName').textContent=prize.name;
+  document.getElementById('rDesc').textContent=prize.desc;
+  document.getElementById('rValue').textContent=prize.value;
+  document.getElementById('resultOverlay').classList.add('show');
+  if(prize.rarity==='legendary'||prize.rarity==='epic') launchConfetti();
+}
+function closeResult(){document.getElementById('resultOverlay').classList.remove('show');}
+
+// ── CONFETTI ──
+function launchConfetti(){
+  const canvas=document.getElementById('confettiCanvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const pieces=[];
+  const colors=['#F0C040','#FFD700','#C0392B','#2ECC71','#A855F7','#FFF','#60A5FA'];
+  for(let i=0;i<150;i++){
+    pieces.push({x:Math.random()*canvas.width,y:-20,vx:(Math.random()-.5)*7,vy:Math.random()*7+2,color:colors[Math.floor(Math.random()*colors.length)],w:Math.random()*9+4,h:Math.random()*13+5,rot:Math.random()*360,rv:(Math.random()-.5)*9,life:1});
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    pieces.forEach(p=>{
+      if(p.life<=0) return;
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rv;p.vy+=.18;p.life-=.007;
+      if(p.y<canvas.height+30) alive=true;
+      ctx.save();ctx.globalAlpha=Math.max(0,p.life);ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
+    });
+    if(alive) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+// ── TOAST ──
+function showToast(icon,html){
+  const t=document.getElementById('toast');
+  document.getElementById('tIcon').textContent=icon;
+  document.getElementById('tText').innerHTML=html;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3800);
+}
+
+// ── COUNTDOWN ──
+function updateCountdown(){
+  const now=new Date();const end=new Date(now);end.setHours(23,59,59,0);const diff=end-now;
+  document.getElementById('cd-h').textContent=Math.floor(diff/3600000).toString().padStart(2,'0');
+  document.getElementById('cd-m').textContent=Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
+  document.getElementById('cd-s').textContent=Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+}
+setInterval(updateCountdown,1000);updateCountdown();
+
+// ── INIT ──
+renderProducts(products);
+</script>
+</body>
+</html>
