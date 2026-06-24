@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="champagne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Galera Shop · VIP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#0B0E0C; --surface:#12161300; --surf:#13171400; --s1:#14181500; --s2:#1A1F1B00; --s3:#222822;
+  --panel:#13181400; 
+  --bg2:#0E1210; --card:#13181400;
+  --line:#262C28; --line2:#343C37;
+  --text:#ECEAE0; --muted:#9A9D90; --dim:#62665C;
+  --credit:#4FD3A4; --credit-bg:rgba(79,211,164,.12);
+  --debit:#F08A7A; --debit-bg:rgba(240,138,122,.12);
+  /* legendary / prize gold (fixed, used by JS rarity) */
+  --gold:#F0C040; --gold-d:#9A7A1E; --gold-g:rgba(240,192,64,.14);
+  /* themeable gem accent */
+  --gem:#E8C77A; --gem-2:#F4DEA8; --gem-d:#B9923F; --gem-g:rgba(232,199,122,.13); --gem-bd:rgba(232,199,122,.32); --ink:#0C0E0B;
+  --r:16px; --rs:11px;
+  --shadow:0 18px 50px rgba(0,0,0,.5);
+  --fd:'Bricolage Grotesque',sans-serif; --fb:'Hanken Grotesk',sans-serif; --fm:'Space Mono',monospace;
+}
+[data-theme="champagne"]{ --gem:#E8C77A; --gem-2:#F4DEA8; --gem-d:#B9923F; --gem-g:rgba(232,199,122,.13); --gem-bd:rgba(232,199,122,.32); --ink:#0C0E0B; }
+[data-theme="emerald"]{ --gem:#46CC95; --gem-2:#84E4BE; --gem-d:#2A8C64; --gem-g:rgba(70,204,149,.13); --gem-bd:rgba(70,204,149,.34); --ink:#04140E; }
+[data-theme="amethyst"]{ --gem:#AC8FFF; --gem-2:#CBB9FF; --gem-d:#7857D6; --gem-g:rgba(172,143,255,.14); --gem-bd:rgba(172,143,255,.34); --ink:#0C0814; }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+body{display:block;}
+img{display:block;max-width:100%;}
+button,select,input{font-family:var(--fb);}
+::selection{background:var(--gem-g);color:var(--text);}
+*::-webkit-scrollbar{width:10px;height:10px;}
+*::-webkit-scrollbar-thumb{background:var(--line2);border-radius:20px;border:3px solid var(--bg);}
+:focus-visible{outline:2px solid var(--gem);outline-offset:2px;border-radius:4px;}
+
+/* velvet vault ambience */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+   radial-gradient(70% 55% at 80% -8%,var(--gem-g),transparent 60%),
+   radial-gradient(60% 50% at -5% 12%,rgba(70,120,95,.06),transparent 60%),
+   radial-gradient(120% 90% at 50% 120%,rgba(0,0,0,.55),transparent 60%);}
+
+/* ── GEM MARK (signature) ── */
+.gem,.gem-sm,.price-icon{flex-shrink:0;position:relative;
+  background:linear-gradient(150deg,var(--gem-2),var(--gem) 52%,var(--gem-d));
+  clip-path:polygon(20% 5%,80% 5%,100% 39%,50% 100%,0 39%);}
+.gem::after,.gem-sm::after,.price-icon::after{content:'';position:absolute;inset:0;clip-path:inherit;
+  background:
+   linear-gradient(152deg,transparent 36%,rgba(255,255,255,.45) 37% 39%,transparent 40%),
+   linear-gradient(208deg,transparent 56%,rgba(0,0,0,.22) 57% 60%,transparent 61%),
+   linear-gradient(90deg,transparent 49%,rgba(0,0,0,.14) 50% 51%,transparent 52%);}
+.gem{width:48px;height:48px;filter:drop-shadow(0 10px 20px var(--gem-g));}
+.gem-sm{width:15px;height:15px;}
+.price-icon{width:17px;height:17px;font-size:0;color:transparent;}
+
+/* ── TOP NAV ── */
+.topnav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:18px;
+  padding:14px 30px;background:rgba(11,14,12,.72);backdrop-filter:blur(20px) saturate(1.3);
+  border-bottom:1px solid var(--line);}
+.tn-brand{display:flex;align-items:center;gap:10px;}
+.tn-logo{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
+.tn-logo span{color:var(--gem);padding:0 1px;}
+.tn-badge{font-family:var(--fm);font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--ink);background:var(--gem);border:1px solid var(--gem);border-radius:6px;padding:3px 7px;box-shadow:0 2px 12px var(--gem-g);}
+.tn-nav{display:flex;gap:2px;margin:0 auto;background:var(--s2);border:1px solid var(--line);border-radius:30px;padding:4px;}
+.nav-item{font-family:var(--fb);font-size:13px;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;padding:8px 18px;border-radius:24px;transition:all .16s;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{background:var(--gem);color:var(--ink);}
+.tn-right{display:flex;align-items:center;gap:11px;flex-shrink:0;}
+.tn-bal,.tn-av{flex-shrink:0;}
+.tn-search{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--line);border-radius:24px;padding:8px 14px;width:200px;transition:border-color .15s,width .2s;}
+.tn-search:focus-within{border-color:var(--gem-bd);}
+.tn-search input{background:none;border:none;outline:none;font-size:13px;color:var(--text);width:100%;}
+.tn-search input::placeholder{color:var(--dim);}
+.tn-search>span{font-size:12px;filter:grayscale(.4);opacity:.7;}
+.tn-bal{display:flex;align-items:center;gap:8px;background:var(--gem-g);border:1px solid var(--gem-bd);border-radius:24px;padding:8px 15px;font-family:var(--fm);font-size:13px;font-weight:700;color:var(--gem-2);white-space:nowrap;}
+.tn-av{width:38px;height:38px;border-radius:12px;background:linear-gradient(140deg,var(--gem),var(--gem-d));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);box-shadow:0 6px 16px var(--gem-g);cursor:pointer;}
+
+/* ── MAIN ── */
+.main{position:relative;z-index:1;height:calc(100vh - 65px);overflow-y:auto;scroll-padding-top:24px;}
+
+/* ── VAULT HERO ── */
+.vault{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;padding:34px 30px 8px;align-items:stretch;}
+.vault-l{display:flex;flex-direction:column;justify-content:center;
+  background:linear-gradient(160deg,var(--s2),var(--bg2));border:1px solid var(--line);border-radius:22px;padding:30px 32px;position:relative;overflow:hidden;}
+.vault-l::after{content:'';position:absolute;top:-60px;right:-50px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--gem-g),transparent 70%);}
+.v-greet{font-size:13px;color:var(--muted);margin-bottom:18px;position:relative;}
+.v-greet strong{color:var(--text);font-weight:700;}
+.v-bal-row{display:flex;align-items:center;gap:18px;margin-bottom:22px;position:relative;}
+.v-bal{font-family:var(--fm);font-size:52px;font-weight:700;line-height:.9;color:var(--text);letter-spacing:-.03em;}
+.v-bal-unit{font-size:12px;color:var(--gem);text-transform:uppercase;letter-spacing:.13em;margin-top:8px;font-weight:600;}
+.tier{position:relative;margin-bottom:24px;}
+.tier-meta{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:8px;}
+.tier-meta .tn1{font-family:var(--fd);font-weight:700;color:var(--text);letter-spacing:.01em;white-space:nowrap;}
+.tier-meta .tn2{color:var(--muted);white-space:nowrap;}
+.tier-meta .tn2 b{color:var(--gem-2);font-family:var(--fm);font-weight:700;}
+.tier-bar{height:8px;border-radius:8px;background:var(--s3);overflow:hidden;border:1px solid var(--line);}
+.tier-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--gem-d),var(--gem) 70%,var(--gem-2));box-shadow:0 0 16px var(--gem-g);}
+.v-actions{display:flex;gap:10px;flex-wrap:wrap;position:relative;}
+
+/* featured vitrine */
+.vault-r{position:relative;}
+.feat{position:relative;height:100%;min-height:300px;border-radius:22px;overflow:hidden;border:1px solid var(--line2);cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;transition:transform .25s,border-color .25s;box-shadow:var(--shadow);}
+.feat:hover{transform:translateY(-3px);border-color:var(--gem-bd);}
+.feat-img{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.66) saturate(1.12);animation:featIn .55s ease;}
+.feat:hover .feat-img{filter:brightness(.8) saturate(1.12);}
+@keyframes featIn{from{opacity:.3;transform:scale(1.05);}to{opacity:1;transform:scale(1);}}
+.feat-dots{position:absolute;top:16px;right:16px;z-index:3;display:flex;gap:6px;}
+.fd{width:7px;height:7px;border-radius:50%;border:none;background:rgba(255,255,255,.32);cursor:pointer;padding:0;transition:all .3s;}
+.fd.on{background:var(--gem);width:18px;border-radius:4px;}
+.feat::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(8,10,9,.95) 6%,rgba(8,10,9,.2) 55%,transparent);}
+.feat-tag{position:absolute;top:16px;left:16px;z-index:2;font-family:var(--fm);font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gem-2);background:rgba(11,14,12,.6);backdrop-filter:blur(6px);border:1px solid var(--gem-bd);border-radius:7px;padding:5px 10px;}
+.feat-body{position:relative;z-index:2;padding:24px 26px;}
+.feat-ttl{font-family:var(--fd);font-size:27px;font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1.05;margin-bottom:7px;}
+.feat-sub{font-size:13px;color:rgba(255,255,255,.74);margin-bottom:16px;max-width:340px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.feat-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.feat-price{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:20px;font-weight:700;color:var(--gem-2);}
+.feat-cta{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;}
+
+/* ── EARN STRIP ── */
+.earn-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 30px 4px;}
+.earn-card{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+.earn-emo{font-size:20px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--s3);border-radius:11px;flex-shrink:0;}
+.earn-tx{font-size:12px;color:var(--muted);line-height:1.4;}
+.earn-tx b{display:block;color:var(--text);font-family:var(--fb);font-weight:700;font-size:12.5px;}
+.earn-val{margin-left:auto;font-family:var(--fm);font-size:12px;font-weight:700;color:var(--gem-2);white-space:nowrap;}
+
+/* ── BTNS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;text-decoration:none;font-family:var(--fb);}
+.btn-gem,.btn-gold{background:var(--gem);color:var(--ink);box-shadow:0 8px 22px var(--gem-g);}
+.btn-gem:hover,.btn-gold:hover{filter:brightness(1.06);transform:translateY(-1px);}
+.btn-ghost,.btn-outline{background:transparent;border:1px solid var(--line2);color:var(--text);}
+.btn-ghost:hover,.btn-outline:hover{border-color:var(--gem);color:var(--gem-2);}
+
+/* ── FILTERS ── */
+.filter-sec{padding:26px 30px 0;}
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.f-lbl{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);white-space:nowrap;}
+.pill{padding:8px 15px;border-radius:22px;font-size:12.5px;font-weight:600;border:1px solid var(--line);color:var(--muted);cursor:pointer;transition:all .14s;white-space:nowrap;background:var(--s1);}
+.pill:hover{border-color:var(--line2);color:var(--text);}
+.pill.active{background:var(--gem);border-color:var(--gem);color:var(--ink);}
+.sort-w{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);}
+.sort-w select{background:var(--s2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:12px;color:var(--text);outline:none;cursor:pointer;}
+
+/* ── PRODUCTS ── */
+.products-sec{padding:26px 30px 48px;}
+.sec-hdr{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;}
+.sec-ttl{font-family:var(--fd);font-size:25px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
+.sec-sub{font-family:var(--fm);font-size:11px;color:var(--muted);letter-spacing:.04em;}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+
+/* ── VITRINE CARD ── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;display:flex;flex-direction:column;}
+.card:hover{transform:translateY(-4px);border-color:var(--line2);box-shadow:var(--shadow);}
+.card.vip-card{border-color:var(--gem);box-shadow:0 0 0 1px var(--gem),0 8px 26px var(--gem-g);}
+.card.vip-card:hover{border-color:var(--gem);box-shadow:0 0 0 1px var(--gem),0 18px 50px var(--gem-g);}
+.card-photo{height:190px;position:relative;overflow:hidden;background-size:cover;background-position:center;background-color:#0d100e;flex-shrink:0;transition:transform .35s;}
+.card:hover .card-photo{transform:scale(1.04);}
+.card-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(10,12,10,.78) 100%);}
+.card-badges{position:absolute;top:12px;left:12px;z-index:5;display:flex;gap:5px;flex-wrap:wrap;}
+.badge-hot,.badge-lim,.badge-new,.badge-vip-pill{display:flex;align-items:center;gap:3px;padding:4px 9px;border-radius:7px;font-family:var(--fm);font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;backdrop-filter:blur(5px);}
+.badge-hot{background:rgba(232,124,42,.18);border:1px solid rgba(232,124,42,.5);color:#F2A05A;}
+.badge-lim{background:rgba(229,80,70,.18);border:1px solid rgba(229,80,70,.5);color:#F08278;}
+.badge-new{background:rgba(79,211,164,.16);border:1px solid rgba(79,211,164,.5);color:#5FE0B0;}
+.badge-vip-pill{background:var(--gem);border:1px solid var(--gem);color:var(--ink);letter-spacing:.12em;box-shadow:0 2px 10px var(--gem-g);}
+.card-stock-badge{position:absolute;top:12px;right:12px;z-index:5;padding:4px 10px;border-radius:7px;font-family:var(--fm);font-size:8.5px;font-weight:700;background:rgba(8,10,9,.62);backdrop-filter:blur(5px);color:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.13);letter-spacing:.03em;}
+.card-stock-badge.low{color:#F2A05A;border-color:rgba(232,124,42,.45);}
+.card-svg-img{height:190px;overflow:hidden;flex-shrink:0;position:relative;}
+.card-svg-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.card-body{padding:16px;display:flex;flex-direction:column;flex:1;}
+.card-cat{font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.13em;color:var(--gem);margin-bottom:7px;font-weight:700;}
+.card-name{font-family:var(--fd);font-size:15.5px;font-weight:700;color:var(--text);margin-bottom:7px;line-height:1.25;letter-spacing:-.01em;}
+.card-desc{font-size:11.5px;color:var(--muted);line-height:1.55;margin-bottom:16px;flex:1;}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:14px;border-top:1px solid var(--line);}
+.price-w{display:flex;align-items:center;gap:7px;}
+.price-n{font-family:var(--fm);font-size:16px;font-weight:700;color:var(--gem-2);}
+.price-l{font-family:var(--fm);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-left:1px;align-self:flex-end;margin-bottom:2px;}
+.btn-resgatar{padding:8px 15px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--fb);transition:all .15s;background:var(--gem);color:var(--ink);white-space:nowrap;}
+.btn-resgatar:hover{filter:brightness(1.06);transform:translateY(-1px);}
+.btn-vip{padding:8px 15px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--gem-bd);font-family:var(--fb);transition:all .15s;background:var(--gem-g);color:var(--gem-2);white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.btn-vip:hover{background:var(--gem);color:var(--ink);}
+.btn-insuf{padding:8px 15px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--line2);font-family:var(--fb);background:transparent;color:var(--muted);white-space:nowrap;}
+
+/* ── LOOT / COFRE ── */
+#section-loot{display:none;}
+.loot-wrap{padding:30px 30px 48px;}
+.cs-box{background:linear-gradient(180deg,var(--bg2),#0C100E);border:1px solid var(--line2);border-radius:24px;overflow:hidden;position:relative;box-shadow:var(--shadow);}
+.cs-box::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -12%,var(--gem-g),transparent 56%);pointer-events:none;}
+.cs-head{text-align:center;padding:36px 28px 24px;position:relative;}
+.cs-eye{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--gem);margin-bottom:12px;font-weight:700;}
+.cs-ttl{font-family:var(--fd);font-size:40px;font-weight:800;letter-spacing:-.03em;color:var(--text);margin-bottom:8px;}
+.cs-ttl em{color:var(--gem);font-style:normal;}
+.cs-sub{font-size:13px;color:var(--muted);max-width:450px;margin:0 auto;line-height:1.6;}
+.reel-outer{position:relative;overflow:hidden;}
+.reel-outer::before,.reel-outer::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:5;pointer-events:none;}
+.reel-outer::before{left:0;background:linear-gradient(90deg,var(--bg2),transparent);}
+.reel-outer::after{right:0;background:linear-gradient(270deg,var(--bg2),transparent);}
+.reel-marker{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:3px;background:var(--gem);z-index:10;box-shadow:0 0 14px var(--gem),0 0 40px var(--gem-g);}
+.reel-marker::before,.reel-marker::after{content:'';position:absolute;left:50%;transform:translateX(-50%);width:0;height:0;}
+.reel-marker::before{top:-9px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid var(--gem);}
+.reel-marker::after{bottom:-9px;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:9px solid var(--gem);}
+.reel-track-wrap{overflow:hidden;}
+.reel-track{display:flex;gap:8px;padding:18px 8px;will-change:transform;}
+.reel-item{flex-shrink:0;width:152px;height:174px;border-radius:14px;border:2px solid var(--line);overflow:hidden;position:relative;transition:border-color .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;}
+.ri-emoji{font-size:52px;line-height:1;filter:drop-shadow(0 2px 12px rgba(0,0,0,.6));}
+.ri-overlay{display:none;}
+.ri-info{text-align:center;padding:0 8px;}
+.ri-name{font-size:11px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:3px;font-family:var(--fb);}
+.ri-rarity{font-family:var(--fm);font-size:8.5px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;}
+.reel-item.winner{animation:wPulse 1s ease-in-out infinite;}
+@keyframes wPulse{0%,100%{box-shadow:0 0 0 2px var(--gold),0 0 28px rgba(240,192,64,.4);}50%{box-shadow:0 0 0 3px var(--gold),0 0 52px rgba(240,192,64,.7);}}
+.chances-wrap{padding:18px 28px 0;}
+.ch-ttl{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-bottom:10px;font-weight:700;}
+.ch-row{display:flex;gap:8px;flex-wrap:wrap;}
+.ch-chip{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);font-size:11px;background:var(--s1);}
+.ch-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ch-nm{color:var(--muted);}
+.ch-pct{font-family:var(--fm);color:var(--text);font-weight:700;margin-left:6px;}
+.cs-open{padding:28px 28px 36px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.btn-open{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--gem),var(--gem-2));color:var(--ink);font-size:15px;font-weight:800;font-family:var(--fd);padding:16px 40px;border-radius:14px;cursor:pointer;border:none;box-shadow:0 10px 30px var(--gem-g);transition:all .2s;}
+.btn-open:hover{transform:translateY(-2px);box-shadow:0 14px 40px var(--gem-g);}
+.btn-open:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.open-meta{font-size:12px;color:var(--dim);text-align:center;line-height:1.7;}
+.open-meta strong{color:var(--muted);}
+
+/* ── HIST ── */
+.hist-sec{padding:0 30px 48px;}
+.hist-list{display:flex;flex-direction:column;gap:9px;}
+.hi{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 17px;transition:border-color .15s;}
+.hi:hover{border-color:var(--line2);}
+.hi-ic{font-size:20px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--s3);border-radius:11px;}
+.hi-inf{flex:1;}
+.hi-nm{font-size:13px;font-weight:600;color:var(--text);}
+.hi-dt{font-family:var(--fm);font-size:10px;color:var(--dim);margin-top:2px;}
+.hi-pts{font-family:var(--fm);font-size:13px;font-weight:700;}
+.hi-pts.deb{color:var(--debit);}
+.hi-pts.crd{color:var(--credit);}
+.hi-st{font-family:var(--fm);font-size:9px;padding:3px 8px;border-radius:6px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;}
+.hi-st.ok{background:var(--credit-bg);color:var(--credit);}
+.hi-st.pend{background:var(--gem-g);color:var(--gem-2);}
+
+/* ── MODAL ── */
+.modal-ov{display:none;position:fixed;inset:0;z-index:500;background:rgba(6,8,7,.84);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px;}
+.modal-ov.show{display:flex;}
+.modal{background:var(--surf);border:1px solid var(--line2);border-radius:22px;max-width:500px;width:100%;max-height:92vh;overflow-y:auto;animation:mIn .3s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--shadow);}
+@keyframes mIn{from{opacity:0;transform:scale(.9)translateY(16px);}to{opacity:1;transform:none;}}
+.modal-img-wrap{height:220px;overflow:hidden;border-radius:22px 22px 0 0;position:relative;}
+.modal-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.modal-img-grad{position:absolute;inset:0;background:linear-gradient(to top,var(--surf) 0%,transparent 55%);}
+.m-head{padding:18px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;}
+.m-head-txt{flex:1;}
+.m-cat{font-family:var(--fm);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--gem);margin-bottom:5px;font-weight:700;}
+.m-ttl{font-family:var(--fd);font-size:23px;font-weight:800;letter-spacing:-.02em;color:var(--text);line-height:1.15;}
+.m-cls{background:var(--s3);border:none;color:var(--muted);font-size:16px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;}
+.m-cls:hover{color:var(--text);}
+.m-body{padding:16px 24px 24px;}
+.m-desc{font-size:13.5px;color:var(--muted);line-height:1.75;margin-bottom:18px;}
+.m-details{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px;}
+.deet{background:var(--s2);border-radius:11px;padding:11px 14px;}
+.deet label{font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);display:block;margin-bottom:4px;}
+.deet span{font-size:13.5px;font-weight:600;color:var(--text);}
+.m-sw{display:flex;align-items:center;gap:8px;background:rgba(232,124,42,.1);border:1px solid rgba(232,124,42,.26);border-radius:11px;padding:11px 14px;margin-bottom:13px;font-size:12px;color:#F2A05A;line-height:1.5;}
+.m-pr-row{display:flex;align-items:center;justify-content:space-between;background:var(--gem-g);border:1px solid var(--gem-bd);border-radius:13px;padding:14px 18px;margin-bottom:13px;}
+.m-pr-row .ml{font-size:11.5px;color:var(--muted);}
+.m-pr-row .mr{font-family:var(--fm);font-size:21px;color:var(--gem-2);font-weight:700;}
+.m-pr-row .mr span{font-size:11px;color:var(--dim);font-weight:400;}
+.m-wr{display:flex;gap:7px;background:var(--debit-bg);border:1px solid rgba(240,138,122,.24);border-radius:11px;padding:11px 14px;margin-bottom:13px;font-size:12px;color:var(--debit);line-height:1.5;}
+.m-acts{display:flex;gap:9px;}
+.m-acts .btn{flex:1;justify-content:center;padding:13px 16px;font-size:13.5px;}
+
+/* ── RESULT ── */
+.result-ov{display:none;position:fixed;inset:0;z-index:600;background:rgba(6,8,7,.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px;}
+.result-ov.show{display:flex;}
+.rc{background:linear-gradient(160deg,#191510,#12130F,#0E100D);border-radius:26px;padding:0;text-align:center;position:relative;overflow:hidden;max-width:400px;width:100%;animation:rIn .55s cubic-bezier(.34,1.56,.64,1);}
+@keyframes rIn{from{opacity:0;transform:scale(.5);}to{opacity:1;transform:scale(1);}}
+.rc-img{height:200px;overflow:hidden;position:relative;border-radius:26px 26px 0 0;}
+.rc-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.72);}
+.rc-img-g{position:absolute;inset:0;background:linear-gradient(to top,#12130F 0%,transparent 62%);}
+.rc-emoji{position:relative;z-index:1;height:100%;display:flex;align-items:center;justify-content:center;font-size:104px;line-height:1;filter:drop-shadow(0 10px 26px rgba(0,0,0,.5));}
+.rc-border{position:absolute;inset:0;border-radius:26px;border:1px solid var(--gold);pointer-events:none;opacity:.5;}
+.rc-body{padding:0 32px 36px;position:relative;}
+.rc-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(240,192,64,.28),transparent 70%);pointer-events:none;}
+.rc-eye{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--gold);margin-bottom:7px;font-weight:700;}
+.rc-rb{display:inline-block;padding:4px 14px;border-radius:20px;font-family:var(--fm);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px;}
+.rc-nm{font-family:var(--fd);font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--text);margin-bottom:6px;}
+.rc-desc{font-size:12.5px;color:var(--muted);margin-bottom:18px;line-height:1.65;}
+.rc-val{display:inline-block;background:var(--gold-g);border:1px solid rgba(240,192,64,.3);border-radius:10px;padding:7px 17px;margin-bottom:18px;font-family:var(--fm);font-size:13px;color:var(--gold);font-weight:700;}
+.rc-acts{display:flex;gap:9px;justify-content:center;}
+.rc-cls{position:absolute;top:14px;right:16px;font-size:18px;color:rgba(255,255,255,.7);cursor:pointer;background:rgba(0,0,0,.45);border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;z-index:3;}
+.confetti-cv{position:fixed;inset:0;pointer-events:none;z-index:599;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;z-index:700;background:var(--s2);border:1px solid var(--line2);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow);transform:translateY(120px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:300px;}
+.toast.show{transform:none;opacity:1;}
+.t-ic{font-size:18px;}
+.t-tx{font-size:12.5px;color:var(--text);line-height:1.4;}
+.t-tx strong{display:block;margin-bottom:1px;font-family:var(--fd);}
+
+/* ── PERFIL ── */
+#section-perfil{display:none;}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:660px;}
+.pf-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;transition:border-color .15s;}
+.pf-card:hover{border-color:var(--line2);}
+.pf-card label{font-family:var(--fm);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:block;margin-bottom:9px;font-weight:700;}
+.pf-v{font-size:27px;font-weight:800;font-family:var(--fd);letter-spacing:-.02em;}
+.pf-v.gd{color:var(--gem);}
+.pf-v.mn{font-family:var(--fm);font-weight:700;color:var(--text);}
+.pf-s{font-size:12px;color:var(--muted);margin-top:5px;}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:rgba(11,14,12,.94);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px 0 env(safe-area-inset-bottom,6px);}
+.mob-nav-inner{display:flex;justify-content:space-around;}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 16px;border:none;background:none;color:var(--muted);cursor:pointer;flex:1;}
+.mob-nav-btn.active{color:var(--gem);}
+.mob-nav-btn .mni{font-size:20px;}
+.mob-nav-btn .mnl{font-family:var(--fb);font-size:10px;font-weight:600;}
+.sidebar,.mob-overlay,.tb-menu{display:none !important;}
+
+/* ── THEME SWITCHER ── */
+.theme-fab{position:fixed;bottom:22px;left:22px;z-index:650;display:flex;align-items:center;gap:9px;background:rgba(11,14,12,.84);backdrop-filter:blur(16px);border:1px solid var(--line2);border-radius:30px;padding:8px 13px;box-shadow:var(--shadow);}
+.theme-fab-lbl{font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted);font-weight:700;}
+.theme-fab .sw{width:22px;height:22px;border:2px solid transparent;cursor:pointer;padding:0;transition:transform .15s;clip-path:polygon(20% 5%,80% 5%,100% 39%,50% 100%,0 39%);}
+.theme-fab .sw:hover{transform:scale(1.15);}
+.theme-fab .sw.active{outline:2px solid #fff;outline-offset:2px;border-radius:2px;}
+.sw-champagne{background:linear-gradient(150deg,#F4DEA8,#E8C77A 55%,#B9923F);}
+.sw-emerald{background:linear-gradient(150deg,#84E4BE,#46CC95 55%,#2A8C64);}
+.sw-amethyst{background:linear-gradient(150deg,#CBB9FF,#AC8FFF 55%,#7857D6);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1120px){
+  .topnav{gap:12px;padding:13px 22px;}
+  .tn-search{width:150px;}
+  .nav-item{padding:8px 13px;}
+}
+@media(max-width:980px){
+  .tn-search{width:120px;}
+  .tn-nav{margin-left:auto;margin-right:8px;}
+}
+@media(max-width:920px){
+  .vault{grid-template-columns:1fr;}
+  .feat{min-height:240px;}
+  .earn-strip{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+  .topnav{padding:11px 16px;gap:12px;}
+  .tn-nav{display:none;}
+  .tn-search{width:auto;flex:1;min-width:0;}
+  .tn-badge{display:none;}
+  .main{height:auto;min-height:100vh;padding-bottom:74px;}
+  .mob-nav{display:block;}
+  .vault{padding:20px 16px 4px;gap:14px;}
+  .vault-l{padding:24px 22px;}
+  .v-bal{font-size:42px;}
+  .earn-strip{padding:14px 16px 0;}
+  .filter-sec{padding:18px 16px 0;}
+  .sort-w{display:none;}
+  .products-sec{padding:20px 16px 28px;}
+  .product-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .loot-wrap{padding:18px 16px 28px;}
+  .cs-head{padding:26px 20px 18px;}
+  .cs-ttl{font-size:30px;}
+  .reel-item{width:132px;height:154px;}
+  .hist-sec{padding:0 16px 28px;}
+  .pf-grid{grid-template-columns:1fr 1fr;}
+  .toast{bottom:84px;right:12px;left:12px;max-width:none;}
+  .theme-fab{bottom:84px;left:12px;padding:7px 11px;}
+}
+@media(max-width:430px){
+  .product-grid{grid-template-columns:1fr;}
+  .tn-bal{display:none;}
+  .v-bal{font-size:38px;}
+  .gem{width:42px;height:42px;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <header class="topnav">
+    <div class="tn-brand"><span class="tn-logo">Galera<span>·</span>Shop</span><span class="tn-badge">VIP</span></div>
+    <nav class="tn-nav">
+      <button class="nav-item active" onclick="showSection('loja')">Loja</button>
+      <button class="nav-item" onclick="showSection('loot')">Cofre Diário</button>
+      <button class="nav-item" onclick="showSection('historico')">Histórico</button>
+      <button class="nav-item" onclick="showSection('perfil')">Perfil</button>
+    </nav>
+    <div class="tn-right">
+      <label class="tn-search"><span>🔍</span><input type="text" placeholder="Buscar recompensa..." id="searchInput" oninput="filterProducts()"></label>
+      <div class="tn-bal"><span class="gem-sm" aria-hidden="true"></span><span id="topbarPts">12.840</span></div>
+      <div class="tn-av" title="Rafael Mendes" onclick="showSection('perfil')">R</div>
+    </div>
+  </header>
+
+  <!-- LOJA -->
+  <div id="section-loja">
+    <section class="vault" data-screen-label="Cofre">
+      <div class="vault-l">
+        <div class="v-greet">Bem-vindo de volta, <strong>Rafael</strong> — seu cofre rendeu <strong>+340</strong> esta semana.</div>
+        <div class="v-bal-row">
+          <span class="gem" aria-hidden="true"></span>
+          <div><div class="v-bal" id="sidebarPts">12.840</div><div class="v-bal-unit">Jóias disponíveis</div></div>
+        </div>
+        <div class="tier">
+          <div class="tier-meta"><span class="tn1">◆ VIP Diamante</span><span class="tn2"><b>2.160</b> p/ Elite</span></div>
+          <div class="tier-bar"><div class="tier-fill" style="width:86%"></div></div>
+        </div>
+        <div class="v-actions">
+          <button class="btn btn-gem" onclick="showSection('loot')">📦 Abrir o Cofre do dia</button>
+          <button class="btn btn-ghost" onclick="scrollToGrid()">Ver recompensas</button>
+        </div>
+      </div>
+      <div class="vault-r">
+        <article class="feat" id="featCard" onclick="openFeat()">
+          <div class="feat-img" id="featImg"></div>
+          <div class="feat-dots" id="featDots"></div>
+          <div class="feat-tag">Destaque da temporada</div>
+          <div class="feat-body">
+            <h3 class="feat-ttl" id="featTtl">Las Vegas · 5 noites</h3>
+            <p class="feat-sub" id="featSub">Voo + hotel no Strip para 2 pessoas.</p>
+            <div class="feat-foot"><span class="feat-price"><span class="gem-sm" aria-hidden="true"></span><span id="featPrice">9.500</span></span><span class="feat-cta">Resgatar →</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div class="earn-strip">
+      <div class="earn-card"><div class="earn-emo">💰</div><div class="earn-tx"><b>R$1 apostado</b>vira Jóias</div><div class="earn-val">1 ◆</div></div>
+      <div class="earn-card"><div class="earn-emo">📥</div><div class="earn-tx"><b>Depósito ≥ R$100</b>bônus instantâneo</div><div class="earn-val">+50 ◆</div></div>
+      <div class="earn-card"><div class="earn-emo">🔥</div><div class="earn-tx"><b>7 dias seguidos</b>streak ativa</div><div class="earn-val">+200 ◆</div></div>
+      <div class="earn-card"><div class="earn-emo">📦</div><div class="earn-tx"><b>Cofre diário</b>todo dia grátis</div><div class="earn-val">Grátis</div></div>
+    </div>
+
+    <div class="filter-sec">
+      <div class="filter-row">
+        <span class="f-lbl">Filtrar:</span>
+        <button class="pill active" onclick="setFilter(this,'todos')">Todos</button>
+        <button class="pill" onclick="setFilter(this,'viagens')">✈️ Viagens</button>
+        <button class="pill" onclick="setFilter(this,'eletronicos')">📱 Eletrônicos</button>
+        <button class="pill" onclick="setFilter(this,'uniformes')">👕 Uniformes</button>
+        <button class="pill" onclick="setFilter(this,'shows')">🎵 Shows</button>
+        <button class="pill" onclick="setFilter(this,'jantares')">🍽️ Jantares</button>
+        <button class="pill" onclick="setFilter(this,'giftcards')">🎁 Gift Cards</button>
+        <button class="pill" onclick="setFilter(this,'bonus')">💰 Bônus</button>
+        <div class="sort-w"><span>Ordenar:</span>
+          <select onchange="sortProducts(this.value)">
+            <option value="destaque">Destaque</option>
+            <option value="menor">Menor preço</option>
+            <option value="maior">Maior preço</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="products-sec">
+      <div class="sec-hdr"><div class="sec-ttl">Recompensas</div><div class="sec-sub" id="productCount">24 disponíveis</div></div>
+      <div class="product-grid" id="productGrid"></div>
+    </div>
+  </div>
+
+  <!-- LOOT -->
+  <div id="section-loot">
+    <div class="loot-wrap">
+      <div class="cs-box">
+        <div class="cs-head">
+          <div class="cs-eye">◆ Cofre exclusivo VIP · 1 abertura por dia · Grátis</div>
+          <div class="cs-ttl">O <em>Cofre</em></div>
+          <div class="cs-sub">Role a faixa e descubra seu prêmio. iPhone 17, PS5 e viagens com chance real de cair.</div>
+        </div>
+        <div class="reel-outer">
+          <div class="reel-marker"></div>
+          <div class="reel-track-wrap"><div class="reel-track" id="reelTrack"></div></div>
+        </div>
+        <div class="chances-wrap">
+          <div class="ch-ttl">Probabilidades</div>
+          <div class="ch-row">
+            <div class="ch-chip"><div class="ch-dot" style="background:#9ca3af"></div><span class="ch-nm">Jóias</span><span class="ch-pct">40%</span></div>
+            <div class="ch-chip"><div class="ch-dot" style="background:#60a5fa"></div><span class="ch-nm">Free Spins</span><span class="ch-pct">25%</span></div>
+            <div class="ch-chip"><div class="ch-dot" style="background:#a78bfa"></div><span class="ch-nm">Bônus R$</span><span class="ch-pct">20%</span></div>
+            <div class="ch-chip"><div class="ch-dot" style="background:#f472b6"></div><span class="ch-nm">Gift Card</span><span class="ch-pct">10%</span></div>
+            <div class="ch-chip"><div class="ch-dot" style="background:#E87C2A"></div><span class="ch-nm">PS5 / iPhone</span><span class="ch-pct">3%</span></div>
+            <div class="ch-chip"><div class="ch-dot" style="background:var(--gold)"></div><span class="ch-nm">Viagem</span><span class="ch-pct">2%</span></div>
+          </div>
+        </div>
+        <div class="cs-open">
+          <button class="btn-open" id="openBoxBtn" onclick="spinReel()">📦 Abrir o Cofre</button>
+          <div class="open-meta"><strong id="nextOpenTxt">Disponível agora · Grátis</strong><br>Abertura diária gratuita</div>
+        </div>
+      </div>
+      <div style="margin-top:24px;">
+        <div class="sec-hdr"><div class="sec-ttl" style="font-size:20px">Suas Últimas Aberturas</div></div>
+        <div class="hist-list">
+          <div class="hi"><div class="hi-ic">💎</div><div class="hi-inf"><div class="hi-nm">200 Jóias bônus</div><div class="hi-dt">Ontem · 21/06</div></div><div class="hi-pts crd">+200</div><div class="hi-st ok">Creditado</div></div>
+          <div class="hi"><div class="hi-ic">🎰</div><div class="hi-inf"><div class="hi-nm">50 Free Spins — Fortune Tiger</div><div class="hi-dt">20/06</div></div><div class="hi-pts crd">Ativado</div><div class="hi-st ok">Creditado</div></div>
+          <div class="hi"><div class="hi-ic">💰</div><div class="hi-inf"><div class="hi-nm">Bônus R$ 25,00</div><div class="hi-dt">19/06</div></div><div class="hi-pts crd">+R$25</div><div class="hi-st ok">Creditado</div></div>
+          <div class="hi"><div class="hi-ic">🎁</div><div class="hi-inf"><div class="hi-nm">Gift Card iFood R$ 50</div><div class="hi-dt">18/06</div></div><div class="hi-pts crd">Enviado</div><div class="hi-st pend">Pendente</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div id="section-historico" style="display:none">
+    <div class="products-sec history-sec">
+      <div class="sec-hdr"><div class="sec-ttl">Histórico de Jóias</div><div class="sec-sub">Últimos 30 dias</div></div>
+      <div class="hist-list">
+        <div class="hi"><div class="hi-ic">📥</div><div class="hi-inf"><div class="hi-nm">Depósito R$ 500</div><div class="hi-dt">22/06</div></div><div class="hi-pts crd">+50</div><div class="hi-st ok">Creditado</div></div>
+        <div class="hi"><div class="hi-ic">🎰</div><div class="hi-inf"><div class="hi-nm">Apostas Casino — Semana 25</div><div class="hi-dt">22/06</div></div><div class="hi-pts crd">+1.200</div><div class="hi-st ok">Creditado</div></div>
+        <div class="hi"><div class="hi-ic">🛍️</div><div class="hi-inf"><div class="hi-nm">Resgate — Gift Card Steam</div><div class="hi-dt">21/06</div></div><div class="hi-pts deb">−800</div><div class="hi-st ok">Entregue</div></div>
+        <div class="hi"><div class="hi-ic">📦</div><div class="hi-inf"><div class="hi-nm">Caixa Diária — 200 Jóias</div><div class="hi-dt">21/06</div></div><div class="hi-pts crd">+200</div><div class="hi-st ok">Creditado</div></div>
+        <div class="hi"><div class="hi-ic">⚽</div><div class="hi-inf"><div class="hi-nm">Apostas Esportes — Rodada 38</div><div class="hi-dt">20/06</div></div><div class="hi-pts crd">+3.400</div><div class="hi-st ok">Creditado</div></div>
+        <div class="hi"><div class="hi-ic">🔥</div><div class="hi-inf"><div class="hi-nm">Streak 7 dias</div><div class="hi-dt">20/06</div></div><div class="hi-pts crd">+200</div><div class="hi-st ok">Creditado</div></div>
+        <div class="hi"><div class="hi-ic">🛍️</div><div class="hi-inf"><div class="hi-nm">Resgate — Jantar Fogo de Chão</div><div class="hi-dt">18/06</div></div><div class="hi-pts deb">−2.800</div><div class="hi-st pend">Em preparo</div></div>
+        <div class="hi"><div class="hi-ic">🎰</div><div class="hi-inf"><div class="hi-nm">Apostas Casino — Semana 24</div><div class="hi-dt">15/06</div></div><div class="hi-pts crd">+4.600</div><div class="hi-st ok">Creditado</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERFIL -->
+  <div id="section-perfil">
+    <div class="products-sec">
+      <div class="sec-hdr"><div class="sec-ttl">Perfil VIP</div></div>
+      <div class="pf-grid">
+        <div class="pf-card"><label>Status</label><div class="pf-v gd">◆ VIP</div><div class="pf-s">Membro desde Mar/2024</div></div>
+        <div class="pf-card"><label>Total de Jóias Ganhas</label><div class="pf-v mn">48.340</div><div class="pf-s">+12.840 disponíveis</div></div>
+        <div class="pf-card"><label>Resgates Realizados</label><div class="pf-v mn">7</div><div class="pf-s">≈ R$ 1.850 em prêmios</div></div>
+        <div class="pf-card"><label>Streak Atual</label><div class="pf-v gd">🔥 14 dias</div><div class="pf-s">Bônus de 500 Jóias em 14 dias</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mob-nav">
+  <div class="mob-nav-inner">
+    <button class="mob-nav-btn active" id="mnb-loja" onclick="showSection('loja')"><span class="mni">🏪</span><span class="mnl">Loja</span></button>
+    <button class="mob-nav-btn" id="mnb-loot" onclick="showSection('loot')"><span class="mni">📦</span><span class="mnl">Caixa</span></button>
+    <button class="mob-nav-btn" id="mnb-historico" onclick="showSection('historico')"><span class="mni">📋</span><span class="mnl">Histórico</span></button>
+    <button class="mob-nav-btn" id="mnb-perfil" onclick="showSection('perfil')"><span class="mni">⭐</span><span class="mnl">Perfil</span></button>
+  </div>
+</nav>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-ov" id="productModal">
+  <div class="modal">
+    <div class="modal-img-wrap"><img id="mImg" alt=""><div class="modal-img-grad"></div></div>
+    <div class="m-head">
+      <div class="m-head-txt"><div class="m-cat" id="mCat"></div><div class="m-ttl" id="mTtl"></div></div>
+      <button class="m-cls" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-body">
+      <p class="m-desc" id="mDesc"></p>
+      <div class="m-details" id="mDetails"></div>
+      <div class="m-sw" id="mSW" style="display:none">⚠️ <span id="mSWTxt"></span></div>
+      <div class="m-pr-row">
+        <div><div class="ml">Valor em Jóias</div><div style="font-size:10px;color:var(--dim);margin-top:2px">Saldo: <span id="mBal" style="color:var(--gold)">12.840</span> 💎</div></div>
+        <div class="mr" id="mPr">— <span>Jóias</span></div>
+      </div>
+      <div class="m-wr" id="mWR" style="display:none">⚠️ Saldo insuficiente. Faltam <span id="mMiss">0</span> Jóias.</div>
+      <div class="m-acts">
+        <button class="btn btn-outline" style="border-color:var(--border2);color:var(--muted)" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-gold" id="redeemBtn" onclick="redeemItem()">Resgatar agora</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<canvas class="confetti-cv" id="confettiCv"></canvas>
+<div class="result-ov" id="resultOv">
+  <div class="rc">
+    <div class="rc-img" id="rcImg"><div class="rc-emoji" id="rEmoji"></div><div class="rc-img-g"></div></div>
+    <button class="rc-cls" onclick="closeResult()">✕</button>
+    <div class="rc-body">
+      <div class="rc-glow"></div>
+      <div class="rc-eye" style="margin-top:16px">🎉 Você ganhou!</div>
+      <div class="rc-rb" id="rRB"></div>
+      <div class="rc-nm" id="rNm"></div>
+      <p class="rc-desc" id="rDesc"></p>
+      <div class="rc-val" id="rVal"></div>
+      <div class="rc-acts">
+        <button class="btn btn-outline" style="border-color:var(--border2);color:var(--muted)" onclick="closeResult()">Fechar</button>
+        <button class="btn btn-gold" onclick="closeResult();showSection('loja')">Ir à Loja →</button>
+      </div>
+    </div>
+    <div class="rc-border"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="t-ic" id="tIc">✅</div><div class="t-tx" id="tTx"><strong>Sucesso!</strong></div></div>
+
+<script>
+// ── STATE ──
+let userPoints = 12840, currentFilter = 'todos', currentProduct = null;
+let lootOpened = false, isSpinning = false, currentSort = 'destaque';
+
+// ── SIDEBAR MOBILE ──
+function toggleSidebar(){}
+function closeSidebar(){}
+function scrollToGrid(){var g=document.querySelector('.products-sec'),m=document.querySelector('.main');if(g&&m){m.scrollTo({top:g.offsetTop-70,behavior:'smooth'});}else if(g){g.scrollIntoView({behavior:'smooth'});}}
+
+// ── SVG IMAGE URIS ──
+const SVGS = {
+  "vegas": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22s%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23020010%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230d0030%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a0010%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a0020%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23s%29%22/%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2230%22%20r%3D%221.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22200%22%20cy%3D%2240%22%20r%3D%221.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.9%22/%3E%3Ccircle%20cx%3D%22450%22%20cy%3D%2235%22%20r%3D%221.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.8%22/%3E%3Crect%20y%3D%22280%22%20width%3D%22600%22%20height%3D%22100%22%20fill%3D%22%230a0005%22/%3E%3Crect%20x%3D%22240%22%20y%3D%22280%22%20width%3D%22120%22%20height%3D%22100%22%20fill%3D%22%23111%22/%3E%3Crect%20x%3D%22295%22%20y%3D%22280%22%20width%3D%2210%22%20height%3D%22100%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.3%22/%3E%3Crect%20x%3D%2220%22%20y%3D%22180%22%20width%3D%2260%22%20height%3D%22100%22%20fill%3D%22%231a0030%22/%3E%3Crect%20x%3D%2290%22%20y%3D%22140%22%20width%3D%2280%22%20height%3D%22140%22%20fill%3D%22%23120025%22/%3E%3Crect%20x%3D%22180%22%20y%3D%22160%22%20width%3D%2255%22%20height%3D%22120%22%20fill%3D%22%231a0030%22/%3E%3Crect%20x%3D%22245%22%20y%3D%22100%22%20width%3D%22110%22%20height%3D%22180%22%20fill%3D%22%230d001a%22/%3E%3Crect%20x%3D%22270%22%20y%3D%2280%22%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22%23E53935%22%20opacity%3D%22.9%22/%3E%3Crect%20x%3D%22250%22%20y%3D%22140%22%20width%3D%22100%22%20height%3D%2230%22%20fill%3D%22none%22%20stroke%3D%22%23F0C040%22%20stroke-width%3D%222%22%20rx%3D%223%22%20opacity%3D%22.7%22/%3E%3Ctext%20x%3D%22262%22%20y%3D%22160%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20fill%3D%22%23F0C040%22%3ECASINO%3C/text%3E%3Crect%20x%3D%22365%22%20y%3D%22130%22%20width%3D%2270%22%20height%3D%22150%22%20fill%3D%22%23150020%22/%3E%3Crect%20x%3D%22440%22%20y%3D%22150%22%20width%3D%2290%22%20height%3D%22130%22%20fill%3D%22%231a0028%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22285%22%20rx%3D%22200%22%20ry%3D%228%22%20fill%3D%22%23C0392B%22%20opacity%3D%22.15%22/%3E%3Crect%20x%3D%220%22%20y%3D%22290%22%20width%3D%22600%22%20height%3D%2290%22%20fill%3D%22url%28%23g%29%22%20opacity%3D%22.7%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22330%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2222%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ELas%20Vegas%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22355%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3E5%20noites%20-%20Strip%20Hotel%204%20estrelas%3C/text%3E%3C/svg%3E",
+  "disney": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22sky%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a1a4a%22/%3E%3Cstop%20offset%3D%2270%25%22%20stop-color%3D%22%231a3a8a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%232a5aaa%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22ca%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23b8cce8%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%236a9acc%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23sky%29%22/%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2260%22%20r%3D%222%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.9%22/%3E%3Ccircle%20cx%3D%22500%22%20cy%3D%2250%22%20r%3D%222%22%20fill%3D%22%239C27B0%22%20opacity%3D%22.9%22/%3E%3Crect%20y%3D%22300%22%20width%3D%22600%22%20height%3D%2280%22%20fill%3D%22%230d2a0d%22/%3E%3Crect%20x%3D%22210%22%20y%3D%22200%22%20width%3D%22180%22%20height%3D%22110%22%20fill%3D%22url%28%23ca%29%22/%3E%3Crect%20x%3D%22190%22%20y%3D%22180%22%20width%3D%2245%22%20height%3D%22130%22%20fill%3D%22%239ab8d8%22/%3E%3Cpolygon%20points%3D%22190%2C180%20212%2C140%20235%2C180%22%20fill%3D%22%23b8d0e8%22/%3E%3Crect%20x%3D%22365%22%20y%3D%22180%22%20width%3D%2245%22%20height%3D%22130%22%20fill%3D%22%239ab8d8%22/%3E%3Cpolygon%20points%3D%22365%2C180%20387%2C140%20410%2C180%22%20fill%3D%22%23b8d0e8%22/%3E%3Crect%20x%3D%22270%22%20y%3D%22130%22%20width%3D%2260%22%20height%3D%22180%22%20fill%3D%22%23b8cce8%22/%3E%3Cpolygon%20points%3D%22265%2C130%20300%2C70%20335%2C130%22%20fill%3D%22%23c8ddf5%22/%3E%3Cline%20x1%3D%22300%22%20y1%3D%2270%22%20x2%3D%22300%22%20y2%3D%2240%22%20stroke%3D%22%23888%22%20stroke-width%3D%222%22/%3E%3Cpolygon%20points%3D%22300%2C40%20325%2C50%20300%2C60%22%20fill%3D%22%23F0C040%22/%3E%3Crect%20x%3D%22230%22%20y%3D%22220%22%20width%3D%2220%22%20height%3D%2230%22%20rx%3D%2210%22%20fill%3D%22%235a8aaa%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%22270%22%20y%3D%22150%22%20width%3D%2216%22%20height%3D%2224%22%20rx%3D%228%22%20fill%3D%22%237aaac8%22%20opacity%3D%22.7%22/%3E%3Crect%20x%3D%22315%22%20y%3D%22150%22%20width%3D%2216%22%20height%3D%2224%22%20rx%3D%228%22%20fill%3D%22%237aaac8%22%20opacity%3D%22.7%22/%3E%3Crect%20x%3D%22275%22%20y%3D%22270%22%20width%3D%2250%22%20height%3D%2240%22%20rx%3D%2225%22%20fill%3D%22%231a2a4a%22/%3E%3Crect%20x%3D%220%22%20y%3D%22300%22%20width%3D%22600%22%20height%3D%2280%22%20fill%3D%22rgba%280%2C0%2C0%2C0.65%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2222%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EDisney%20Orlando%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22358%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3E7%20noites%20-%20Park%20Hopper%20incluso%3C/text%3E%3C/svg%3E",
+  "punta": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22sky%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a2a5a%22/%3E%3Cstop%20offset%3D%2260%25%22%20stop-color%3D%22%231a5a9a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%232a7acc%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22sea%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a3a6a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23051520%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23sky%29%22/%3E%3Ccircle%20cx%3D%22480%22%20cy%3D%2280%22%20r%3D%2218%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.9%22/%3E%3Crect%20x%3D%220%22%20y%3D%22220%22%20width%3D%22600%22%20height%3D%22160%22%20fill%3D%22url%28%23sea%29%22/%3E%3Cpath%20d%3D%22M0%2C240%20Q150%2C230%20300%2C240%20Q450%2C250%20600%2C240%22%20stroke%3D%22%232a6aaa%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20opacity%3D%22.6%22/%3E%3Cpath%20d%3D%22M0%2C280%20L0%2C380%20L200%2C380%20L280%2C260%20L200%2C240%20Z%22%20fill%3D%22%231a3a0a%22/%3E%3Crect%20x%3D%2230%22%20y%3D%22230%22%20width%3D%2225%22%20height%3D%2250%22%20fill%3D%22%23e8d8c0%22%20opacity%3D%22.9%22/%3E%3Crect%20x%3D%2260%22%20y%3D%22220%22%20width%3D%2230%22%20height%3D%2260%22%20fill%3D%22%23d8c8b0%22%20opacity%3D%22.9%22/%3E%3Crect%20x%3D%22230%22%20y%3D%22185%22%20width%3D%2216%22%20height%3D%2255%22%20fill%3D%22%23f0e8e0%22/%3E%3Crect%20x%3D%22226%22%20y%3D%22182%22%20width%3D%2224%22%20height%3D%228%22%20fill%3D%22%23C0392B%22/%3E%3Ccircle%20cx%3D%22238%22%20cy%3D%22178%22%20r%3D%226%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.9%22/%3E%3Crect%20x%3D%220%22%20y%3D%22300%22%20width%3D%22600%22%20height%3D%2280%22%20fill%3D%22rgba%280%2C0%2C0%2C0.6%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2222%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EPunta%20del%20Este%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22358%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3E4%20noites%20-%20Resort%20beira-mar%3C/text%3E%3C/svg%3E",
+  "rio": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22sky%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a1520%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a3040%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22h%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231a2a10%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230d1808%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23sky%29%22/%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2230%22%20r%3D%221.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.7%22/%3E%3Ccircle%20cx%3D%22250%22%20cy%3D%2240%22%20r%3D%221.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M430%2C280%20Q480%2C180%20520%2C200%20Q560%2C180%20590%2C240%20L600%2C280%20Z%22%20fill%3D%22%231a2a15%22/%3E%3Cpath%20d%3D%22M200%2C380%20Q250%2C200%20300%2C180%20Q350%2C200%20380%2C380%20Z%22%20fill%3D%22url%28%23h%29%22/%3E%3Crect%20x%3D%22296%22%20y%3D%22155%22%20width%3D%228%22%20height%3D%2245%22%20fill%3D%22%23e8e0d8%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%22152%22%20r%3D%226%22%20fill%3D%22%23e8e0d8%22/%3E%3Crect%20x%3D%22275%22%20y%3D%22168%22%20width%3D%2250%22%20height%3D%225%22%20rx%3D%222%22%20fill%3D%22%23e0d8d0%22/%3E%3Crect%20y%3D%22300%22%20width%3D%22600%22%20height%3D%2280%22%20fill%3D%22%23050d18%22/%3E%3Ccircle%20cx%3D%2240%22%20cy%3D%22330%22%20r%3D%222%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.6%22/%3E%3Ccircle%20cx%3D%22130%22%20cy%3D%22340%22%20r%3D%222%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.7%22/%3E%3Ccircle%20cx%3D%22470%22%20cy%3D%22335%22%20r%3D%221.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.5%22/%3E%3Cpath%20d%3D%22M150%2C280%20Q300%2C260%20450%2C280%20L450%2C310%20Q300%2C290%20150%2C310%20Z%22%20fill%3D%22%230a2a4a%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%220%22%20y%3D%22300%22%20width%3D%22600%22%20height%3D%2280%22%20fill%3D%22rgba%280%2C0%2C0%2C0.65%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2222%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ERio%20de%20Janeiro%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22358%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3E3%20noites%20-%20Hotel%205%20estrelas%20Ipanema%3C/text%3E%3C/svg%3E",
+  "iphone": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a0a1a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a1030%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22ph%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a2a3a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a1a2a%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22wall%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a1a4a%22/%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%232a0a5a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230a2a1a%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22200%22%20rx%3D%22130%22%20ry%3D%22160%22%20fill%3D%22%235a3aaa%22%20opacity%3D%22.2%22/%3E%3Crect%20x%3D%22210%22%20y%3D%2240%22%20width%3D%22180%22%20height%3D%22300%22%20rx%3D%2224%22%20fill%3D%22url%28%23ph%29%22%20stroke%3D%22%233a3a5a%22%20stroke-width%3D%221.5%22/%3E%3Crect%20x%3D%22225%22%20y%3D%2255%22%20width%3D%2265%22%20height%3D%2255%22%20rx%3D%2214%22%20fill%3D%22%23111118%22/%3E%3Ccircle%20cx%3D%22245%22%20cy%3D%2270%22%20r%3D%227%22%20fill%3D%22%231a1a2a%22/%3E%3Ccircle%20cx%3D%22245%22%20cy%3D%2270%22%20r%3D%224%22%20fill%3D%22%230d0d18%22/%3E%3Ccircle%20cx%3D%22247%22%20cy%3D%2268%22%20r%3D%221.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.3%22/%3E%3Ccircle%20cx%3D%22270%22%20cy%3D%2270%22%20r%3D%227%22%20fill%3D%22%231a1a2a%22/%3E%3Ccircle%20cx%3D%22270%22%20cy%3D%2270%22%20r%3D%224%22%20fill%3D%22%230d0d18%22/%3E%3Ccircle%20cx%3D%22257%22%20cy%3D%2293%22%20r%3D%226%22%20fill%3D%22%231a1a2a%22/%3E%3Ccircle%20cx%3D%22257%22%20cy%3D%2293%22%20r%3D%223.5%22%20fill%3D%22%230d0d18%22/%3E%3Crect%20x%3D%22215%22%20y%3D%22115%22%20width%3D%22170%22%20height%3D%22200%22%20rx%3D%225%22%20fill%3D%22url%28%23wall%29%22/%3E%3Crect%20x%3D%22268%22%20y%3D%22120%22%20width%3D%2264%22%20height%3D%2216%22%20rx%3D%228%22%20fill%3D%22%23000%22/%3E%3Crect%20x%3D%22228%22%20y%3D%22155%22%20width%3D%2228%22%20height%3D%2228%22%20rx%3D%226%22%20fill%3D%22%231a3a8a%22%20opacity%3D%22.8%22/%3E%3Crect%20x%3D%22262%22%20y%3D%22155%22%20width%3D%2228%22%20height%3D%2228%22%20rx%3D%226%22%20fill%3D%22%232a1a5a%22%20opacity%3D%22.8%22/%3E%3Crect%20x%3D%22296%22%20y%3D%22155%22%20width%3D%2228%22%20height%3D%2228%22%20rx%3D%226%22%20fill%3D%22%231a4a2a%22%20opacity%3D%22.8%22/%3E%3Crect%20x%3D%22330%22%20y%3D%22155%22%20width%3D%2228%22%20height%3D%2228%22%20rx%3D%226%22%20fill%3D%22%234a1a1a%22%20opacity%3D%22.8%22/%3E%3Crect%20x%3D%22228%22%20y%3D%22190%22%20width%3D%2228%22%20height%3D%2228%22%20rx%3D%226%22%20fill%3D%22%233a2a0a%22%20opacity%3D%22.8%22/%3E%3Crect%20x%3D%22262%22%20y%3D%22190%22%20width%3D%2228%22%20height%3D%2228%22%20rx%3D%226%22%20fill%3D%22%230a3a4a%22%20opacity%3D%22.8%22/%3E%3Ctext%20x%3D%22300%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2228%22%20font-weight%3D%22bold%22%20fill%3D%22%23fff%22%20opacity%3D%22.9%22%3E9%3A41%3C/text%3E%3Crect%20x%3D%22388%22%20y%3D%22140%22%20width%3D%225%22%20height%3D%2240%22%20rx%3D%222%22%20fill%3D%22%232a2a3a%22/%3E%3Crect%20x%3D%22207%22%20y%3D%22130%22%20width%3D%225%22%20height%3D%2225%22%20rx%3D%222%22%20fill%3D%22%232a2a3a%22/%3E%3Crect%20x%3D%22207%22%20y%3D%22162%22%20width%3D%225%22%20height%3D%2235%22%20rx%3D%222%22%20fill%3D%22%232a2a3a%22/%3E%3Crect%20x%3D%220%22%20y%3D%22300%22%20width%3D%22600%22%20height%3D%2280%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22333%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2220%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EiPhone%2017%20Pro%20Max%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22355%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3E256GB%20-%20Titanio%20Desert%20-%20Lacrado%3C/text%3E%3C/svg%3E",
+  "ps5": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%221%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23050510%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230a0a20%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22body%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23e8e8f0%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23c8c8d8%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22220%22%20rx%3D%22200%22%20ry%3D%22120%22%20fill%3D%22%230033aa%22%20opacity%3D%22.15%22/%3E%3Cpath%20d%3D%22M160%2C260%20Q160%2C180%20220%2C160%20L280%2C150%20L320%2C150%20L380%2C160%20Q440%2C180%20440%2C260%20L440%2C280%20Q440%2C300%20420%2C300%20L180%2C300%20Q160%2C300%20160%2C280%20Z%22%20fill%3D%22url%28%23body%29%22/%3E%3Cpath%20d%3D%22M240%2C155%20L360%2C155%20L370%2C165%20L370%2C295%20L230%2C295%20L230%2C165%20Z%22%20fill%3D%22%230a0a15%22/%3E%3Cpath%20d%3D%22M220%2C160%20Q200%2C140%20190%2C120%20Q185%2C100%20210%2C95%20Q240%2C90%20280%2C150%20Z%22%20fill%3D%22%23e0e0ee%22/%3E%3Cpath%20d%3D%22M380%2C160%20Q400%2C140%20410%2C120%20Q415%2C100%20390%2C95%20Q360%2C90%20320%2C150%20Z%22%20fill%3D%22%23e0e0ee%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%22225%22%20r%3D%2222%22%20fill%3D%22%230055cc%22%20opacity%3D%22.8%22/%3E%3Ctext%20x%3D%22300%22%20y%3D%22231%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%23fff%22%3EPS%3C/text%3E%3Crect%20x%3D%22240%22%20y%3D%22255%22%20width%3D%22120%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%231a1a2a%22/%3E%3Crect%20x%3D%22268%22%20y%3D%22178%22%20width%3D%2212%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%231a1a28%22/%3E%3Crect%20x%3D%22286%22%20y%3D%22178%22%20width%3D%2212%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%231a1a28%22/%3E%3Ccircle%20cx%3D%22325%22%20cy%3D%22181%22%20r%3D%227%22%20fill%3D%22%230a0a18%22/%3E%3Ccircle%20cx%3D%22325%22%20cy%3D%22181%22%20r%3D%224%22%20fill%3D%22%231a1aaa%22%20opacity%3D%22.7%22/%3E%3Cpath%20d%3D%22M200%2C310%20Q185%2C295%20180%2C280%20Q178%2C265%20195%2C260%20Q215%2C258%20230%2C270%20L230%2C320%20Z%22%20fill%3D%22%23d8d8e8%22%20opacity%3D%22.9%22/%3E%3Cpath%20d%3D%22M400%2C310%20Q415%2C295%20420%2C280%20Q422%2C265%20405%2C260%20Q385%2C258%20370%2C270%20L370%2C320%20Z%22%20fill%3D%22%23d8d8e8%22%20opacity%3D%22.9%22/%3E%3Cpath%20d%3D%22M230%2C270%20L230%2C320%20Q300%2C340%20370%2C320%20L370%2C270%20Q330%2C255%20300%2C255%20Q270%2C255%20230%2C270%20Z%22%20fill%3D%22%23c8c8d8%22%20opacity%3D%22.9%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.85%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2220%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EPlayStation%205%20Slim%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22357%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3E%2B%202%20Controles%20DualSense%20%2B%202%20Jogos%3C/text%3E%3C/svg%3E",
+  "tv": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2308080f%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23121220%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22sc%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a1a4a%22/%3E%3Cstop%20offset%3D%2230%25%22%20stop-color%3D%22%231a0a4a%22/%3E%3Cstop%20offset%3D%2270%25%22%20stop-color%3D%22%230a3a2a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%232a1a0a%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Crect%20x%3D%2260%22%20y%3D%2250%22%20width%3D%22480%22%20height%3D%22280%22%20rx%3D%228%22%20fill%3D%22%23111118%22%20stroke%3D%22%23222230%22%20stroke-width%3D%222%22/%3E%3Crect%20x%3D%2270%22%20y%3D%2258%22%20width%3D%22460%22%20height%3D%22264%22%20rx%3D%224%22%20fill%3D%22url%28%23sc%29%22/%3E%3Ctext%20x%3D%22300%22%20y%3D%22120%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2236%22%20font-weight%3D%22bold%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.15%29%22%3E4K%20QLED%3C/text%3E%3Crect%20x%3D%2285%22%20y%3D%22130%22%20width%3D%22100%22%20height%3D%2260%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.08%29%22/%3E%3Crect%20x%3D%22195%22%20y%3D%22130%22%20width%3D%22100%22%20height%3D%2260%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.06%29%22/%3E%3Crect%20x%3D%22305%22%20y%3D%22130%22%20width%3D%22100%22%20height%3D%2260%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.08%29%22/%3E%3Crect%20x%3D%22415%22%20y%3D%22130%22%20width%3D%22100%22%20height%3D%2260%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.05%29%22/%3E%3Crect%20x%3D%2285%22%20y%3D%22210%22%20width%3D%22430%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.1%29%22/%3E%3Crect%20x%3D%2285%22%20y%3D%22210%22%20width%3D%22180%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%23E53935%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%22175%22%20r%3D%2230%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.15%29%22/%3E%3Cpolygon%20points%3D%22292%2C162%20292%2C188%20318%2C175%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.9%29%22/%3E%3Crect%20x%3D%22270%22%20y%3D%22330%22%20width%3D%2260%22%20height%3D%2210%22%20rx%3D%223%22%20fill%3D%22%230d0d18%22/%3E%3Crect%20x%3D%22240%22%20y%3D%22338%22%20width%3D%22120%22%20height%3D%228%22%20rx%3D%224%22%20fill%3D%22%23111118%22/%3E%3Crect%20x%3D%220%22%20y%3D%22300%22%20width%3D%22600%22%20height%3D%2280%22%20fill%3D%22rgba%280%2C0%2C0%2C0.85%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22333%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2220%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ESmart%20TV%2065%20pol.%204K%20QLED%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22355%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3EHDR%20Dolby%20Vision%20-%20Entrega%20e%20instalacao%3C/text%3E%3C/svg%3E",
+  "airpods": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a0810%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23181020%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22200%22%20rx%3D%22150%22%20ry%3D%22120%22%20fill%3D%22%235a3a8a%22%20opacity%3D%22.12%22/%3E%3Crect%20x%3D%22230%22%20y%3D%22100%22%20width%3D%22140%22%20height%3D%22170%22%20rx%3D%2228%22%20fill%3D%22%23e8e8f0%22%20stroke%3D%22%23d0d0e0%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%22235%22%20y%3D%22105%22%20width%3D%22130%22%20height%3D%22160%22%20rx%3D%2224%22%20fill%3D%22%23f0f0f8%22/%3E%3Crect%20x%3D%22228%22%20y%3D%22170%22%20width%3D%22144%22%20height%3D%228%22%20rx%3D%222%22%20fill%3D%22%23d0d0e0%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%22260%22%20r%3D%224%22%20fill%3D%22%231a8a1a%22%20opacity%3D%22.8%22/%3E%3Cellipse%20cx%3D%22270%22%20cy%3D%22145%22%20rx%3D%2218%22%20ry%3D%2222%22%20fill%3D%22%23e0e0f0%22%20stroke%3D%22%23c8c8d8%22%20stroke-width%3D%221%22/%3E%3Cellipse%20cx%3D%22270%22%20cy%3D%22135%22%20rx%3D%228%22%20ry%3D%2214%22%20fill%3D%22%23c8c8d8%22/%3E%3Cellipse%20cx%3D%22330%22%20cy%3D%22145%22%20rx%3D%2218%22%20ry%3D%2222%22%20fill%3D%22%23e0e0f0%22%20stroke%3D%22%23c8c8d8%22%20stroke-width%3D%221%22/%3E%3Cellipse%20cx%3D%22330%22%20cy%3D%22135%22%20rx%3D%228%22%20ry%3D%2214%22%20fill%3D%22%23c8c8d8%22/%3E%3Ccircle%20cx%3D%22270%22%20cy%3D%22152%22%20r%3D%226%22%20fill%3D%22%23b8b8cc%22/%3E%3Ccircle%20cx%3D%22330%22%20cy%3D%22152%22%20r%3D%226%22%20fill%3D%22%23b8b8cc%22/%3E%3Crect%20x%3D%220%22%20y%3D%22300%22%20width%3D%22600%22%20height%3D%2280%22%20fill%3D%22rgba%280%2C0%2C0%2C0.85%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22333%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2220%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EAirPods%20Pro%202a%20Geracao%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22355%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ECancelamento%20de%20ruido%20-%20MagSafe%20-%20Lacrado%3C/text%3E%3C/svg%3E",
+  "selecao": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a1a0a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23050d05%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Crect%20y%3D%22280%22%20width%3D%22600%22%20height%3D%22100%22%20fill%3D%22%230d1f0d%22/%3E%3Cpath%20d%3D%22M180%2C80%20L150%2C120%20L120%2C110%20L140%2C200%20L180%2C360%20L420%2C360%20L460%2C200%20L480%2C110%20L450%2C120%20L420%2C80%20L380%2C60%20Q300%2C50%20220%2C60%20Z%22%20fill%3D%22%23F0C040%22/%3E%3Cpath%20d%3D%22M250%2C60%20Q300%2C45%20350%2C60%20Q340%2C90%20300%2C95%20Q260%2C90%20250%2C60%20Z%22%20fill%3D%22%230d6a2a%22/%3E%3Ctext%20x%3D%22300%22%20y%3D%22240%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22bold%22%20font-size%3D%2272%22%20fill%3D%22%230d6a2a%22%20opacity%3D%22.8%22%3E10%3C/text%3E%3Ccircle%20cx%3D%22220%22%20cy%3D%22130%22%20r%3D%2222%22%20fill%3D%22%230d6a2a%22/%3E%3Ctext%20x%3D%22220%22%20y%3D%22136%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2210%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ECBF%3C/text%3E%3Cpath%20d%3D%22M360%2C115%20Q380%2C108%20390%2C118%20Q385%2C128%20350%2C135%20Z%22%20fill%3D%22%23fff%22%20opacity%3D%22.7%22/%3E%3Cpath%20d%3D%22M180%2C80%20L150%2C120%20L120%2C110%20L130%2C80%20L160%2C60%20Z%22%20fill%3D%22%23F0C040%22/%3E%3Cpath%20d%3D%22M420%2C80%20L450%2C120%20L480%2C110%20L470%2C80%20L440%2C60%20Z%22%20fill%3D%22%23F0C040%22/%3E%3Ctext%20x%3D%22220%22%20y%3D%22108%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%228%22%20fill%3D%22%23F0C040%22%3E%2A%20%2A%20%2A%20%2A%20%2A%3C/text%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.75%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ECamisa%20Selecao%20Copa%202026%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ENike%20Oficial%20CBF%20-%20Personalizada%3C/text%3E%3C/svg%3E",
+  "flamengo": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23100505%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23050000%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cpath%20d%3D%22M180%2C80%20L150%2C120%20L120%2C110%20L140%2C200%20L180%2C360%20L420%2C360%20L460%2C200%20L480%2C110%20L450%2C120%20L420%2C80%20L380%2C60%20Q300%2C50%20220%2C60%20Z%22%20fill%3D%22%230a0a0a%22/%3E%3Cpath%20d%3D%22M200%2C65%20L195%2C360%20L240%2C360%20L245%2C65%20Z%22%20fill%3D%22%23C0392B%22/%3E%3Cpath%20d%3D%22M265%2C55%20L260%2C360%20L310%2C360%20L315%2C55%20Z%22%20fill%3D%22%23C0392B%22/%3E%3Cpath%20d%3D%22M335%2C55%20L330%2C360%20L375%2C360%20L380%2C58%20Z%22%20fill%3D%22%23C0392B%22/%3E%3Cpath%20d%3D%22M250%2C60%20Q300%2C45%20350%2C60%20Q340%2C88%20300%2C92%20Q260%2C88%20250%2C60%20Z%22%20fill%3D%22%23C0392B%22/%3E%3Cpath%20d%3D%22M158%2C105%20L148%2C115%20L135%2C108%20L130%2C88%20L145%2C82%20Z%22%20fill%3D%22%23C0392B%22/%3E%3Cpath%20d%3D%22M442%2C105%20L452%2C115%20L465%2C108%20L470%2C88%20L455%2C82%20Z%22%20fill%3D%22%23C0392B%22/%3E%3Cpath%20d%3D%22M355%2C110%20L370%2C138%20L340%2C138%20Z%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Ccircle%20cx%3D%22218%22%20cy%3D%22132%22%20r%3D%2222%22%20fill%3D%22%23C0392B%22%20stroke%3D%22%23F0C040%22%20stroke-width%3D%222%22/%3E%3Ctext%20x%3D%22218%22%20y%3D%22137%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%229%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ECRF%3C/text%3E%3Ctext%20x%3D%22300%22%20y%3D%22240%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22bold%22%20font-size%3D%2272%22%20fill%3D%22%23fff%22%20opacity%3D%22.15%22%3E10%3C/text%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ECamisa%20Flamengo%2025/26%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3EAdidas%20Oficial%20-%20Personalizada%20CRF%3C/text%3E%3C/svg%3E",
+  "nba": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23050518%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230a0a25%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cpath%20d%3D%22M185%2C75%20L155%2C115%20L130%2C105%20L150%2C195%20L185%2C355%20L415%2C355%20L450%2C195%20L470%2C105%20L445%2C115%20L415%2C75%20L380%2C55%20Q300%2C45%20220%2C55%20Z%22%20fill%3D%22%231a1a2a%22/%3E%3Cpath%20d%3D%22M200%2C60%20L195%2C355%20L235%2C355%20L240%2C60%20Z%22%20fill%3D%22%23552288%22%20opacity%3D%22.6%22/%3E%3Cpath%20d%3D%22M365%2C60%20L360%2C355%20L400%2C355%20L405%2C60%20Z%22%20fill%3D%22%23552288%22%20opacity%3D%22.6%22/%3E%3Cpath%20d%3D%22M252%2C55%20Q300%2C42%20348%2C55%20Q338%2C82%20300%2C86%20Q262%2C82%20252%2C55%20Z%22%20fill%3D%22%23552288%22/%3E%3Ctext%20x%3D%22300%22%20y%3D%22230%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22bold%22%20font-size%3D%2280%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.9%22%3E23%3C/text%3E%3Ctext%20x%3D%22300%22%20y%3D%22155%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22bold%22%20font-size%3D%2222%22%20fill%3D%22%23F0C040%22%3ELAKERS%3C/text%3E%3Cpath%20d%3D%22M355%2C105%20Q375%2C98%20385%2C108%20Q380%2C118%20345%2C125%20Z%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Ccircle%20cx%3D%22220%22%20cy%3D%22125%22%20r%3D%2220%22%20fill%3D%22%23552288%22%20stroke%3D%22%23F0C040%22%20stroke-width%3D%222%22/%3E%3Ctext%20x%3D%22220%22%20y%3D%22130%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%228%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ENBA%3C/text%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EKit%20NBA%20Oficial%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ENike%20Official%20-%20Time%20a%20escolha%3C/text%3E%3C/svg%3E",
+  "show": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23000%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230a0010%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cpath%20d%3D%22M100%2C0%20L60%2C300%20L140%2C300%20Z%22%20fill%3D%22%23C0392B%22%20opacity%3D%22.08%22/%3E%3Cpath%20d%3D%22M200%2C0%20L150%2C300%20L250%2C300%20Z%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.07%22/%3E%3Cpath%20d%3D%22M300%2C0%20L260%2C300%20L340%2C300%20Z%22%20fill%3D%22%23fff%22%20opacity%3D%22.06%22/%3E%3Cpath%20d%3D%22M400%2C0%20L350%2C300%20L450%2C300%20Z%22%20fill%3D%22%234a90d9%22%20opacity%3D%22.07%22/%3E%3Cpath%20d%3D%22M500%2C0%20L460%2C300%20L540%2C300%20Z%22%20fill%3D%22%239C27B0%22%20opacity%3D%22.08%22/%3E%3Crect%20y%3D%22290%22%20width%3D%22600%22%20height%3D%2215%22%20fill%3D%22%231a0030%22/%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%22295%22%20rx%3D%2225%22%20ry%3D%2212%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22150%22%20cy%3D%22296%22%20rx%3D%2226%22%20ry%3D%2212%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22250%22%20cy%3D%22295%22%20rx%3D%2225%22%20ry%3D%2212%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22292%22%20rx%3D%2228%22%20ry%3D%2213%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22400%22%20cy%3D%22293%22%20rx%3D%2226%22%20ry%3D%2212%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22500%22%20cy%3D%22294%22%20rx%3D%2225%22%20ry%3D%2212%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22550%22%20cy%3D%22292%22%20rx%3D%2223%22%20ry%3D%2211%22%20fill%3D%22%230a0015%22/%3E%3Cline%20x1%3D%22300%22%20y1%3D%220%22%20x2%3D%22100%22%20y2%3D%22300%22%20stroke%3D%22%23E53935%22%20stroke-width%3D%221.5%22%20opacity%3D%22.4%22/%3E%3Cline%20x1%3D%22300%22%20y1%3D%220%22%20x2%3D%22500%22%20y2%3D%22300%22%20stroke%3D%22%234a90d9%22%20stroke-width%3D%221.5%22%20opacity%3D%22.4%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%22295%22%20r%3D%2245%22%20fill%3D%22%23fff%22%20opacity%3D%22.08%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22280%22%20rx%3D%22250%22%20ry%3D%2230%22%20fill%3D%22%232a0050%22%20opacity%3D%22.3%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.85%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ECamarote%20VIP%20-%20Show%20Premium%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3E2%20ingressos%20-%20Open%20bar%20%2B%20couvert%20-%20SP%3C/text%3E%3C/svg%3E",
+  "festival": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23050010%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23100020%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Ccircle%20cx%3D%22150%22%20cy%3D%2280%22%20r%3D%223%22%20fill%3D%22%23E53935%22%20opacity%3D%22.9%22/%3E%3Cline%20x1%3D%22150%22%20y1%3D%2280%22%20x2%3D%22120%22%20y2%3D%2250%22%20stroke%3D%22%23E53935%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22/%3E%3Cline%20x1%3D%22150%22%20y1%3D%2280%22%20x2%3D%22180%22%20y2%3D%2255%22%20stroke%3D%22%23E53935%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22/%3E%3Ccircle%20cx%3D%22450%22%20cy%3D%2260%22%20r%3D%223%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.9%22/%3E%3Cline%20x1%3D%22450%22%20y1%3D%2260%22%20x2%3D%22420%22%20y2%3D%2235%22%20stroke%3D%22%23F0C040%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22/%3E%3Cline%20x1%3D%22450%22%20y1%3D%2260%22%20x2%3D%22480%22%20y2%3D%2240%22%20stroke%3D%22%23F0C040%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%22150%22%20y%3D%22160%22%20width%3D%22300%22%20height%3D%22130%22%20fill%3D%22%231a0030%22/%3E%3Crect%20x%3D%22150%22%20y%3D%22155%22%20width%3D%22300%22%20height%3D%2212%22%20fill%3D%22%232a0050%22/%3E%3Crect%20x%3D%22145%22%20y%3D%22100%22%20width%3D%2212%22%20height%3D%2260%22%20fill%3D%22%232a2a3a%22/%3E%3Crect%20x%3D%22443%22%20y%3D%22100%22%20width%3D%2212%22%20height%3D%2260%22%20fill%3D%22%232a2a3a%22/%3E%3Crect%20x%3D%22145%22%20y%3D%22100%22%20width%3D%22310%22%20height%3D%2210%22%20fill%3D%22%233a3a4a%22/%3E%3Crect%20x%3D%22160%22%20y%3D%22108%22%20width%3D%22280%22%20height%3D%226%22%20fill%3D%22%23222230%22/%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22111%22%20r%3D%225%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22220%22%20cy%3D%22111%22%20r%3D%225%22%20fill%3D%22%23C0392B%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22260%22%20cy%3D%22111%22%20r%3D%225%22%20fill%3D%22%234a90d9%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%22111%22%20r%3D%225%22%20fill%3D%22%239C27B0%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22340%22%20cy%3D%22111%22%20r%3D%225%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22380%22%20cy%3D%22111%22%20r%3D%225%22%20fill%3D%22%23E53935%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22420%22%20cy%3D%22111%22%20r%3D%225%22%20fill%3D%22%232ECC71%22%20opacity%3D%22.8%22/%3E%3Cellipse%20cx%3D%22230%22%20cy%3D%22220%22%20rx%3D%2212%22%20ry%3D%2228%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22270%22%20cy%3D%22215%22%20rx%3D%2210%22%20ry%3D%2225%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22218%22%20rx%3D%2211%22%20ry%3D%2227%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22330%22%20cy%3D%22215%22%20rx%3D%2210%22%20ry%3D%2225%22%20fill%3D%22%230a0015%22/%3E%3Cellipse%20cx%3D%22370%22%20cy%3D%22220%22%20rx%3D%2212%22%20ry%3D%2228%22%20fill%3D%22%230a0015%22/%3E%3Crect%20y%3D%22290%22%20width%3D%22600%22%20height%3D%2290%22%20fill%3D%22%2307000f%22/%3E%3Cellipse%20cx%3D%2280%22%20cy%3D%22292%22%20rx%3D%2222%22%20ry%3D%2210%22%20fill%3D%22%230a0018%22/%3E%3Cellipse%20cx%3D%22195%22%20cy%3D%22293%22%20rx%3D%2222%22%20ry%3D%2210%22%20fill%3D%22%230a0018%22/%3E%3Cellipse%20cx%3D%22320%22%20cy%3D%22292%22%20rx%3D%2228%22%20ry%3D%2212%22%20fill%3D%22%230a0018%22/%3E%3Cellipse%20cx%3D%22445%22%20cy%3D%22293%22%20rx%3D%2222%22%20ry%3D%2210%22%20fill%3D%22%230a0018%22/%3E%3Cellipse%20cx%3D%22565%22%20cy%3D%22292%22%20rx%3D%2220%22%20ry%3D%229%22%20fill%3D%22%230a0018%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.85%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EFestival%20de%20Musica%20-%20Passe%20VIP%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3E3%20dias%20-%20Area%20exclusiva%20%2B%20estacionamento%3C/text%3E%3C/svg%3E",
+  "chef": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f0800%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a1000%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22200%22%20rx%3D%22180%22%20ry%3D%22160%22%20fill%3D%22%23c07010%22%20opacity%3D%22.08%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22278%22%20rx%3D%22216%22%20ry%3D%2246%22%20fill%3D%22%232a1a00%22%20stroke%3D%22%233a2800%22%20stroke-width%3D%221%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22270%22%20rx%3D%22180%22%20ry%3D%2238%22%20fill%3D%22%23f0ede8%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%22248%22%20r%3D%2270%22%20fill%3D%22%23f5f2ee%22%20stroke%3D%22%23e0ddd8%22%20stroke-width%3D%222%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%22248%22%20r%3D%2258%22%20fill%3D%22%23fff%22%20stroke%3D%22%23e8e5e0%22%20stroke-width%3D%221%22/%3E%3Cellipse%20cx%3D%22295%22%20cy%3D%22248%22%20rx%3D%2228%22%20ry%3D%2222%22%20fill%3D%22%235a2010%22%20opacity%3D%22.9%22/%3E%3Cellipse%20cx%3D%22292%22%20cy%3D%22245%22%20rx%3D%2224%22%20ry%3D%2218%22%20fill%3D%22%236a2818%22/%3E%3Cpath%20d%3D%22M268%2C250%20Q290%2C235%20320%2C252%20Q310%2C260%20280%2C258%20Z%22%20fill%3D%22%238a1a10%22%20opacity%3D%22.6%22/%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%22235%22%20r%3D%223%22%20fill%3D%22%232a5a1a%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22325%22%20cy%3D%22255%22%20r%3D%228%22%20fill%3D%22%23fff%22%20opacity%3D%22.9%22/%3E%3Ccircle%20cx%3D%22197%22%20cy%3D%22207%22%20r%3D%224%22%20fill%3D%22%23ff8c00%22%20opacity%3D%22.8%22/%3E%3Crect%20x%3D%22190%22%20y%3D%22215%22%20width%3D%2214%22%20height%3D%2245%22%20rx%3D%222%22%20fill%3D%22%23f5f0e8%22/%3E%3Cpath%20d%3D%22M380%2C160%20Q395%2C180%20390%2C200%20Q405%2C205%20375%2C205%20Q370%2C180%20380%2C160%20Z%22%20fill%3D%22rgba%28180%2C30%2C30%2C0.4%29%22%20stroke%3D%22%238a6060%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%22381%22%20y%3D%22205%22%20width%3D%223%22%20height%3D%2230%22%20fill%3D%22%238a7070%22/%3E%3Crect%20x%3D%22371%22%20y%3D%22234%22%20width%3D%2223%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%238a7070%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.75%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EJantar%20com%20Chef%20Renomado%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3EDegustacao%207%20etapas%20-%20Harmonizacao%20inclusa%3C/text%3E%3C/svg%3E",
+  "bbq": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f0500%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a0800%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22meat%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%238B1A00%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235a1000%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22320%22%20rx%3D%22250%22%20ry%3D%2240%22%20fill%3D%22%23c04000%22%20opacity%3D%22.2%22/%3E%3Crect%20x%3D%2280%22%20y%3D%22200%22%20width%3D%22440%22%20height%3D%228%22%20rx%3D%222%22%20fill%3D%22%23333%22/%3E%3Crect%20x%3D%2280%22%20y%3D%22218%22%20width%3D%22440%22%20height%3D%228%22%20rx%3D%222%22%20fill%3D%22%23333%22/%3E%3Crect%20x%3D%2280%22%20y%3D%22236%22%20width%3D%22440%22%20height%3D%228%22%20rx%3D%222%22%20fill%3D%22%23333%22/%3E%3Crect%20x%3D%22100%22%20y%3D%22195%22%20width%3D%226%22%20height%3D%2255%22%20rx%3D%222%22%20fill%3D%22%232a2a2a%22/%3E%3Crect%20x%3D%22155%22%20y%3D%22195%22%20width%3D%226%22%20height%3D%2255%22%20rx%3D%222%22%20fill%3D%22%232a2a2a%22/%3E%3Crect%20x%3D%22210%22%20y%3D%22195%22%20width%3D%226%22%20height%3D%2255%22%20rx%3D%222%22%20fill%3D%22%232a2a2a%22/%3E%3Crect%20x%3D%22265%22%20y%3D%22195%22%20width%3D%226%22%20height%3D%2255%22%20rx%3D%222%22%20fill%3D%22%232a2a2a%22/%3E%3Crect%20x%3D%22320%22%20y%3D%22195%22%20width%3D%226%22%20height%3D%2255%22%20rx%3D%222%22%20fill%3D%22%232a2a2a%22/%3E%3Crect%20x%3D%22375%22%20y%3D%22195%22%20width%3D%226%22%20height%3D%2255%22%20rx%3D%222%22%20fill%3D%22%232a2a2a%22/%3E%3Crect%20x%3D%22430%22%20y%3D%22195%22%20width%3D%226%22%20height%3D%2255%22%20rx%3D%222%22%20fill%3D%22%232a2a2a%22/%3E%3Crect%20x%3D%22485%22%20y%3D%22195%22%20width%3D%226%22%20height%3D%2255%22%20rx%3D%222%22%20fill%3D%22%232a2a2a%22/%3E%3Crect%20x%3D%2295%22%20y%3D%22185%22%20width%3D%22120%22%20height%3D%2255%22%20rx%3D%228%22%20fill%3D%22url%28%23meat%29%22/%3E%3Cline%20x1%3D%22110%22%20y1%3D%22188%22%20x2%3D%22110%22%20y2%3D%22238%22%20stroke%3D%22%233a0800%22%20stroke-width%3D%225%22%20opacity%3D%22.6%22/%3E%3Cline%20x1%3D%22130%22%20y1%3D%22188%22%20x2%3D%22130%22%20y2%3D%22238%22%20stroke%3D%22%233a0800%22%20stroke-width%3D%225%22%20opacity%3D%22.6%22/%3E%3Cline%20x1%3D%22150%22%20y1%3D%22188%22%20x2%3D%22150%22%20y2%3D%22238%22%20stroke%3D%22%233a0800%22%20stroke-width%3D%225%22%20opacity%3D%22.6%22/%3E%3Cline%20x1%3D%22170%22%20y1%3D%22188%22%20x2%3D%22170%22%20y2%3D%22238%22%20stroke%3D%22%233a0800%22%20stroke-width%3D%225%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%22240%22%20y%3D%22190%22%20width%3D%22130%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%237a1800%22/%3E%3Cline%20x1%3D%22258%22%20y1%3D%22190%22%20x2%3D%22258%22%20y2%3D%22240%22%20stroke%3D%22%233a0800%22%20stroke-width%3D%225%22%20opacity%3D%22.5%22/%3E%3Cline%20x1%3D%22298%22%20y1%3D%22190%22%20x2%3D%22298%22%20y2%3D%22240%22%20stroke%3D%22%233a0800%22%20stroke-width%3D%225%22%20opacity%3D%22.5%22/%3E%3Cline%20x1%3D%22338%22%20y1%3D%22190%22%20x2%3D%22338%22%20y2%3D%22240%22%20stroke%3D%22%233a0800%22%20stroke-width%3D%225%22%20opacity%3D%22.5%22/%3E%3Crect%20x%3D%22385%22%20y%3D%22185%22%20width%3D%22110%22%20height%3D%2255%22%20rx%3D%228%22%20fill%3D%22%238B1500%22/%3E%3Cline%20x1%3D%22400%22%20y1%3D%22185%22%20x2%3D%22400%22%20y2%3D%22240%22%20stroke%3D%22%233a0500%22%20stroke-width%3D%225%22%20opacity%3D%22.6%22/%3E%3Cline%20x1%3D%22430%22%20y1%3D%22185%22%20x2%3D%22430%22%20y2%3D%22240%22%20stroke%3D%22%233a0500%22%20stroke-width%3D%225%22%20opacity%3D%22.6%22/%3E%3Cline%20x1%3D%22460%22%20y1%3D%22185%22%20x2%3D%22460%22%20y2%3D%22240%22%20stroke%3D%22%233a0500%22%20stroke-width%3D%225%22%20opacity%3D%22.6%22/%3E%3Cpath%20d%3D%22M120%2C255%20Q130%2C220%20140%2C240%20Q145%2C215%20155%2C245%20Q150%2C200%20165%2C235%20Q170%2C210%20180%2C255%20Z%22%20fill%3D%22%23E53935%22%20opacity%3D%22.7%22/%3E%3Cpath%20d%3D%22M120%2C255%20Q130%2C230%20140%2C245%20Q148%2C225%20155%2C248%20Q152%2C215%20162%2C238%20Q168%2C220%20175%2C255%20Z%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.5%22/%3E%3Cpath%20d%3D%22M290%2C255%20Q300%2C215%20310%2C238%20Q318%2C205%20325%2C245%20Q328%2C210%20338%2C250%20Z%22%20fill%3D%22%23E53935%22%20opacity%3D%22.7%22/%3E%3Cpath%20d%3D%22M410%2C255%20Q420%2C218%20430%2C240%20Q436%2C208%20442%2C242%20Q446%2C215%20455%2C255%20Z%22%20fill%3D%22%23E53935%22%20opacity%3D%22.7%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EFogo%20de%20Chao%20-%20Rodizio%20VIP%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ERodizio%20%2B%20drinks%20-%20SP%2C%20RJ%2C%20BH%2C%20BSB%3C/text%3E%3C/svg%3E",
+  "gc-amazon": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23080810%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23101020%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22card%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23FF9900%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23E47911%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22180%22%20rx%3D%22200%22%20ry%3D%22130%22%20fill%3D%22%23FF9900%22%20opacity%3D%22.08%22/%3E%3Crect%20x%3D%2292%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22240%22%20rx%3D%2220%22%20fill%3D%22url%28%23card%29%22/%3E%3Crect%20x%3D%2292%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22110%22%20rx%3D%2220%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.06%29%22/%3E%3Ccircle%20cx%3D%22480%22%20cy%3D%22100%22%20r%3D%2280%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.04%29%22/%3E%3Ccircle%20cx%3D%22130%22%20cy%3D%22260%22%20r%3D%2270%22%20fill%3D%22rgba%280%2C0%2C0%2C0.1%29%22/%3E%3Ctext%20x%3D%22130%22%20y%3D%22140%22%20font-family%3D%22Arial%22%20font-size%3D%2238%22%20font-weight%3D%22900%22%20fill%3D%22%23fff%22%20opacity%3D%22.95%22%3EAmazon%3C/text%3E%3Crect%20x%3D%22130%22%20y%3D%22152%22%20width%3D%22110%22%20height%3D%2226%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.15%29%22/%3E%3Ctext%20x%3D%22135%22%20y%3D%22169%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%20letter-spacing%3D%223%22%3EGIFT%20CARD%3C/text%3E%3Ctext%20x%3D%22130%22%20y%3D%22240%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2244%22%20font-weight%3D%22bold%22%20fill%3D%22%23fff%22%20opacity%3D%22.9%22%3ER%24%20300%3C/text%3E%3Ctext%20x%3D%22130%22%20y%3D%22278%22%20font-family%3D%22Courier%20New%2Cmonospace%22%20font-size%3D%2214%22%20fill%3D%22%23fff%22%20opacity%3D%22.4%22%20letter-spacing%3D%223%22%3E%2A%2A%2A%2A%20%2A%2A%2A%2A%20%2A%2A%2A%2A%204829%3C/text%3E%3Crect%20x%3D%22430%22%20y%3D%22220%22%20width%3D%2248%22%20height%3D%2236%22%20rx%3D%226%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.3%29%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%22438%22%20y%3D%22225%22%20width%3D%2232%22%20height%3D%2226%22%20rx%3D%223%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.1%29%22/%3E%3Cline%20x1%3D%22430%22%20y1%3D%22238%22%20x2%3D%22478%22%20y2%3D%22238%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke-width%3D%221%22/%3E%3Cline%20x1%3D%22454%22%20y1%3D%22220%22%20x2%3D%22454%22%20y2%3D%22256%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EGift%20Card%20Amazon%20R%24%20300%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ECodigo%20digital%20-%20Entrega%20em%2024h%3C/text%3E%3C/svg%3E",
+  "gc-steam": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23080810%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23101020%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22card%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231B2838%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%232a475e%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22180%22%20rx%3D%22200%22%20ry%3D%22130%22%20fill%3D%22%231B2838%22%20opacity%3D%22.08%22/%3E%3Crect%20x%3D%2292%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22240%22%20rx%3D%2220%22%20fill%3D%22url%28%23card%29%22/%3E%3Crect%20x%3D%2292%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22110%22%20rx%3D%2220%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.06%29%22/%3E%3Ccircle%20cx%3D%22480%22%20cy%3D%22100%22%20r%3D%2280%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.04%29%22/%3E%3Ccircle%20cx%3D%22130%22%20cy%3D%22260%22%20r%3D%2270%22%20fill%3D%22rgba%280%2C0%2C0%2C0.1%29%22/%3E%3Ctext%20x%3D%22130%22%20y%3D%22140%22%20font-family%3D%22Arial%22%20font-size%3D%2238%22%20font-weight%3D%22900%22%20fill%3D%22%23c7d5e0%22%20opacity%3D%22.95%22%3ESteam%3C/text%3E%3Crect%20x%3D%22130%22%20y%3D%22152%22%20width%3D%22110%22%20height%3D%2226%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.15%29%22/%3E%3Ctext%20x%3D%22135%22%20y%3D%22169%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20font-weight%3D%22700%22%20fill%3D%22%23c7d5e0%22%20letter-spacing%3D%223%22%3EGIFT%20CARD%3C/text%3E%3Ctext%20x%3D%22130%22%20y%3D%22240%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2244%22%20font-weight%3D%22bold%22%20fill%3D%22%23c7d5e0%22%20opacity%3D%22.9%22%3ER%24%20100%3C/text%3E%3Ctext%20x%3D%22130%22%20y%3D%22278%22%20font-family%3D%22Courier%20New%2Cmonospace%22%20font-size%3D%2214%22%20fill%3D%22%23c7d5e0%22%20opacity%3D%22.4%22%20letter-spacing%3D%223%22%3E%2A%2A%2A%2A%20%2A%2A%2A%2A%20%2A%2A%2A%2A%204829%3C/text%3E%3Crect%20x%3D%22430%22%20y%3D%22220%22%20width%3D%2248%22%20height%3D%2236%22%20rx%3D%226%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.3%29%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%22438%22%20y%3D%22225%22%20width%3D%2232%22%20height%3D%2226%22%20rx%3D%223%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.1%29%22/%3E%3Cline%20x1%3D%22430%22%20y1%3D%22238%22%20x2%3D%22478%22%20y2%3D%22238%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke-width%3D%221%22/%3E%3Cline%20x1%3D%22454%22%20y1%3D%22220%22%20x2%3D%22454%22%20y2%3D%22256%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EGift%20Card%20Steam%20R%24%20100%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3EPara%20jogos%2C%20DLCs%20e%20itens%3C/text%3E%3C/svg%3E",
+  "gc-ifood": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23080810%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23101020%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22card%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23E21A1A%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b21010%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22180%22%20rx%3D%22200%22%20ry%3D%22130%22%20fill%3D%22%23E21A1A%22%20opacity%3D%22.08%22/%3E%3Crect%20x%3D%2292%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22240%22%20rx%3D%2220%22%20fill%3D%22url%28%23card%29%22/%3E%3Crect%20x%3D%2292%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22110%22%20rx%3D%2220%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.06%29%22/%3E%3Ccircle%20cx%3D%22480%22%20cy%3D%22100%22%20r%3D%2280%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.04%29%22/%3E%3Ccircle%20cx%3D%22130%22%20cy%3D%22260%22%20r%3D%2270%22%20fill%3D%22rgba%280%2C0%2C0%2C0.1%29%22/%3E%3Ctext%20x%3D%22130%22%20y%3D%22140%22%20font-family%3D%22Arial%22%20font-size%3D%2238%22%20font-weight%3D%22900%22%20fill%3D%22%23fff%22%20opacity%3D%22.95%22%3EiFood%3C/text%3E%3Crect%20x%3D%22130%22%20y%3D%22152%22%20width%3D%22110%22%20height%3D%2226%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.15%29%22/%3E%3Ctext%20x%3D%22135%22%20y%3D%22169%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%20letter-spacing%3D%223%22%3EGIFT%20CARD%3C/text%3E%3Ctext%20x%3D%22130%22%20y%3D%22240%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2244%22%20font-weight%3D%22bold%22%20fill%3D%22%23fff%22%20opacity%3D%22.9%22%3ER%24%20150%3C/text%3E%3Ctext%20x%3D%22130%22%20y%3D%22278%22%20font-family%3D%22Courier%20New%2Cmonospace%22%20font-size%3D%2214%22%20fill%3D%22%23fff%22%20opacity%3D%22.4%22%20letter-spacing%3D%223%22%3E%2A%2A%2A%2A%20%2A%2A%2A%2A%20%2A%2A%2A%2A%204829%3C/text%3E%3Crect%20x%3D%22430%22%20y%3D%22220%22%20width%3D%2248%22%20height%3D%2236%22%20rx%3D%226%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.3%29%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%22438%22%20y%3D%22225%22%20width%3D%2232%22%20height%3D%2226%22%20rx%3D%223%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.1%29%22/%3E%3Cline%20x1%3D%22430%22%20y1%3D%22238%22%20x2%3D%22478%22%20y2%3D%22238%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke-width%3D%221%22/%3E%3Cline%20x1%3D%22454%22%20y1%3D%22220%22%20x2%3D%22454%22%20y2%3D%22256%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EGift%20Card%20iFood%20R%24%20150%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3EDelivery%20e%20pickup%20-%20Codigo%20em%2024h%3C/text%3E%3C/svg%3E",
+  "gc-netflix": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23080810%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23101020%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22card%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23E50914%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23831010%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22180%22%20rx%3D%22200%22%20ry%3D%22130%22%20fill%3D%22%23E50914%22%20opacity%3D%22.08%22/%3E%3Crect%20x%3D%2292%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22240%22%20rx%3D%2220%22%20fill%3D%22url%28%23card%29%22/%3E%3Crect%20x%3D%2292%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22110%22%20rx%3D%2220%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.06%29%22/%3E%3Ccircle%20cx%3D%22480%22%20cy%3D%22100%22%20r%3D%2280%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.04%29%22/%3E%3Ccircle%20cx%3D%22130%22%20cy%3D%22260%22%20r%3D%2270%22%20fill%3D%22rgba%280%2C0%2C0%2C0.1%29%22/%3E%3Ctext%20x%3D%22130%22%20y%3D%22140%22%20font-family%3D%22Arial%22%20font-size%3D%2238%22%20font-weight%3D%22900%22%20fill%3D%22%23fff%22%20opacity%3D%22.95%22%3ENETFLIX%3C/text%3E%3Crect%20x%3D%22130%22%20y%3D%22152%22%20width%3D%22110%22%20height%3D%2226%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.15%29%22/%3E%3Ctext%20x%3D%22135%22%20y%3D%22169%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%20letter-spacing%3D%223%22%3EGIFT%20CARD%3C/text%3E%3Ctext%20x%3D%22130%22%20y%3D%22240%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2244%22%20font-weight%3D%22bold%22%20fill%3D%22%23fff%22%20opacity%3D%22.9%22%3E6%20MESES%3C/text%3E%3Ctext%20x%3D%22130%22%20y%3D%22278%22%20font-family%3D%22Courier%20New%2Cmonospace%22%20font-size%3D%2214%22%20fill%3D%22%23fff%22%20opacity%3D%22.4%22%20letter-spacing%3D%223%22%3E%2A%2A%2A%2A%20%2A%2A%2A%2A%20%2A%2A%2A%2A%204829%3C/text%3E%3Crect%20x%3D%22430%22%20y%3D%22220%22%20width%3D%2248%22%20height%3D%2236%22%20rx%3D%226%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.3%29%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%22438%22%20y%3D%22225%22%20width%3D%2232%22%20height%3D%2226%22%20rx%3D%223%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.1%29%22/%3E%3Cline%20x1%3D%22430%22%20y1%3D%22238%22%20x2%3D%22478%22%20y2%3D%22238%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke-width%3D%221%22/%3E%3Cline%20x1%3D%22454%22%20y1%3D%22220%22%20x2%3D%22454%22%20y2%3D%22256%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.2%29%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ENetflix%20Premium%206%20meses%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3EPlano%20Premium%204K%20-%204%20telas%3C/text%3E%3C/svg%3E",
+  "bonus": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a0800%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a1200%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22c1%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231a5a2a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230d3a1a%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22c2%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%234a0a0a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%232a0505%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22260%22%20rx%3D%22260%22%20ry%3D%2270%22%20fill%3D%22%230d3a15%22%20stroke%3D%22%231a5a25%22%20stroke-width%3D%222%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22255%22%20rx%3D%22240%22%20ry%3D%2260%22%20fill%3D%22%230f4018%22/%3E%3Cellipse%20cx%3D%22200%22%20cy%3D%22220%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%231a5a2a%22/%3E%3Cellipse%20cx%3D%22200%22%20cy%3D%22215%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22url%28%23c1%29%22%20stroke%3D%22%232a7a3a%22%20stroke-width%3D%222%22/%3E%3Cellipse%20cx%3D%22200%22%20cy%3D%22210%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%231a5a2a%22/%3E%3Cellipse%20cx%3D%22200%22%20cy%3D%22205%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22url%28%23c1%29%22%20stroke%3D%22%232a7a3a%22%20stroke-width%3D%222%22/%3E%3Cellipse%20cx%3D%22200%22%20cy%3D%22195%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22url%28%23c1%29%22%20stroke%3D%22%232a7a3a%22%20stroke-width%3D%222%22/%3E%3Ctext%20x%3D%22200%22%20y%3D%22199%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2210%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ER%2425%3C/text%3E%3Cellipse%20cx%3D%22310%22%20cy%3D%22215%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%234a0a0a%22/%3E%3Cellipse%20cx%3D%22310%22%20cy%3D%22210%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22url%28%23c2%29%22%20stroke%3D%22%236a1a1a%22%20stroke-width%3D%222%22/%3E%3Cellipse%20cx%3D%22310%22%20cy%3D%22205%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%234a0a0a%22/%3E%3Cellipse%20cx%3D%22310%22%20cy%3D%22200%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22url%28%23c2%29%22%20stroke%3D%22%236a1a1a%22%20stroke-width%3D%222%22/%3E%3Cellipse%20cx%3D%22310%22%20cy%3D%22185%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%23C0392B%22%20stroke%3D%22%23E53935%22%20stroke-width%3D%222%22/%3E%3Ctext%20x%3D%22310%22%20y%3D%22189%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2210%22%20font-weight%3D%22bold%22%20fill%3D%22%23fff%22%3ER%2450%3C/text%3E%3Cellipse%20cx%3D%22415%22%20cy%3D%22205%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%237a6a00%22%20stroke%3D%22%239a8a10%22%20stroke-width%3D%222%22/%3E%3Cellipse%20cx%3D%22415%22%20cy%3D%22200%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%235a4a00%22/%3E%3Cellipse%20cx%3D%22415%22%20cy%3D%22195%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%237a6a00%22%20stroke%3D%22%239a8a10%22%20stroke-width%3D%222%22/%3E%3Cellipse%20cx%3D%22415%22%20cy%3D%22190%22%20rx%3D%2245%22%20ry%3D%2215%22%20fill%3D%22%23F0C040%22%20stroke%3D%22%23F5CC55%22%20stroke-width%3D%222%22/%3E%3Ctext%20x%3D%22415%22%20y%3D%22194%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2210%22%20font-weight%3D%22bold%22%20fill%3D%22%230a0800%22%3ER%24200%3C/text%3E%3Crect%20x%3D%22180%22%20y%3D%22120%22%20width%3D%22180%22%20height%3D%2250%22%20rx%3D%224%22%20fill%3D%22%231a5a1a%22%20transform%3D%22rotate%28-8%2C270%2C145%29%22/%3E%3Crect%20x%3D%22185%22%20y%3D%22123%22%20width%3D%22170%22%20height%3D%2244%22%20rx%3D%223%22%20fill%3D%22%231f6f1f%22%20transform%3D%22rotate%28-8%2C270%2C145%29%22/%3E%3Ctext%20x%3D%22240%22%20y%3D%22152%22%20font-family%3D%22Arial%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%20transform%3D%22rotate%28-8%2C270%2C145%29%22%3ER%24%20200%3C/text%3E%3Crect%20x%3D%22210%22%20y%3D%22110%22%20width%3D%22180%22%20height%3D%2250%22%20rx%3D%224%22%20fill%3D%22%231a5a1a%22%20transform%3D%22rotate%285%2C300%2C135%29%22/%3E%3Crect%20x%3D%22215%22%20y%3D%22113%22%20width%3D%22170%22%20height%3D%2244%22%20rx%3D%223%22%20fill%3D%22%231f7a1f%22%20transform%3D%22rotate%285%2C300%2C135%29%22/%3E%3Ctext%20x%3D%22265%22%20y%3D%22143%22%20font-family%3D%22Arial%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%20transform%3D%22rotate%285%2C300%2C135%29%22%3ER%24%20200%3C/text%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EBonus%20R%24%20200%20em%20Saldo%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ESem%20rollover%20-%20Diamond%20e%20Elite%20-%20Imediato%3C/text%3E%3C/svg%3E",
+  "spins": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f0800%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a0d00%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Crect%20x%3D%22130%22%20y%3D%2280%22%20width%3D%22340%22%20height%3D%22260%22%20rx%3D%2218%22%20fill%3D%22%232a1a08%22%20stroke%3D%22%234a3010%22%20stroke-width%3D%223%22/%3E%3Crect%20x%3D%22140%22%20y%3D%2290%22%20width%3D%22320%22%20height%3D%22240%22%20rx%3D%2214%22%20fill%3D%22%231a1008%22/%3E%3Crect%20x%3D%22155%22%20y%3D%22110%22%20width%3D%2285%22%20height%3D%22120%22%20rx%3D%226%22%20fill%3D%22%230d0806%22%20stroke%3D%22%233a2810%22%20stroke-width%3D%222%22/%3E%3Crect%20x%3D%22255%22%20y%3D%22110%22%20width%3D%2285%22%20height%3D%22120%22%20rx%3D%226%22%20fill%3D%22%230d0806%22%20stroke%3D%22%233a2810%22%20stroke-width%3D%222%22/%3E%3Crect%20x%3D%22355%22%20y%3D%22110%22%20width%3D%2285%22%20height%3D%22120%22%20rx%3D%226%22%20fill%3D%22%230d0806%22%20stroke%3D%22%233a2810%22%20stroke-width%3D%222%22/%3E%3Ctext%20x%3D%22197%22%20y%3D%22185%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2252%22%20font-weight%3D%22900%22%20fill%3D%22%23E53935%22%3E7%3C/text%3E%3Ctext%20x%3D%22297%22%20y%3D%22185%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2252%22%20font-weight%3D%22900%22%20fill%3D%22%23E53935%22%3E7%3C/text%3E%3Ctext%20x%3D%22397%22%20y%3D%22185%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2252%22%20font-weight%3D%22900%22%20fill%3D%22%23F0C040%22%3E7%3C/text%3E%3Crect%20x%3D%22148%22%20y%3D%22163%22%20width%3D%22300%22%20height%3D%223%22%20rx%3D%221%22%20fill%3D%22%23E53935%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%22355%22%20y%3D%22110%22%20width%3D%2285%22%20height%3D%22120%22%20rx%3D%226%22%20fill%3D%22none%22%20stroke%3D%22%23F0C040%22%20stroke-width%3D%223%22%20opacity%3D%22.8%22/%3E%3Ctext%20x%3D%22300%22%20y%3D%22268%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%20letter-spacing%3D%224%22%3EFREE%20SPINS%3C/text%3E%3Crect%20x%3D%22475%22%20y%3D%22130%22%20width%3D%2214%22%20height%3D%2280%22%20rx%3D%227%22%20fill%3D%22%238a6030%22/%3E%3Ccircle%20cx%3D%22482%22%20cy%3D%22125%22%20r%3D%2214%22%20fill%3D%22%23C0392B%22%20stroke%3D%22%238a2020%22%20stroke-width%3D%222%22/%3E%3Crect%20x%3D%22240%22%20y%3D%22285%22%20width%3D%22120%22%20height%3D%2216%22%20rx%3D%228%22%20fill%3D%22%230a0806%22%20stroke%3D%22%233a2810%22%20stroke-width%3D%221%22/%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22100%22%20r%3D%227%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22210%22%20cy%3D%2296%22%20r%3D%226%22%20fill%3D%22%23E53935%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%2293%22%20r%3D%227%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.9%22/%3E%3Ccircle%20cx%3D%22420%22%20cy%3D%22100%22%20r%3D%227%22%20fill%3D%22%239C27B0%22%20opacity%3D%22.8%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3E100%20Free%20Spins%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ESlot%20a%20escolha%20-%20Credito%20imediato%20-%2048h%3C/text%3E%3C/svg%3E",
+  "cashback": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23040814%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23081018%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22card%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230d3a8a%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230a1a4a%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Crect%20x%3D%2290%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22245%22%20rx%3D%2222%22%20fill%3D%22url%28%23card%29%22%20stroke%3D%22%231a3a6a%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%2290%22%20y%3D%2260%22%20width%3D%22420%22%20height%3D%22110%22%20rx%3D%2222%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.04%29%22/%3E%3Crect%20x%3D%22120%22%20y%3D%22100%22%20width%3D%2255%22%20height%3D%2242%22%20rx%3D%227%22%20fill%3D%22%23d4a820%22%20stroke%3D%22%23b8920a%22%20stroke-width%3D%221%22/%3E%3Crect%20x%3D%22127%22%20y%3D%22106%22%20width%3D%2241%22%20height%3D%2230%22%20rx%3D%224%22%20fill%3D%22%23c09010%22/%3E%3Cline%20x1%3D%22120%22%20y1%3D%22121%22%20x2%3D%22175%22%20y2%3D%22121%22%20stroke%3D%22%23b8920a%22%20stroke-width%3D%221%22/%3E%3Cline%20x1%3D%22147%22%20y1%3D%22100%22%20x2%3D%22147%22%20y2%3D%22142%22%20stroke%3D%22%23b8920a%22%20stroke-width%3D%221%22/%3E%3Ctext%20x%3D%22300%22%20y%3D%22210%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2272%22%20font-weight%3D%22900%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.9%22%3E10%25%3C/text%3E%3Ctext%20x%3D%22300%22%20y%3D%22240%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2216%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.6%29%22%20letter-spacing%3D%224%22%3ECASHBACK%3C/text%3E%3Ctext%20x%3D%22127%22%20y%3D%22272%22%20font-family%3D%22Courier%20New%2Cmonospace%22%20font-size%3D%2216%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.4%29%22%20letter-spacing%3D%224%22%3E4829%202847%3C/text%3E%3Ctext%20x%3D%22127%22%20y%3D%22290%22%20font-family%3D%22Arial%22%20font-size%3D%2211%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.3%29%22%3EVALIDO%207%20DIAS%3C/text%3E%3Ctext%20x%3D%22380%22%20y%3D%22290%22%20font-family%3D%22Arial%22%20font-size%3D%2213%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.5%29%22%20font-weight%3D%22600%22%3ER.%20MENDES%20VIP%3C/text%3E%3Ccircle%20cx%3D%22450%22%20cy%3D%22110%22%20r%3D%2222%22%20fill%3D%22%23E53935%22%20opacity%3D%22.7%22/%3E%3Ccircle%20cx%3D%22470%22%20cy%3D%22110%22%20r%3D%2222%22%20fill%3D%22%23F0C040%22%20opacity%3D%22.7%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2219%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3ECashback%2010%25%20-%207%20dias%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ETodas%20as%20apostas%20-%20Credito%20automatico%20semanal%3C/text%3E%3C/svg%3E",
+  "joias": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20600%20380%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23050510%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230a0a20%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22600%22%20height%3D%22380%22%20fill%3D%22url%28%23bg%29%22/%3E%3Cellipse%20cx%3D%22300%22%20cy%3D%22180%22%20rx%3D%22160%22%20ry%3D%22130%22%20fill%3D%22%234a9aff%22%20opacity%3D%22.08%22/%3E%3Cpolygon%20points%3D%22300%2C80%20240%2C140%20300%2C120%20360%2C140%22%20fill%3D%22%236ab0ff%22%20opacity%3D%22.9%22/%3E%3Cpolygon%20points%3D%22300%2C80%20360%2C140%20340%2C80%22%20fill%3D%22%234a90e0%22%20opacity%3D%22.8%22/%3E%3Cpolygon%20points%3D%22300%2C80%20240%2C140%20260%2C80%22%20fill%3D%22%2380c0ff%22%20opacity%3D%22.9%22/%3E%3Cpolygon%20points%3D%22300%2C80%20260%2C80%20240%2C140%22%20fill%3D%22%235aa0f0%22%20opacity%3D%22.85%22/%3E%3Cpolygon%20points%3D%22300%2C80%20340%2C80%20360%2C140%22%20fill%3D%22%233a80d0%22%20opacity%3D%22.85%22/%3E%3Cpolygon%20points%3D%22240%2C140%20200%2C160%20300%2C150%20400%2C160%20360%2C140%22%20fill%3D%22%232a70c0%22%20opacity%3D%22.9%22/%3E%3Cpolygon%20points%3D%22240%2C140%20300%2C150%20300%2C120%22%20fill%3D%22%234a90e0%22%20opacity%3D%22.7%22/%3E%3Cpolygon%20points%3D%22200%2C160%20300%2C150%20300%2C270%20250%2C220%22%20fill%3D%22%231a60b0%22%20opacity%3D%22.9%22/%3E%3Cpolygon%20points%3D%22400%2C160%20300%2C150%20300%2C270%20350%2C220%22%20fill%3D%22%230a50a0%22%20opacity%3D%22.9%22/%3E%3Cpolygon%20points%3D%22200%2C160%20250%2C220%20300%2C270%22%20fill%3D%22%232a70c0%22%20opacity%3D%22.8%22/%3E%3Cpolygon%20points%3D%22400%2C160%20350%2C220%20300%2C270%22%20fill%3D%22%231a5ab0%22%20opacity%3D%22.8%22/%3E%3Cline%20x1%3D%22300%22%20y1%3D%2280%22%20x2%3D%22300%22%20y2%3D%2270%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%20opacity%3D%22.8%22/%3E%3Cline%20x1%3D%22296%22%20y1%3D%2284%22%20x2%3D%22290%22%20y2%3D%2275%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22/%3E%3Cline%20x1%3D%22304%22%20y1%3D%2284%22%20x2%3D%22310%22%20y2%3D%2275%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22/%3E%3Ccircle%20cx%3D%22278%22%20cy%3D%22115%22%20r%3D%223%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Ccircle%20cx%3D%22322%22%20cy%3D%22112%22%20r%3D%222.5%22%20fill%3D%22%23fff%22%20opacity%3D%22.5%22/%3E%3Cpolygon%20points%3D%22160%2C200%20148%2C215%20160%2C225%20172%2C215%22%20fill%3D%22%234a90e0%22%20opacity%3D%22.5%22/%3E%3Cpolygon%20points%3D%22430%2C190%20418%2C205%20430%2C215%20442%2C205%22%20fill%3D%22%236ab0ff%22%20opacity%3D%22.5%22/%3E%3Crect%20x%3D%220%22%20y%3D%22305%22%20width%3D%22600%22%20height%3D%2275%22%20fill%3D%22rgba%280%2C0%2C0%2C0.8%29%22/%3E%3Ctext%20x%3D%2230%22%20y%3D%22335%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2222%22%20font-weight%3D%22bold%22%20fill%3D%22%23F0C040%22%3EJoias%20Bonus%3C/text%3E%3Ctext%20x%3D%2230%22%20y%3D%22356%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%3ECreditadas%20automaticamente%20na%20sua%20conta%3C/text%3E%3C/svg%3E",
+};
+
+// ── PRODUCTS DATA ──
+const P = [
+  // VIAGENS
+  {id:'viagem-vegas',cat:'viagens',img:SVGS["vegas"],name:'Las Vegas · 5 Noites',desc:'Voo + hotel Strip 4★ para 2 pessoas saindo de SP. Transfer, 1 jantar premium e city tour inclusos.',price:9500,featured:true,stock:3,details:[['Duração','5 noites'],['Pessoas','2'],['Inclui','Voo + Hotel Strip'],['Validade','Fev/2027']]},
+  {id:'viagem-disney',cat:'viagens',img:SVGS["disney"],name:'Disney Orlando · 7 Noites',desc:'7 noites em hotel Disney Resort para família. Voo, park hopper 5 dias e transfer inclusos.',price:14500,featured:true,stock:2,details:[['Duração','7 noites'],['Pessoas','2 adultos + 1 criança'],['Inclui','Voo + Hotel + Ingressos'],['Validade','Jan/2027']]},
+  {id:'viagem-punta',cat:'viagens',img:SVGS["punta"],name:'Punta del Este · 4 Noites',desc:'Resort beira-mar para 2 pessoas com café da manhã incluso e acesso ao spa.',price:6800,featured:false,stock:5,details:[['Duração','4 noites'],['Pessoas','2'],['Inclui','Hotel + spa + café'],['Validade','Dez/2026']]},
+  {id:'viagem-rj',cat:'viagens',img:SVGS["rio"],name:'Rio de Janeiro · 3 Noites',desc:'Hotel 5★ em Ipanema para 2 pessoas com café da manhã e passeio de barco pela Baía de Guanabara.',price:3800,featured:false,stock:8,details:[['Duração','3 noites'],['Pessoas','2'],['Inclui','Hotel 5★ + passeio barco'],['Validade','Out/2026']]},
+  // ELETRÔNICOS
+  {id:'iphone17',cat:'eletronicos',img:SVGS["iphone"],name:'iPhone 17 Pro Max 256GB',desc:'iPhone 17 Pro Max 256GB lacrado. Nota fiscal Apple inclusa. Escolha a cor: Titânio, Preto ou Desert.',price:11500,featured:true,stock:2,details:[['Memória','256GB'],['Garantia','Apple 1 ano'],['Entrega','5 dias úteis'],['Cor','A escolher']]},
+  {id:'ps5',cat:'eletronicos',img:SVGS["ps5"],name:'PlayStation 5 Slim + 2 Jogos',desc:'PS5 Slim com 2 controles DualSense e 2 jogos à escolha. Produto lacrado com nota fiscal.',price:8200,featured:true,stock:3,details:[['Console','PS5 Slim'],['Inclui','2 controles + 2 jogos'],['Entrega','7 dias úteis'],['Garantia','1 ano']]},
+  {id:'smarttv',cat:'eletronicos',img:SVGS["tv"],name:'Smart TV 65" 4K QLED',desc:'Smart TV 65" QLED com HDR Dolby Vision. Samsung ou LG. Entrega e instalação em capitais.',price:7200,featured:false,stock:4,details:[['Tela','65" QLED 4K'],['Sistema','Smart TV'],['Entrega','Capitais + instalação'],['Garantia','1 ano']]},
+  {id:'airpods',cat:'eletronicos',img:SVGS["airpods"],name:'AirPods Pro 2ª geração',desc:'AirPods Pro com cancelamento ativo de ruído e estojo MagSafe. Produto lacrado com NF Apple.',price:3200,featured:false,stock:6,details:[['Modelo','AirPods Pro 2ª Gen'],['Case','MagSafe'],['Garantia','Apple 1 ano'],['Entrega','5 dias úteis']]},
+  // UNIFORMES
+  {id:'camisa-selecao',cat:'uniformes',img:SVGS["selecao"],name:'Camisa Seleção Copa 2026',desc:'Camisa oficial da Seleção Brasileira Copa do Mundo 2026. Nike licenciada com personalização de nome e número.',price:1500,featured:true,stock:999,details:[['Produto','Nike Oficial CBF'],['Personalização','Nome + número'],['Tamanhos','P ao GGG'],['Entrega','10 dias úteis']]},
+  {id:'camisa-flamengo',cat:'uniformes',img:SVGS["flamengo"],name:'Camisa Flamengo Oficial 25/26',desc:'Camisa oficial Flamengo temporada 25/26. Adidas licenciada, personalização com nome e número.',price:1200,featured:false,stock:999,details:[['Produto','Adidas Oficial'],['Personalização','Nome + número'],['Tamanhos','P ao GGG'],['Entrega','10 dias úteis']]},
+  {id:'kit-nba',cat:'uniformes',img:SVGS["nba"],name:'Kit NBA Oficial · Time à escolha',desc:'Jersey + shorts oficiais NBA, time de sua preferência. Produto importado 100% original.',price:2200,featured:false,stock:15,details:[['Produto','Nike Official NBA'],['Inclui','Jersey + shorts'],['Time','À escolha'],['Entrega','15 dias úteis']]},
+  // SHOWS
+  {id:'show-vip',cat:'shows',img:SVGS["show"],name:'Camarote VIP · Show Premium SP',desc:'2 ingressos camarote VIP para o próximo grande show em São Paulo. Open bar e couvert artístico incluso.',price:4500,featured:true,stock:4,details:[['Ingressos','2 (camarote VIP)'],['Inclui','Open bar + couvert'],['Local','São Paulo'],['Data','A confirmar']]},
+  {id:'festival',cat:'shows',img:SVGS["festival"],name:'Festival de Música · Passe VIP 3 dias',desc:'Passe VIP de 3 dias em festival de música para 2 pessoas com estacionamento e área exclusiva.',price:3800,featured:false,stock:6,details:[['Duração','3 dias'],['Pessoas','2'],['Inclui','Área VIP + estacionamento'],['Data','Ago/2026']]},
+  // JANTARES
+  {id:'jantar-chef',cat:'jantares',img:SVGS["chef"],name:'Jantar com Chef Renomado',desc:'Jantar privativo degustação 7 etapas para 2 pessoas. Chef com passagem internacional, harmonização inclusa.',price:6500,featured:true,stock:2,details:[['Pessoas','2'],['Formato','Degustação 7 etapas'],['Inclui','Harmonização completa'],['Validade','4 meses']]},
+  {id:'jantar-prime',cat:'jantares',img:SVGS["chef"],name:'Jantar Fine Dining · 2 pessoas',desc:'Menu completo (entrada + principal + sobremesa + vinho) para 2 em restaurante premium parceiro.',price:3800,featured:false,stock:999,details:[['Pessoas','2'],['Inclui','Menu completo + vinho'],['Restaurantes','10 opções SP/RJ/BH'],['Validade','6 meses']]},
+  {id:'churrasco',cat:'jantares',img:SVGS["bbq"],name:'Fogo de Chão · Rodízio para 2',desc:'Rodízio premium para 2 pessoas na Fogo de Chão com drinks de entrada e sobremesa.',price:2800,featured:false,stock:999,details:[['Pessoas','2'],['Inclui','Rodízio + drinks'],['Unidades','SP, RJ, BH, BSB'],['Validade','3 meses']]},
+  // GIFT CARDS
+  {id:'gc-amazon',cat:'giftcards',img:SVGS["gc-amazon"],name:'Gift Card Amazon R$ 300',desc:'Crédito de R$ 300 na Amazon para comprar qualquer produto. Código digital entregue em até 24h no seu e-mail.',price:2400,featured:false,stock:999,details:[['Valor','R$ 300,00'],['Validade','2 anos'],['Entrega','Código em 24h'],['Plataforma','Amazon.com.br']]},
+  {id:'gc-steam',cat:'giftcards',img:SVGS["gc-steam"],name:'Gift Card Steam R$ 100',desc:'R$ 100 em créditos Steam para jogos, DLCs e itens. Código imediato após resgate.',price:800,featured:false,stock:999,details:[['Valor','R$ 100,00'],['Validade','Sem validade'],['Entrega','Código imediato'],['Plataforma','Steam']]},
+  {id:'gc-ifood',cat:'giftcards',img:SVGS["gc-ifood"],name:'Gift Card iFood R$ 150',desc:'R$ 150 de crédito iFood para delivery ou pickup. Código enviado para seu e-mail em até 24h.',price:1200,featured:false,stock:999,details:[['Valor','R$ 150,00'],['Validade','1 ano'],['Entrega','Código em 24h'],['Plataforma','iFood']]},
+  {id:'gc-netflix',cat:'giftcards',img:SVGS["gc-netflix"],name:'Netflix Premium · 6 meses',desc:'6 meses de Netflix plano Premium (4K, 4 telas). Código digital entregue em 24h.',price:2400,featured:false,stock:999,details:[['Plano','Premium 4K'],['Duração','6 meses'],['Entrega','Código em 24h'],['Telas','4 simultâneas']]},
+  // BÔNUS
+  {id:'bonus-200',cat:'bonus',img:SVGS["bonus"],name:'Bônus R$ 200 em saldo',desc:'R$ 200 em bônus de apostas. Sem rollover para clientes VIP Diamond e Elite. Creditado imediatamente.',price:1500,featured:true,stock:999,details:[['Valor','R$ 200,00'],['Rollover','Sem (Diamond/Elite)'],['Validade','7 dias'],['Crédito','Imediato']]},
+  {id:'freespins',cat:'bonus',img:SVGS["spins"],name:'100 Free Spins — Slot à escolha',desc:'100 giros grátis no slot de sua preferência (exceto jackpots progressivos). Crédito imediato na conta.',price:800,featured:false,stock:999,details:[['Giros','100'],['Jogo','À escolha'],['Validade','48 horas'],['Crédito','Imediato']]},
+  {id:'cashback',cat:'bonus',img:SVGS["cashback"],name:'Cashback 10% por 7 dias',desc:'10% de cashback em todas as apostas durante 7 dias consecutivos. Crédito automático semanal.',price:3000,featured:false,stock:999,details:[['Percentual','10%'],['Duração','7 dias'],['Tipo','Todas apostas'],['Crédito','Semanal']]},
+];
+
+// ── LOOT PRIZES ──
+const PRIZES = [
+  {emoji:'💎',img:SVGS["joias"],  name:'100 Jóias',       desc:'Creditadas automaticamente.',               value:'+100 Jóias',                          pts:100, rarity:'common',    rarityLabel:'Comum',   weight:20},
+  {emoji:'💎',img:SVGS["joias"],  name:'200 Jóias',       desc:'Jóias creditadas na conta.',                value:'+200 Jóias',                          pts:200, rarity:'common',    rarityLabel:'Comum',   weight:20},
+  {emoji:'🎰',img:SVGS["spins"],  name:'50 Free Spins',   desc:'50 giros no Fortune Tiger em 5 min.',       value:'50 Free Spins ativados',              pts:0,   rarity:'uncommon',  rarityLabel:'Incomum', weight:15},
+  {emoji:'🎰',img:SVGS["spins"],  name:'100 Free Spins',  desc:'100 giros no slot à sua escolha.',          value:'100 Free Spins ativados',             pts:0,   rarity:'uncommon',  rarityLabel:'Incomum', weight:10},
+  {emoji:'💰',img:SVGS["bonus"],   name:'Bônus R$ 25',     desc:'R$ 25 em bônus. Válido 48h.',               value:'R$ 25 creditados',                    pts:0,   rarity:'rare',      rarityLabel:'Raro',    weight:12},
+  {emoji:'💵',img:SVGS["bonus"],   name:'Bônus R$ 100',    desc:'R$ 100 em bônus. Válido 7 dias.',           value:'R$ 100 creditados',                   pts:0,   rarity:'rare',      rarityLabel:'Raro',    weight:8},
+  {emoji:'🎁',img:SVGS["gc-amazon"], name:'Gift Card R$ 50', desc:'iFood R$ 50. Código no e-mail em 24h.',     value:'Gift Card enviado',                   pts:0,   rarity:'epic',      rarityLabel:'Épico',   weight:6},
+  {emoji:'📦',img:SVGS["gc-amazon"], name:'Gift Amazon R$100',desc:'R$ 100 na Amazon. Código em 24h.',         value:'Gift Card R$100 enviado',             pts:0,   rarity:'epic',      rarityLabel:'Épico',   weight:4},
+  {emoji:'🎮',img:SVGS["ps5"],    name:'PlayStation 5',   desc:'PS5 Slim + 2 controles. Entrega em 7 dias. RARO!', value:'PS5 — seu AM entrará em contato!',pts:0,rarity:'legendary', rarityLabel:'Lendário',weight:2},
+  {emoji:'📱',img:SVGS["iphone"], name:'iPhone 17 Pro Max',desc:'iPhone 17 Pro Max 256GB lacrado. ULTRA RARO!',value:'iPhone 17 — seu AM entrará em contato!',pts:0,rarity:'legendary',rarityLabel:'Lendário',weight:1},
+  {emoji:'✈️',img:SVGS["vegas"],  name:'Las Vegas · 5 Noites',desc:'Voo + hotel Strip 4★ para 2. MEGA RARO!',value:'Las Vegas — seu AM entrará em contato!',pts:0,rarity:'legendary',rarityLabel:'Lendário',weight:1},
+];
+
+const RARITY_STYLE={
+  common:'background:rgba(156,163,175,.18);color:#9ca3af;',
+  uncommon:'background:rgba(96,165,250,.15);color:#60a5fa;',
+  rare:'background:rgba(167,139,250,.15);color:#a78bfa;',
+  epic:'background:linear-gradient(135deg,rgba(219,39,119,.15),rgba(168,85,247,.15));color:#f472b6;',
+  legendary:'background:linear-gradient(135deg,rgba(240,192,64,.22),rgba(200,140,30,.15));color:var(--gold);border:1px solid rgba(240,192,64,.3);',
+};
+
+// ── WEIGHTED RANDOM ──
+function weightedRandom(){
+  const tot=PRIZES.reduce((s,p)=>s+p.weight,0);
+  let r=Math.random()*tot;
+  for(const p of PRIZES){r-=p.weight;if(r<=0)return p;}
+  return PRIZES[0];
+}
+
+// ── REEL ──
+const WIN_IDX=46; // index in the reel array where the prize is placed
+
+// Reel visual pool — lightweight emoji+gradient tiles (no heavy img tags)
+// Real photos only show in the result modal after spin
+const REEL_POOL = [
+  {emoji:'💎',label:'100 Jóias',    rarity:'common',   bg:'linear-gradient(135deg,#0a0a1a,#1a1030)'},
+  {emoji:'🎰',label:'50 Spins',     rarity:'uncommon', bg:'linear-gradient(135deg,#0a1020,#0d2040)'},
+  {emoji:'💰',label:'Bônus R$25',   rarity:'rare',     bg:'linear-gradient(135deg,#150a2e,#1e0a3a)'},
+  {emoji:'💎',label:'200 Jóias',    rarity:'common',   bg:'linear-gradient(135deg,#0a0a1a,#1a1030)'},
+  {emoji:'🎁',label:'Gift Card',    rarity:'epic',     bg:'linear-gradient(135deg,#2a0a1e,#1a0a28)'},
+  {emoji:'🎮',label:'PS5',          rarity:'legendary',bg:'linear-gradient(135deg,#1a1400,#2a1e00)'},
+  {emoji:'💎',label:'100 Jóias',    rarity:'common',   bg:'linear-gradient(135deg,#0a0a1a,#1a1030)'},
+  {emoji:'💵',label:'Bônus R$100',  rarity:'rare',     bg:'linear-gradient(135deg,#150a2e,#1e0a3a)'},
+  {emoji:'📱',label:'iPhone 17',    rarity:'legendary',bg:'linear-gradient(135deg,#1a1400,#2a1e00)'},
+  {emoji:'💎',label:'200 Jóias',    rarity:'common',   bg:'linear-gradient(135deg,#0a0a1a,#1a1030)'},
+  {emoji:'📦',label:'Gift Amazon',  rarity:'epic',     bg:'linear-gradient(135deg,#2a0a1e,#1a0a28)'},
+  {emoji:'🎰',label:'100 Spins',    rarity:'uncommon', bg:'linear-gradient(135deg,#0a1020,#0d2040)'},
+  {emoji:'💎',label:'100 Jóias',    rarity:'common',   bg:'linear-gradient(135deg,#0a0a1a,#1a1030)'},
+  {emoji:'✈️',label:'Las Vegas',    rarity:'legendary',bg:'linear-gradient(135deg,#1a1400,#2a1e00)'},
+  {emoji:'💰',label:'Bônus R$25',   rarity:'rare',     bg:'linear-gradient(135deg,#150a2e,#1e0a3a)'},
+  {emoji:'💎',label:'200 Jóias',    rarity:'common',   bg:'linear-gradient(135deg,#0a0a1a,#1a1030)'},
+  {emoji:'🎁',label:'Gift iFood',   rarity:'epic',     bg:'linear-gradient(135deg,#2a0a1e,#1a0a28)'},
+  {emoji:'💵',label:'Bônus R$100',  rarity:'rare',     bg:'linear-gradient(135deg,#150a2e,#1e0a3a)'},
+  {emoji:'💎',label:'100 Jóias',    rarity:'common',   bg:'linear-gradient(135deg,#0a0a1a,#1a1030)'},
+  {emoji:'🎰',label:'50 Spins',     rarity:'uncommon', bg:'linear-gradient(135deg,#0a1020,#0d2040)'},
+];
+
+const RARITY_BORDER = {
+  common:'#4a5568', uncommon:'#2563eb', rare:'#7c3aed', epic:'#db2777', legendary:'#F0C040'
+};
+const RARITY_COLOR = {
+  common:'#9ca3af', uncommon:'#60a5fa', rare:'#a78bfa', epic:'#f472b6', legendary:'#F0C040'
+};
+const RARITY_LABEL = {
+  common:'Comum', uncommon:'Incomum', rare:'Raro', epic:'Épico', legendary:'★ Lendário'
+};
+
+function buildReel(winner){
+  const track=document.getElementById('reelTrack');
+  // Build 60 items from pool, inject winner at WIN_IDX
+  const items=[];
+  for(let i=0;i<60;i++) items.push({...REEL_POOL[i%REEL_POOL.length]});
+  if(winner){
+    // Map prize rarity/name/emoji to a reel tile
+    items[WIN_IDX]={
+      emoji: winner.emoji || '💎',
+      label: winner.name,
+      rarity: winner.rarity,
+      bg: winner.rarity==='legendary'
+        ? 'linear-gradient(135deg,#1a1400,#2a2000)'
+        : winner.rarity==='epic'
+        ? 'linear-gradient(135deg,#2a0a1e,#1a0a28)'
+        : winner.rarity==='rare'
+        ? 'linear-gradient(135deg,#150a2e,#1e0a3a)'
+        : winner.rarity==='uncommon'
+        ? 'linear-gradient(135deg,#0a1020,#0d2040)'
+        : 'linear-gradient(135deg,#0a0a1a,#1a1030)',
+    };
+  }
+  track.innerHTML=items.map((item,i)=>{
+    const border=RARITY_BORDER[item.rarity]||'#4a5568';
+    const col=RARITY_COLOR[item.rarity]||'#9ca3af';
+    const lbl=RARITY_LABEL[item.rarity]||'Comum';
+    return`<div class="reel-item" id="ri-${i}" style="background:${item.bg};border-color:${border}">
+      <div class="ri-emoji">${item.emoji}</div>
+      <div class="ri-info">
+        <div class="ri-name">${item.label}</div>
+        <div class="ri-rarity" style="color:${col}">${lbl}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function spinReel(){
+  if(lootOpened){showToast('⏰','<strong>Já aberta hoje!</strong>Volte amanhã.'); return;}
+  if(isSpinning) return;
+  isSpinning=true;
+  const btn=document.getElementById('openBoxBtn');
+  btn.disabled=true; btn.textContent='Girando...';
+  const prize=weightedRandom();
+  buildReel(prize);
+  const track=document.getElementById('reelTrack');
+  const viewport=track.parentElement;
+  // Wait one rAF so the browser has painted the new DOM and we can measure real sizes
+  requestAnimationFrame(()=>{
+    const firstItem=document.getElementById('ri-0');
+    const actualW=firstItem?firstItem.offsetWidth:150;
+    const gapPx=8;
+    const actualSlot=actualW+gapPx;
+    const trackPadL=8; // padding:16px 8px on .reel-track
+    const vw=viewport.offsetWidth;
+    const winnerCenter=trackPadL+WIN_IDX*actualSlot+actualW/2;
+    const targetX=winnerCenter-vw/2;
+    track.style.transition='none';
+    track.style.transform='translateX(0px)';
+    void track.offsetWidth;
+    const dur=5200,t0=performance.now();
+    function ease(t){return 1-Math.pow(1-t,5);}
+    function frame(now){
+      const t=Math.min((now-t0)/dur,1);
+      track.style.transform=`translateX(-${targetX*ease(t)}px)`;
+      if(t<1){requestAnimationFrame(frame);}
+      else{
+        track.style.transform=`translateX(-${targetX}px)`;
+        document.getElementById(`ri-${WIN_IDX}`)?.classList.add('winner');
+        if(prize.pts>0){userPoints+=prize.pts;updatePtsUI();}
+        lootOpened=true;
+        btn.textContent='✓ Aberta hoje';
+        document.getElementById('nextOpenTxt').textContent='Disponível amanhã';
+        setTimeout(()=>showResult(prize),900);
+        isSpinning=false;
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+buildReel(null);
+
+// ── REAL PHOTO URLs (Unsplash — hotlink allowed in browsers) ──
+const PHOTOS = {
+  'viagem-vegas':   'https://images.unsplash.com/photo-1684575571081-d6abda485519?w=800&h=460&fit=crop&q=80',
+  'viagem-disney':  'https://images.unsplash.com/photo-1578230706129-5e3ebca647d3?w=800&h=460&fit=crop&q=80',
+  'viagem-punta':   'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=460&fit=crop&q=80',
+  'viagem-rj':      'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=600&h=340&fit=crop&q=80',
+  'iphone17':       'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&h=340&fit=crop&q=80',
+  'ps5':            'https://images.unsplash.com/photo-1622297845775-5ff3fef71d13?w=800&h=460&fit=crop&q=80',
+  'airpods':        'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=800&h=460&fit=crop&q=80',
+  'smarttv':        'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&h=340&fit=crop&q=80',
+  'camisa-selecao': 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&h=340&fit=crop&q=80',
+  'camisa-flamengo':'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&h=340&fit=crop&q=80',
+  'kit-nba':        'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=340&fit=crop&q=80',
+  'show-vip':       'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=340&fit=crop&q=80',
+  'festival':       'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600&h=340&fit=crop&q=80',
+  'jantar-chef':    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=340&fit=crop&q=80',
+  'jantar-prime':   'https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=600&h=340&fit=crop&q=80',
+  'churrasco':      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=340&fit=crop&q=80',
+};
+
+// Cards that get VIP badge
+const VIP_CARDS = ['viagem-disney','viagem-punta','viagem-vegas','kit-nba','show-vip','jantar-chef'];
+// Cards that are "NEW"
+const NEW_CARDS = ['smarttv','airpods','festival','jantar-prime'];
+// Bonus/giftcard cats use SVG img, not photo
+const PHOTO_CATS = ['viagens','eletronicos','uniformes','shows','jantares'];
+
+// ── HELPERS ──
+function catLbl(c){return{viagens:'✈️ Viagens',eletronicos:'📱 Eletrônicos',uniformes:'👕 Uniformes',shows:'🎵 Shows',jantares:'🍽️ Jantares',giftcards:'🎁 Gift Cards',bonus:'💰 Bônus'}[c]||c;}
+function isVip(p){return VIP_CARDS.includes(p.id);}
+function isNew(p){return NEW_CARDS.includes(p.id);}
+function isHot(p){return p.stock!==999&&p.stock<=2;}
+function isLimited(p){return p.stock!==999&&p.stock<=5&&p.stock>2;}
+function usePhoto(p){return PHOTO_CATS.includes(p.cat);}
+
+function stockBadgeHtml(p){
+  if(p.stock===999) return '';
+  const low = p.stock<=2;
+  return `<div class="card-stock-badge${low?' low':''}">${p.stock} restante${p.stock===1?'':'s'}</div>`;
+}
+
+function badgesHtml(p){
+  let b='';
+  if(isHot(p))     b+=`<div class="badge-hot">🔥 HOT</div>`;
+  if(isLimited(p)) b+=`<div class="badge-lim">⚠ LIMITADO</div>`;
+  if(isNew(p))     b+=`<div class="badge-new">+ NOVO</div>`;
+  if(isVip(p))     b+=`<div class="badge-vip-pill">◆ VIP</div>`;
+  if(!b) return '';
+  return `<div class="card-badges">${b}</div>`;
+}
+
+function ctaHtml(p){
+  if(isVip(p)) return `<button class="btn-vip" onclick="event.stopPropagation();openModal('${p.id}')">◆ VIP</button>`;
+  if(userPoints>=p.price) return `<button class="btn-resgatar" onclick="event.stopPropagation();openModal('${p.id}')">Resgatar</button>`;
+  return `<button class="btn-insuf" onclick="event.stopPropagation();openModal('${p.id}')">Insuficiente</button>`;
+}
+
+// ── RENDER ──
+function renderProducts(list){
+  document.getElementById('productCount').textContent=`${list.length} disponíveis`;
+  document.getElementById('productGrid').innerHTML=list.map(p=>{
+    const vip = isVip(p);
+    const photo = PHOTOS[p.id];
+    const usePh = usePhoto(p) && photo;
+
+    // Image area
+    let imgHtml;
+    if(usePh){
+      // Real photo via CSS background-image (avoids CORS/referer blocks)
+      imgHtml=`<div class="card-photo" style="background-image:url('${photo}')">${badgesHtml(p)}${stockBadgeHtml(p)}</div>`;
+    } else {
+      // SVG data-uri for bonus/giftcard
+      imgHtml=`<div class="card-svg-img" style="position:relative">${badgesHtml(p)}${stockBadgeHtml(p)}<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.parentElement.style.background='#13151C'"></div>`;
+    }
+
+    return`<div class="card${vip?' vip-card':''}" onclick="openModal('${p.id}')">
+      ${imgHtml}
+      <div class="card-body">
+        <div class="card-cat">${catLbl(p.cat)}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.desc.substring(0,72)}...</div>
+        <div class="card-foot">
+          <div class="price-w">
+            <div class="price-icon">◆</div>
+            <div class="price-n">${p.price.toLocaleString('pt-BR')}</div>
+            <div class="price-l">jóias</div>
+          </div>
+          ${ctaHtml(p)}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── FILTER/SORT ──
+function setFilter(btn,cat){
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); currentFilter=cat; applyFS();
+}
+function filterProducts(){applyFS();}
+function sortProducts(v){currentSort=v;applyFS();}
+function applyFS(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let list=[...P];
+  if(currentFilter!=='todos')list=list.filter(p=>p.cat===currentFilter);
+  if(q)list=list.filter(p=>p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q));
+  if(currentSort==='menor')list.sort((a,b)=>a.price-b.price);
+  else if(currentSort==='maior')list.sort((a,b)=>b.price-a.price);
+  else list.sort((a,b)=>b.featured-a.featured);
+  renderProducts(list);
+}
+
+// ── MODAL ──
+function openModal(id){
+  const p=P.find(x=>x.id===id); if(!p)return;
+  currentProduct=p;
+  // Use real photo if available, else SVG data-uri
+  const photoUrl = PHOTOS[p.id] || p.img;
+  const mImgEl = document.getElementById('mImg');
+  mImgEl.src = photoUrl;
+  mImgEl.onerror = ()=>{ mImgEl.src = p.img; };
+  document.getElementById('mCat').textContent=catLbl(p.cat);
+  document.getElementById('mTtl').textContent=p.name;
+  document.getElementById('mDesc').textContent=p.desc;
+  document.getElementById('mPr').innerHTML=`${p.price.toLocaleString('pt-BR')} <span>Jóias</span>`;
+  document.getElementById('mBal').textContent=userPoints.toLocaleString('pt-BR');
+  document.getElementById('mDetails').innerHTML=p.details.map(([k,v])=>`<div class="deet"><label>${k}</label><span>${v}</span></div>`).join('');
+  const sw=document.getElementById('mSW');
+  if(p.stock!==999&&p.stock<=5){sw.style.display='flex';document.getElementById('mSWTxt').textContent=`Apenas ${p.stock} disponíve${p.stock===1?'l':'is'}!`;}
+  else sw.style.display='none';
+  const wr=document.getElementById('mWR'),rb=document.getElementById('redeemBtn');
+  if(userPoints<p.price){wr.style.display='flex';document.getElementById('mMiss').textContent=(p.price-userPoints).toLocaleString('pt-BR');rb.disabled=true;rb.style.opacity='.4';rb.style.cursor='not-allowed';}
+  else{wr.style.display='none';rb.disabled=false;rb.style.opacity='1';rb.style.cursor='pointer';}
+  document.getElementById('productModal').classList.add('show');
+}
+function closeModal(){document.getElementById('productModal').classList.remove('show');}
+function redeemItem(){
+  if(!currentProduct)return;
+  userPoints-=currentProduct.price;
+  updatePtsUI(); closeModal();
+  showToast('🎉',`<strong>${currentProduct.name} resgatado!</strong>Seu AM entrará em contato.`);
+}
+
+// ── PTS UI ──
+function updatePtsUI(){
+  const f=userPoints.toLocaleString('pt-BR');
+  document.getElementById('sidebarPts').textContent=f;
+  document.getElementById('topbarPts').textContent=f;
+  applyFS();
+}
+
+// ── SECTIONS ──
+function showSection(sec){
+  ['loja','loot','historico','perfil'].forEach(s=>{
+    const el=document.getElementById(`section-${s}`);
+    if(el)el.style.display=s===sec?'block':'none';
+  });
+  // sidebar nav
+  document.querySelectorAll('.nav-item').forEach((n,i)=>{
+    n.classList.toggle('active',['loja','loot','historico','perfil'][i]===sec);
+  });
+  // mobile nav
+  ['loja','loot','historico','perfil'].forEach(s=>{
+    document.getElementById(`mnb-${s}`)?.classList.toggle('active',s===sec);
+  });
+  if(sec==='loot') buildReel(null);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── RESULT ──
+function rarityBg(r){return({common:'radial-gradient(circle at 50% 34%,#2b303b,#14171c)',uncommon:'radial-gradient(circle at 50% 34%,#143560,#0c1726)',rare:'radial-gradient(circle at 50% 34%,#311c56,#160e26)',epic:'radial-gradient(circle at 50% 34%,#4d1740,#1d0e22)',legendary:'radial-gradient(circle at 50% 34%,#4d3b10,#1c1606)'})[r]||'radial-gradient(circle at 50% 34%,#2b303b,#14171c)';}
+function showResult(prize){
+  const rcImg=document.getElementById('rcImg');if(rcImg)rcImg.style.background=rarityBg(prize.rarity);
+  const rE=document.getElementById('rEmoji');if(rE)rE.textContent=prize.emoji||'💎';
+  const rb=document.getElementById('rRB');
+  rb.textContent=prize.rarityLabel;
+  rb.style.cssText=RARITY_STYLE[prize.rarity]||'';
+  rb.style.padding='4px 14px';rb.style.borderRadius='20px';
+  document.getElementById('rNm').textContent=prize.name;
+  document.getElementById('rDesc').textContent=prize.desc;
+  document.getElementById('rVal').textContent=prize.value;
+  document.getElementById('resultOv').classList.add('show');
+  if(prize.rarity==='legendary'||prize.rarity==='epic')launchConfetti();
+}
+function closeResult(){document.getElementById('resultOv').classList.remove('show');}
+
+// ── CONFETTI ──
+function launchConfetti(){
+  const cv=document.getElementById('confettiCv'),ctx=cv.getContext('2d');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const pp=[],cols=['#F0C040','#FFD700','#C0392B','#2ECC71','#A855F7','#fff','#60A5FA'];
+  for(let i=0;i<140;i++)pp.push({x:Math.random()*cv.width,y:-20,vx:(Math.random()-.5)*6,vy:Math.random()*6+2,c:cols[Math.floor(Math.random()*cols.length)],w:Math.random()*9+4,h:Math.random()*12+5,r:Math.random()*360,rv:(Math.random()-.5)*8,l:1});
+  function draw(){ctx.clearRect(0,0,cv.width,cv.height);let a=false;pp.forEach(p=>{if(p.l<=0)return;p.x+=p.vx;p.y+=p.vy;p.r+=p.rv;p.vy+=.16;p.l-=.007;if(p.y<cv.height+30)a=true;ctx.save();ctx.globalAlpha=Math.max(0,p.l);ctx.translate(p.x,p.y);ctx.rotate(p.r*Math.PI/180);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});if(a)requestAnimationFrame(draw);else ctx.clearRect(0,0,cv.width,cv.height);}
+  draw();
+}
+
+// ── TOAST ──
+function showToast(ic,html){
+  const t=document.getElementById('toast');
+  document.getElementById('tIc').textContent=ic;
+  document.getElementById('tTx').innerHTML=html;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3800);
+}
+
+// ── COUNTDOWN ──
+function updateCd(){
+  const h=document.getElementById('cd-h');if(!h)return;
+  const now=new Date(),end=new Date(now);end.setHours(23,59,59,0);const d=end-now;
+  h.textContent=String(Math.floor(d/3600000)).padStart(2,'0');
+  document.getElementById('cd-m').textContent=String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-s').textContent=String(Math.floor((d%60000)/1000)).padStart(2,'0');
+}
+setInterval(updateCd,1000);updateCd();
+
+// ── INIT ──
+renderProducts(P);
+
+// ── FEATURED CAROUSEL ──
+const FEATURED=['viagem-vegas','iphone17','viagem-disney','viagem-punta'];
+let featIdx=0,featTimer=null;
+function renderFeat(i){
+  const p=P.find(x=>x.id===FEATURED[i]);if(!p)return;featIdx=i;
+  const fi=document.getElementById('featImg');
+  if(fi){fi.style.backgroundImage='url("'+(PHOTOS[p.id]||p.img)+'")';fi.style.animation='none';void fi.offsetWidth;fi.style.animation='';}
+  var t=document.getElementById('featTtl');if(t)t.textContent=p.name;
+  var s=document.getElementById('featSub');if(s)s.textContent=p.desc;
+  var pr=document.getElementById('featPrice');if(pr)pr.textContent=p.price.toLocaleString('pt-BR');
+  document.querySelectorAll('#featDots .fd').forEach(function(d,di){d.classList.toggle('on',di===i);});
+}
+function openFeat(){openModal(FEATURED[featIdx]);}
+function nextFeat(){renderFeat((featIdx+1)%FEATURED.length);}
+function startFeat(){stopFeat();featTimer=setInterval(nextFeat,5000);}
+function stopFeat(){if(featTimer){clearInterval(featTimer);featTimer=null;}}
+(function(){
+  var dc=document.getElementById('featDots');
+  if(dc)dc.innerHTML=FEATURED.map(function(_,i){return '<button class="fd'+(i===0?' on':'')+'" onclick="event.stopPropagation();renderFeat('+i+');startFeat();" aria-label="Destaque '+(i+1)+'"></button>';}).join('');
+  renderFeat(0);startFeat();
+  var fc=document.getElementById('featCard');
+  if(fc){fc.addEventListener('mouseenter',stopFeat);fc.addEventListener('mouseleave',startFeat);}
+})();
+</script>
+
+<!-- THEME SWITCHER -->
+<div class="theme-fab" role="group" aria-label="Trocar paleta">
+  <span class="theme-fab-lbl">Gema</span>
+  <button class="sw sw-champagne active" data-t="champagne" onclick="setTheme('champagne')" aria-label="Champagne"></button>
+  <button class="sw sw-emerald" data-t="emerald" onclick="setTheme('emerald')" aria-label="Esmeralda"></button>
+  <button class="sw sw-amethyst" data-t="amethyst" onclick="setTheme('amethyst')" aria-label="Ametista"></button>
+</div>
+<script>
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('galera_gem',t);}catch(e){}document.querySelectorAll('.theme-fab .sw').forEach(function(s){s.classList.toggle('active',s.dataset.t===t);});}
+(function(){var t='champagne';try{t=localStorage.getItem('galera_gem')||'champagne';}catch(e){}setTheme(t);})();
+</script>
+
+</body>
+</html>
