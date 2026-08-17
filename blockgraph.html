@@ -1,0 +1,81 @@
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem;">
+  <div style="background: var(--surface-1); border-radius: var(--radius); padding: 0.85rem 1rem;">
+    <div style="font-size: 12px; color: var(--text-secondary);">Suspenso Desenrola 2.0</div>
+    <div style="font-size: 22px; font-weight: 500; color: var(--text-primary);">432</div>
+  </div>
+  <div style="background: var(--surface-1); border-radius: var(--radius); padding: 0.85rem 1rem;">
+    <div style="font-size: 12px; color: var(--text-secondary);">Auto exclusão Gov</div>
+    <div style="font-size: 22px; font-weight: 500; color: var(--text-primary);">59</div>
+  </div>
+  <div style="background: var(--surface-1); border-radius: var(--radius); padding: 0.85rem 1rem;">
+    <div style="font-size: 12px; color: var(--text-secondary);">Auto exclusão</div>
+    <div style="font-size: 22px; font-weight: 500; color: var(--text-primary);">30</div>
+  </div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
+  <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-secondary);">
+    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #e87ba4;"></span>Suspenso Desenrola 2.0</span>
+    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #2a78d6;"></span>Auto exclusão Gov</span>
+    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #eb6834;"></span>Auto exclusão</span>
+    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #1baf7a;"></span>Frozen</span>
+    <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #4a3aa7;"></span>Timeout</span>
+  </div>
+  <button id="downloadBtn" style="font-size: 12px; display: flex; align-items: center; gap: 6px;"><i class="ti ti-download" style="font-size:14px" aria-hidden="true"></i>Baixar PNG</button>
+</div>
+
+<div style="position: relative; width: 100%; height: 340px;">
+  <canvas id="blockedDaily" role="img" aria-label="Gráfico de barras empilhadas mostrando bloqueios de conta detectados pelo pipeline diário, de 1 a 16 de agosto de 2026, por causa: Suspenso Desenrola 2.0, Auto exclusão Gov, Auto exclusão, Frozen e Timeout">Bloqueios detectados por dia no pipeline diário, 1 a 16 de agosto, total 536: Desenrola 432, Auto exclusão Gov 59, Auto exclusão 30, Frozen 9, Timeout 6. Desenrola domina todos os dias, subindo gradualmente de 21 para 31 por dia.</canvas>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const labels = ["01/08","02/08","03/08","04/08","05/08","06/08","07/08","08/08","09/08","10/08","11/08","12/08","13/08","14/08","15/08","16/08"];
+const govSelfExcl = [16,1,0,6,1,3,1,3,1,5,2,1,1,2,4,12];
+const selfExcl =    [2,0,3,2,4,1,2,2,1,1,2,3,3,2,1,1];
+const desenrola =   [21,22,22,23,23,26,28,28,28,28,30,30,30,31,31,31];
+const frozen =      [0,1,1,0,0,1,0,1,0,1,0,0,0,0,2,2];
+const timeout =     [0,0,2,0,1,0,0,0,0,0,0,2,0,0,0,1];
+
+const chart = new Chart(document.getElementById('blockedDaily'), {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [
+      { label: 'Suspenso Desenrola 2.0', data: desenrola, backgroundColor: '#e87ba4', borderRadius: 4, borderSkipped: false },
+      { label: 'Auto exclusão Gov', data: govSelfExcl, backgroundColor: '#2a78d6', borderRadius: 4, borderSkipped: false },
+      { label: 'Auto exclusão', data: selfExcl, backgroundColor: '#eb6834', borderRadius: 4, borderSkipped: false },
+      { label: 'Frozen', data: frozen, backgroundColor: '#1baf7a', borderRadius: 4, borderSkipped: false },
+      { label: 'Timeout', data: timeout, backgroundColor: '#4a3aa7', borderRadius: 4, borderSkipped: false }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, maxRotation: 0, color: '#898781', font: { size: 11 } } },
+      y: { stacked: true, beginAtZero: true, grid: { color: '#e1e0d9' }, ticks: { precision: 0, color: '#898781', font: { size: 11 } } }
+    }
+  }
+});
+
+document.getElementById('downloadBtn').addEventListener('click', function() {
+  const canvas = document.getElementById('blockedDaily');
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--surface-1').trim() || '#ffffff';
+  const tmp = document.createElement('canvas');
+  tmp.width = canvas.width;
+  tmp.height = canvas.height;
+  const ctx = tmp.getContext('2d');
+  ctx.fillStyle = bg || '#ffffff';
+  ctx.fillRect(0, 0, tmp.width, tmp.height);
+  ctx.drawImage(canvas, 0, 0);
+  const url = tmp.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bloqueios_detectados_por_dia.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
+</script>
